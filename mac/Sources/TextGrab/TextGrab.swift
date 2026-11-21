@@ -6,6 +6,8 @@ public struct Page {
     public let app: String
     public let window: String
     public let blocks: [Block]
+    /// The element that shows the text: the web area, the text area, or the window.
+    public let viewport: AXUIElement
 }
 
 /// A paragraph, heading, or list item.
@@ -50,7 +52,7 @@ public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws
     }
     guard let window else { throw GrabError.noWindow }
 
-    var reader = Reader()
+    var reader = Reader(), viewport = window
     if let web = Node(window).first(depth: 30, where: { $0.role == "AXWebArea" }) {
         // One article is the content (a post, a README). Several articles are a feed, read whole from main.
         var main: Node?, articles: [Node] = []
@@ -59,15 +61,17 @@ public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws
             if n.subrole == "AXDocumentArticle" { articles.append(n); return false }
             return !n.isSkipped
         }
+        viewport = web.element
         reader.web = true
         reader.layoutTables = main == nil && articles.isEmpty
         reader.walk(articles.count == 1 ? articles[0] : main ?? web)
     } else if let area = textArea(in: window) {
+        viewport = area.element
         reader.readTextArea(area)
     } else {
         reader.walk(Node(window))
     }
-    return Page(app: app.localizedName ?? "", window: window.string(kAXTitleAttribute) ?? "", blocks: reader.blocks)
+    return Page(app: app.localizedName ?? "", window: window.string(kAXTitleAttribute) ?? "", blocks: reader.blocks, viewport: viewport)
 }
 
 /// The focused text area, or else the one holding the most text.
