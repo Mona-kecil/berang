@@ -15,3 +15,5 @@ bench/clone/*
 bench/listen/*
 !bench/listen/build.py
 !bench/listen/align.py
+.build/
+.swiftpm/
