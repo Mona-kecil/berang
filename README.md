@@ -2,7 +2,7 @@
 
 A free text-to-speech reader that runs on your own machine. Press play and it reads the page or document in front of you, with highlighting, speed control, and optionally your own cloned voice. Nothing is sent to a server.
 
-Status: the voice engines are benchmarked and the macOS text grabber works. The player comes next.
+Status: a first Mac player reads web pages and documents aloud. See the [milestones](https://github.com/Mona-kecil/berang/milestones) for what comes next.
 
 ## Engine benchmark
 
@@ -39,7 +39,18 @@ python3 bench/clean/test_clean.py
 echo 'Dr. Patel raised $3.5M on 2026-11-22.' | python3 bench/clean/clean.py
 ```
 
-## Text grabber
+## Mac app
+
+`mac/` holds a floating player that reads the window you were last in, using the Phonon 31m voice and highlighting the paragraph being read. Requires macOS 15 on Apple silicon. On the first play it downloads the voice (137 MB) from the Phonon release and checks its SHA-256.
+
+```sh
+cd mac && swift build -c release
+.build/release/Berang
+```
+
+Right-click the player to quit.
+
+### Text grabber
 
 `berang-grab` in `mac/` uses the macOS Accessibility API to print a window's main text as Markdown. It reads the article and skips menus, sidebars, buttons, data tables, and back matter such as References. With no arguments, it reads the focused window of the frontmost app.
 
@@ -49,7 +60,7 @@ cd mac && swift build -c release
 swift test
 ```
 
-The app that runs it, such as your terminal, needs Accessibility access in System Settings > Privacy & Security > Accessibility.
+Both read other apps' text, so the app that runs them, such as your terminal, needs Accessibility access in System Settings > Privacy & Security > Accessibility.
 
 ## License
 
