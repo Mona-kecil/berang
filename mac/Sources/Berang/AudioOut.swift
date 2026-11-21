@@ -30,7 +30,10 @@ import AVFoundation
         }
         try Task.checkCancellation()
         // Completes after every buffer before it has played, or when stop() clears the queue.
-        await node.scheduleBuffer(buffer([0]), completionCallbackType: .dataPlayedBack)
+        let last = buffer([0])
+        await withCheckedContinuation { (done: CheckedContinuation<Void, Never>) in
+            node.scheduleBuffer(last, completionCallbackType: .dataPlayedBack) { _ in done.resume() }
+        }
         try Task.checkCancellation()
     }
 
