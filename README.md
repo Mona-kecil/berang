@@ -2,7 +2,7 @@
 
 A free text-to-speech reader that runs on your own machine. Press play and it reads the page or document in front of you, with highlighting, speed control, and optionally your own cloned voice. Nothing is sent to a server.
 
-Status: choosing the voice engine. The macOS app comes next.
+Status: the voice engines are benchmarked and the macOS text grabber works. The player comes next.
 
 ## Engine benchmark
 
@@ -38,6 +38,18 @@ Before text reaches the voice model, `bench/clean/clean.py` rewrites it into spe
 python3 bench/clean/test_clean.py
 echo 'Dr. Patel raised $3.5M on 2026-11-22.' | python3 bench/clean/clean.py
 ```
+
+## Text grabber
+
+`berang-grab` in `mac/` uses the macOS Accessibility API to print a window's main text as Markdown. It reads the article and skips menus, sidebars, buttons, data tables, and back matter such as References. With no arguments, it reads the focused window of the frontmost app.
+
+```sh
+cd mac && swift build -c release
+.build/release/berang-grab com.apple.Safari | python3 ../bench/clean/clean.py
+swift test
+```
+
+The app that runs it, such as your terminal, needs Accessibility access in System Settings > Privacy & Security > Accessibility.
 
 ## License
 
