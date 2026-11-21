@@ -1,0 +1,17 @@
+.DS_Store
+__pycache__/
+*.wav
+*.m4a
+*.aiff
+
+bench/envs/
+bench/models/
+bench/results/*
+!bench/results/summary.md
+bench/results_clean/
+bench/results_setup/
+bench/clone/*
+!bench/clone/run_clone.py
+bench/listen/*
+!bench/listen/build.py
+!bench/listen/align.py
