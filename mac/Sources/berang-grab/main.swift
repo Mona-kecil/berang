@@ -3,6 +3,7 @@
 //        berang-grab --replay page.json.lzma
 // --save writes the window's accessibility tree, compressed, and prints the text read back from that copy.
 // --replay prints the text read from a saved copy.
+// The summary on stderr ends with the block that reading starts at: the selection, a visible click, or the top of the screen.
 import AppKit
 import TextGrab
 
@@ -34,17 +35,20 @@ do {
     let title = args.count > 1 ? args[1] : nil
     let start = ContinuousClock.now
     let blocks: [Block]
+    var startBlock = 0
     if let saveTo {
         let tree = try save(app, windowTitle: title)
         try (JSONEncoder().encode(tree) as NSData).compressed(using: .lzma).write(to: saveTo)
         blocks = read(saved: tree)
     } else {
-        blocks = try grab(app, windowTitle: title).blocks
+        let page = try grab(app, windowTitle: title)
+        blocks = page.blocks
+        startBlock = page.start
     }
     let took = ContinuousClock.now - start
     print(markdown(blocks), terminator: "")
     let chars = blocks.reduce(0) { $0 + $1.text.count }
-    FileHandle.standardError.write(Data("\(app.localizedName ?? "") | \(blocks.count) blocks, \(chars) chars, \(Int(took / .milliseconds(1))) ms\n".utf8))
+    FileHandle.standardError.write(Data("\(app.localizedName ?? "") | \(blocks.count) blocks, \(chars) chars, \(Int(took / .milliseconds(1))) ms, starts at block \(startBlock)\n".utf8))
 } catch {
     FileHandle.standardError.write(Data("\(error)\n".utf8))
     exit(1)

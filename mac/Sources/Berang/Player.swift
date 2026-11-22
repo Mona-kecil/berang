@@ -83,7 +83,7 @@ import TextGrab
                 let page = try grab(target)
                 guard !page.blocks.isEmpty else { throw PhononError(description: "\(page.app) shows no text to read.") }
                 self.page = page
-                index = 0
+                index = page.start
                 await read()
             } catch {
                 state = .failed("\(error)")

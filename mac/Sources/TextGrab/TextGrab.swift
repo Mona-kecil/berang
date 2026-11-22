@@ -8,6 +8,10 @@ public struct Page {
     public let blocks: [Block]
     /// The element that shows the text: the web area, the text area, or the window.
     public let viewport: AXUIElement
+    /// What the viewport is scrolled inside. A web area's frame covers the whole page, not the part on screen.
+    let clip: AXUIElement?
+    /// The block to start reading at: the selected text, the clicked block if it is on screen, or the first block on screen.
+    public let start: Int
 }
 
 /// A paragraph, heading, or list item.
@@ -46,7 +50,9 @@ public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws
         let root = Node(window)
         let (blocks, viewport) = read(root, focused: ax.element(kAXFocusedUIElementAttribute).map(Node.init))
         if viewport !== root || attempt == 3 || blocks.reduce(0, { $0 + $1.text.utf16.count }) >= 200 {
-            return Page(app: app.localizedName ?? "", window: window.string(kAXTitleAttribute) ?? "", blocks: blocks, viewport: viewport.element)
+            let clip = scrollArea(around: viewport.element) ?? window
+            return Page(app: app.localizedName ?? "", window: window.string(kAXTitleAttribute) ?? "", blocks: blocks,
+                        viewport: viewport.element, clip: clip, start: startBlock(blocks, in: viewport.element, clip: clip))
         }
         Thread.sleep(forTimeInterval: 0.25)
     }
@@ -73,6 +79,16 @@ public func read(saved window: SavedNode) -> [Block] {
 /// Blocks as Markdown: headings start with "# ", and a blank line separates blocks.
 public func markdown(_ blocks: [Block]) -> String {
     blocks.map { $0.kind == .heading ? "# \($0.text)" : $0.text }.joined(separator: "\n\n") + "\n"
+}
+
+private func scrollArea(around element: AXUIElement) -> AXUIElement? {
+    var parent = element.element(kAXParentAttribute)
+    for _ in 0..<4 {
+        guard let p = parent else { return nil }
+        if p.string(kAXRoleAttribute) == kAXScrollAreaRole { return p }
+        parent = p.element(kAXParentAttribute)
+    }
+    return nil
 }
 
 private func window(of app: NSRunningApplication, titled title: String?) throws -> (app: AXUIElement, window: AXUIElement) {
