@@ -12,3 +12,11 @@ import Testing
     #expect(paragraphs.first?.hasPrefix("Otters are distinguished by their long, slim bodies") == true)
     #expect(paragraphs.last?.contains("a high metabolic rate") == true)
 }
+
+/// canvas.png is fixtures/canvas.html, a page that draws its text on a canvas, rendered by Chrome. Its paragraphs
+/// are a third of its lines, and its last line has no descenders, so Vision's box for it is a third shorter.
+@Test func readsShortTextDrawnOnACanvas() throws {
+    let blocks = try #require(readImage(SavedPage.folder.appending(path: "fixtures/canvas.png")))
+    #expect(blocks.map(\.kind) == [.heading, .text, .text])
+    #expect(blocks.last?.text == "Budget: about forty percent of last quarter goes to testing devices, and the rest to the voice work.")
+}

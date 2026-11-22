@@ -47,7 +47,9 @@ func pdfLines(_ url: URL) -> (lines: [[PDFLine]], heights: [CGFloat])? {
 /// The paragraphs of a PDF, in reading order, without running headers and footers, page numbers, footnotes,
 /// figure and table captions, or anything after the references heading. A paragraph that runs on to the next
 /// page or column is one paragraph, and a word hyphenated at a line end is joined.
-func pdfParagraphs(_ pages: [[PDFLine]], heights: [CGFloat]) -> [PDFParagraph] {
+/// `sizedLines` says a line's height is its type size, so a change in height starts a heading or caption. Vision's
+/// line boxes fit the letters instead: a line without descenders is a third shorter.
+func pdfParagraphs(_ pages: [[PDFLine]], heights: [CGFloat], sizedLines: Bool = true) -> [PDFParagraph] {
     let pages = pages.enumerated().map { p, lines in
         withoutFootnotes(joinFragments(lines.filter { l in
             // Text set sideways, like arXiv's stamp in the margin.
@@ -57,7 +59,8 @@ func pdfParagraphs(_ pages: [[PDFLine]], heights: [CGFloat]) -> [PDFParagraph] {
     let running = runningLines(pages.map { $0.map(\.text) })
     let lineHeight = median(pages.flatMap { $0.map(\.bounds.height) }) ?? 10
     // The space between lines of a paragraph. Vision's line boxes are taller than PDFKit's, so this is smaller for an image.
-    let leading = median(pages.flatMap { zip($0, $0.dropFirst()).map { $0.bounds.minY - $1.bounds.maxY }.filter { $0 >= -lineHeight / 4 && $0 < lineHeight } }) ?? 0
+    // The lower quartile, as in a short text the gaps between paragraphs can be half of all gaps.
+    let leading = lowerQuartile(pages.flatMap { zip($0, $0.dropFirst()).map { $0.bounds.minY - $1.bounds.maxY }.filter { $0 >= -lineHeight / 4 && $0 < lineHeight } }) ?? 0
 
     var out: [PDFParagraph] = []
     var lines: [PDFLine] = [], start = (page: 0, top: CGFloat(0)), lastPage = 0
@@ -74,7 +77,7 @@ func pdfParagraphs(_ pages: [[PDFLine]], heights: [CGFloat]) -> [PDFParagraph] {
         let kept = page.indices.filter { !running.contains([p, $0]) }.map { page[$0] }
         for (i, line) in kept.enumerated() {
             if let last = lines.last, breaks(after: last, before: line, next: kept[safe: i + 1], lineHeight: lineHeight, leading: leading,
-                                             samePage: lastPage == p) { flush() }
+                                             sizedLines: sizedLines, samePage: lastPage == p) { flush() }
             if lines.isEmpty { start = (p, heights[safe: p].map { $0 - line.bounds.maxY } ?? 0) }
             lines.append(line)
             lastPage = p
@@ -85,7 +88,8 @@ func pdfParagraphs(_ pages: [[PDFLine]], heights: [CGFloat]) -> [PDFParagraph] {
 }
 
 /// Whether a new paragraph starts at `line`, which follows `last`.
-private func breaks(after last: PDFLine, before line: PDFLine, next: PDFLine?, lineHeight: CGFloat, leading: CGFloat, samePage: Bool) -> Bool {
+private func breaks(after last: PDFLine, before line: PDFLine, next: PDFLine?, lineHeight: CGFloat, leading: CGFloat, sizedLines: Bool,
+                    samePage: Bool) -> Bool {
     // The first line of a paragraph is often set in from the lines after it.
     let indented = next.map { line.bounds.minX > $0.bounds.minX + 4 && abs(line.bounds.minX - $0.bounds.minX) < 40 } ?? false
     if !samePage || line.bounds.maxY > last.bounds.minY + lineHeight {
@@ -95,7 +99,7 @@ private func breaks(after last: PDFLine, before line: PDFLine, next: PDFLine?, l
     if startsListItem(line.text) { return true }
     let gap = last.bounds.minY - line.bounds.maxY
     // A heading or caption is set in another size.
-    let resized = abs(line.bounds.height - last.bounds.height) > 0.2 * min(line.bounds.height, last.bounds.height)
+    let resized = sizedLines && abs(line.bounds.height - last.bounds.height) > 0.2 * min(line.bounds.height, last.bounds.height)
     return gap > leading + 0.5 * lineHeight || resized || indented && endsSentence(last.text) || line.bounds.minX > last.bounds.maxX
 }
 
@@ -131,8 +135,9 @@ private func clean(_ paragraphs: [PDFParagraph], lineHeight: CGFloat) -> [PDFPar
         let title = p.text.drop { $0.isNumber || $0 == "." || $0 == " " }.lowercased()
         if p.kind == .heading && backMatter.contains(title) { break }
         if matches(caption, p.text) { continue }
+        // Numbers with few or no words, like a chart's axis.
         let visible = p.text.filter { !$0.isWhitespace }
-        if visible.count >= 8, Double(visible.count(where: \.isLetter)) < 0.4 * Double(visible.count) { continue }
+        if !visible.contains(where: \.isLetter) || visible.count >= 8 && Double(visible.count(where: \.isLetter)) < 0.4 * Double(visible.count) { continue }
         out.append(p)
     }
     return out
@@ -202,6 +207,10 @@ private func endsSentence(_ text: String) -> Bool {
 
 private func median(_ values: [CGFloat]) -> CGFloat? {
     values.isEmpty ? nil : values.sorted()[values.count / 2]
+}
+
+private func lowerQuartile(_ values: [CGFloat]) -> CGFloat? {
+    values.isEmpty ? nil : values.sorted()[values.count / 4]
 }
 
 extension Array {

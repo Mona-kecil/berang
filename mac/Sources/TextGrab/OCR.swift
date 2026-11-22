@@ -19,7 +19,7 @@ func ocrLines(_ image: CGImage) -> [PDFLine] {
 
 /// The paragraphs Vision recognizes in `image`, joined the way a PDF's lines are.
 func ocrParagraphs(_ image: CGImage) -> [PDFParagraph] {
-    pdfParagraphs([ocrLines(image)], heights: [CGFloat(image.height)])
+    pdfParagraphs([ocrLines(image)], heights: [CGFloat(image.height)], sizedLines: false)
 }
 
 /// The blocks of the image at `url`, or nil when it is not an image.
