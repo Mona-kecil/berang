@@ -19,7 +19,7 @@ Prefer not to use Terminal? Download `Berang.zip` from the [latest release](http
 When Berang first opens, Set Up Berang walks you through what it needs:
 
 1. **Accessibility**, so Berang can read other apps. Click Allow, then turn Berang on in System Settings.
-2. **A voice.** Hear each one, then download its engine once: Phonon (137 MB, 38 voices) or Pocket (240 MB, 8 voices).
+2. **A voice.** Hear each one, then download its engine once: Phonon (137 MB, 38 voices), Kitten (82 MB, 10 voices), or Pocket (240 MB, 8 voices).
 3. **Screen Recording**, if you want to read parts of the screen. This is optional.
 4. **Try it**: press ⌥⎋ (Option-Escape) on any page.
 
@@ -54,7 +54,7 @@ In PDFs and Apple Books, Berang highlights the paragraph rather than the word. V
 
 ## Privacy
 
-Berang reads and speaks on your Mac. It connects to the internet only to download a voice engine, once: Phonon from the [Phonon release](https://github.com/gradium-ai/xn-ptts/releases/tag/v0.7.1), checked against a known fingerprint, and Pocket, if you choose one of its voices, from [Hugging Face](https://huggingface.co/mlx-community/pocket-tts). It asks for two permissions:
+Berang reads and speaks on your Mac. It connects to the internet only to download a voice engine, once: Phonon from the [Phonon release](https://github.com/gradium-ai/xn-ptts/releases/tag/v0.7.1), checked against a known fingerprint; Kitten, if you choose one of its voices, from [KittenML](https://huggingface.co/KittenML/kitten-tts-2-nano) with its word lists from [Hugging Face](https://huggingface.co/beshkenadze/kitten-tts-g2p); and Pocket, if you choose one of its voices, from [Hugging Face](https://huggingface.co/mlx-community/pocket-tts). It asks for two permissions:
 
 - **Accessibility**, to read the text of other apps.
 - **Screen Recording**, only if you use ⌥⇧⎋ or read an app that draws its own text. Berang recognizes the text on your Mac and keeps no images.
@@ -65,7 +65,7 @@ Quit Berang from the menu bar, then delete:
 
 - Berang from your Applications folder.
 - The Phonon voice engine, about 300 MB, in `~/Library/Application Support/PhononTTS`.
-- The Pocket voice engine, if you downloaded it, 229 MB, in `~/Library/Application Support/Berang`.
+- The Kitten and Pocket voice engines, if you downloaded them, 94 MB and 229 MB, in `~/Library/Application Support/Berang`.
 - Your reading positions and speed, in `~/Library/Preferences/io.github.mona-kecil.berang.plist`.
 
 You can also remove Berang from System Settings > Privacy & Security > Accessibility and Screen & System Audio Recording.
@@ -93,7 +93,11 @@ open mac/build/Berang.app
 
 ### Voice previews
 
-`mac/App/Previews` holds a few seconds of each voice, so you can hear it before downloading its engine. `berang-say previews mac/App/Previews <Pocket's model folder>` makes them again. The Phonon clips come from Phonon 31m by Gradium (Apache-2.0), and the Pocket clips from Pocket TTS by Kyutai (CC-BY-4.0).
+`mac/App/Previews` holds a few seconds of each voice, so you can hear it before downloading its engine. `berang-say previews mac/App/Previews <Pocket's model folder> <Kitten's folder>` makes them again. The Phonon clips come from Phonon 31m by Gradium (Apache-2.0), the Kitten clips from Kitten TTS 2 nano by KittenML (Apache-2.0), and the Pocket clips from Pocket TTS by Kyutai (CC-BY-4.0).
+
+### Kitten on MLX
+
+Kitten TTS 2 nano ships for ONNX Runtime and PyTorch. `mac/Sources/Kitten` runs it on MLX instead: it is mlx-audio-swift's port of Kitten 0.8 (MIT, see `mac/Sources/Kitten/LICENSE`), at nano's sizes, with the decoder's learned norm scales, uniform starting phases as in Kitten's PyTorch code, and one copy of the decoder's frames instead of one per frame. `berang-say kitten <folder> <reference>` compares it with kittenml's PyTorch output for the same tokens with noise off: on "The team met to plan the next release." the durations match to 0.00001 frames, the pitch to 0.2 Hz except at the last frames, and the spectrograms correlate at 0.993. It speaks 3.2 s of audio in 0.11 s.
 
 ### Engine benchmark
 

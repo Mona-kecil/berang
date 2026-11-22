@@ -12,7 +12,7 @@ extension Phonon: Speech {}
 
 /// The voice engines Berang speaks with, each downloaded on first use.
 enum Engine: String, CaseIterable, Sendable {
-    case phonon, pocket
+    case phonon, kitten, pocket
 
     /// Every engine speaks mono audio at this rate.
     static let sampleRate = 24_000.0
@@ -20,6 +20,7 @@ enum Engine: String, CaseIterable, Sendable {
     var title: String {
         switch self {
         case .phonon: "Phonon"
+        case .kitten: "Kitten"
         case .pocket: "Pocket"
         }
     }
@@ -28,6 +29,7 @@ enum Engine: String, CaseIterable, Sendable {
     var size: Int64 {
         switch self {
         case .phonon: 137_000_000
+        case .kitten: 82_000_000
         case .pocket: 240_000_000
         }
     }
@@ -35,6 +37,7 @@ enum Engine: String, CaseIterable, Sendable {
     var isInstalled: Bool {
         switch self {
         case .phonon: PhononVoice.isInstalled
+        case .kitten: KittenVoice.isInstalled
         case .pocket: PocketVoice.isInstalled
         }
     }
@@ -43,6 +46,7 @@ enum Engine: String, CaseIterable, Sendable {
     var voices: [String] {
         switch self {
         case .phonon: PhononVoice.names
+        case .kitten: KittenVoice.names
         case .pocket: PocketVoice.names
         }
     }
@@ -63,6 +67,7 @@ enum Engine: String, CaseIterable, Sendable {
     var defaultVoice: String {
         switch self {
         case .phonon: "default"
+        case .kitten: "eleanor"
         case .pocket: "alba"
         }
     }
@@ -71,6 +76,7 @@ enum Engine: String, CaseIterable, Sendable {
     func install(progress: @escaping @MainActor (Double) -> Void) async throws {
         switch self {
         case .phonon: try await PhononVoice.install(progress: progress)
+        case .kitten: try await KittenVoice.install(progress: progress)
         case .pocket: try await PocketVoice.install(progress: progress)
         }
     }
@@ -78,6 +84,7 @@ enum Engine: String, CaseIterable, Sendable {
     func load() async throws -> any Speech {
         switch self {
         case .phonon: try await PhononVoice.load()
+        case .kitten: try await KittenVoice.load()
         case .pocket: try await PocketVoice.load()
         }
     }
