@@ -6,25 +6,12 @@ import statistics as st
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 M = f"{ROOT}/models"
-FILES = {
-    "kokoro": [f"{M}/kokoro/kokoro-v1.0.onnx", f"{M}/kokoro/voices-v1.0.bin"],
-    "kokoro_int8": [f"{M}/kokoro/kokoro-v1.0.int8.onnx", f"{M}/kokoro/voices-v1.0.bin"],
-    "piper_med": [f"{M}/piper/en_US-lessac-medium.onnx"],
-    "piper_high": [f"{M}/piper/en_US-lessac-high.onnx"],
-    "moss_nano": [f"{M}/moss_nano/src/models"],
-    "say": [],
-}
 
 
 def size_mb(model):
-    """Model files the voice needs: explicit files, or the Hugging Face snapshot (each file once)."""
-    paths = FILES.get(model)
-    if paths is None:
-        paths = glob.glob(f"{M}/{model}/hf/hub/*/snapshots/*")
+    """The voice's Hugging Face snapshot, counting each file once."""
     total = 0
-    for p in paths:
-        if os.path.isfile(p):
-            total += os.path.getsize(p)
+    for p in glob.glob(f"{M}/{model}/hf/hub/*/snapshots/*"):
         for d, _, fs in os.walk(p):
             total += sum(os.path.getsize(os.path.realpath(os.path.join(d, f))) for f in fs)
     return total / 2**20

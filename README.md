@@ -6,7 +6,7 @@ Status: a first Mac player reads web pages and documents aloud. See the [milesto
 
 ## Engine benchmark
 
-`bench/` compares 11 local voice models plus the macOS system voice on an M1 MacBook Air (8 GB). 2 CPU threads stand in for an iPhone 13. Full table: [`bench/results/summary.md`](bench/results/summary.md).
+`bench/` measures berang's three voices on an M1 MacBook Air (8 GB). 2 CPU threads stand in for an iPhone 13. Full table: [`bench/results/summary.md`](bench/results/summary.md). The three were picked from 11 local models and the macOS system voice; that comparison is in commit 30e6f5e.
 
 | Model | Download | First audio | Generation time per second of audio | License |
 |---|---|---|---|---|
@@ -14,17 +14,17 @@ Status: a first Mac player reads web pages and documents aloud. See the [milesto
 | Kitten 2 nano | 28 MB | 0.65 s | 0.12 s | Apache-2.0 |
 | Pocket 100M | 215 MB | 0.07 s | 0.28 s | CC-BY-4.0 |
 
-Medians of 3 runs at 2 threads. On plain prose, every model's speech transcribes back with 0–1% word errors. On text with numbers, dates, and URLs, the error rate is 11–31% raw and about 5% after `bench/clean/`.
+Medians of 3 runs at 2 threads. On plain prose, each voice's speech transcribes back with no word errors. On text with numbers, dates, and URLs, the error rate is 11–24% raw and 2–8% after `bench/clean/`.
 
 Pocket 100M can clone a voice from about 10 seconds of audio. Its cloning weights are gated: accept the terms at [kyutai/pocket-tts](https://huggingface.co/kyutai/pocket-tts) and set `HF_TOKEN`.
 
 ### Run it
 
-Requires an Apple silicon Mac, [uv](https://docs.astral.sh/uv/), ffmpeg, and git. Setup downloads about 5 GB of models and environments into `bench/`.
+Requires an Apple silicon Mac, [uv](https://docs.astral.sh/uv/), and ffmpeg. Setup puts about 6 GB of models and environments into `bench/`.
 
 ```sh
 bench/setup.sh            # create environments and download models
-bench/bench.sh            # about 1.5 hours; writes bench/results/
+bench/bench.sh            # about 10 minutes; writes bench/results/
 python3 bench/report.py   # print the table
 ```
 

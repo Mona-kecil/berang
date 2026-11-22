@@ -1,4 +1,4 @@
-"""Read the paragraph and the cleaned hard text in a cloned voice. usage: run_clone.py <pocket|pocket_18m> <ref.wav>"""
+"""Read the paragraph and the cleaned hard text in a cloned voice. usage: run_clone.py <ref.wav>"""
 import json
 import os
 import sys
@@ -10,9 +10,9 @@ import torch
 from pocket_tts import TTSModel
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-model, ref = sys.argv[1], sys.argv[2]
+model, ref = "pocket", sys.argv[1]
 torch.set_num_threads(2)
-tts = TTSModel.load_model(language="english_18m_2026-10" if model == "pocket_18m" else None)
+tts = TTSModel.load_model()
 
 t = time.perf_counter()
 state = tts.get_state_for_audio_prompt(ref)

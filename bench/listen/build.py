@@ -6,20 +6,16 @@ import os
 HERE = os.path.dirname(os.path.abspath(__file__))
 summary = json.load(open(f"{HERE}/../results/summary.json"))
 NAMES = {
-    "phonon": "Phonon 31m", "pocket_18m": "Pocket 18M", "pocket": "Pocket 100M", "piper_med": "Piper medium",
-    "kitten2_nano": "Kitten 2 nano", "kitten08_mini": "Kitten 0.8 mini", "kokoro_int8": "Kokoro 8-bit",
-    "kokoro": "Kokoro", "kitten2_mini": "Kitten 2 mini", "piper_high": "Piper high", "moss_nano": "MOSS Nano",
-    "say": "macOS Samantha",
-    "pocket_you": "Pocket 100M · your voice", "pocket_18m_you": "Pocket 18M · your voice",
+    "pocket_you": "Pocket 100M · your voice", "phonon": "Phonon 31m", "kitten2_nano": "Kitten 2 nano",
+    "pocket": "Pocket 100M",
 }
-CLONE_DIRS = {"pocket_you": "pocket", "pocket_18m_you": "pocket_18m"}
+CLONE_DIRS = {"pocket_you": "pocket"}
 
 corpus = json.load(open(f"{HERE}/../corpus.json"))
 texts = {x["id"]: " ".join(x["sentences"]) for x in corpus["passages"]}
 texts["hard_clean"] = texts["hard"]
 cards = []
-FIRST = ["pocket_you", "pocket_18m_you", "phonon", "kitten2_nano", "pocket_18m", "pocket"]
-for m, name in sorted(NAMES.items(), key=lambda kv: FIRST.index(kv[0]) if kv[0] in FIRST else len(FIRST)):
+for m, name in NAMES.items():
     s = summary.get(m)
     if m in CLONE_DIRS:
         if not os.path.exists(f"{HERE}/../clone/{CLONE_DIRS[m]}/metrics.json"):
