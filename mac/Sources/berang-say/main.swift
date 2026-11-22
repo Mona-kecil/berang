@@ -4,10 +4,17 @@
 //                                            first-word.json: per paragraph, the seconds from its text to its
 //                                            first word's sound, on a warm voice.
 //        berang-say estimate <dir>           Writes estimates.json: each chunk's words with their estimated starts.
-//        berang-say previews <dir> [pocket]  Writes <dir>/<engine>/<voice>.m4a: each voice saying the sample, at
-//                                            one loudness, for the app's preview clips. [pocket] is Pocket's model
-//                                            folder, as Berang installs it.
+//        berang-say previews <dir> [pocket] [kitten]  Writes <dir>/<engine>/<voice>.m4a: each voice saying the
+//                                            sample, at one loudness, for the app's preview clips. [pocket] and
+//                                            [kitten] are those engines' folders, as Berang installs them.
+//        berang-say kitten <folder> <ref-dir>  Checks the MLX Kitten 2 against kittenml's PyTorch output in
+//                                            <ref-dir>/ref.json: the same tokens and style, noise off.
+//        berang-say kitten-g2p <g2p-ref.json> <cache>  Compares Misaki's phonemes with kittenml's, sentence by
+//                                            sentence; <cache> holds Misaki's downloaded lexicons.
 import Foundation
+import HuggingFace
+import Kitten
+import MLX
 import MLXAudioTTS
 import PhononTTS
 import Speakable
@@ -25,7 +32,7 @@ struct Estimate: Codable {
 }
 
 let args = CommandLine.arguments
-guard args.count >= 3, ["synth", "estimate", "previews"].contains(args[1]) else {
+guard args.count >= 3, ["synth", "estimate", "previews", "kitten", "kitten-g2p"].contains(args[1]) else {
     FileHandle.standardError.write(Data("usage: berang-say synth <text-file> <dir> | estimate <dir> | previews <dir> [pocket]\n".utf8))
     exit(2)
 }
@@ -66,9 +73,52 @@ func writePreview(_ samples: [Float], to url: URL) throws {
     guard convert.terminationStatus == 0 else { throw PhononError(description: "afconvert failed for \(url.lastPathComponent)") }
 }
 
-let dir = URL(filePath: args[args[1] == "synth" ? 3 : 2])
+let dir = URL(filePath: args[["synth", "kitten", "kitten-g2p"].contains(args[1]) ? 3 : 2])
 do {
-    if args[1] == "previews" {
+    if args[1] == "kitten-g2p", args.count > 3 {
+        struct Line: Decodable { let text: String; let phonemes: String }
+        let lines = try JSONDecoder().decode([Line].self, from: Data(contentsOf: URL(filePath: args[2])))
+        let misaki = MisakiTextProcessor(cache: HubCache(cacheDirectory: URL(filePath: args[3])))
+        try await misaki.prepare()
+        var same = 0
+        for line in lines {
+            let mine = try misaki.process(text: line.text, language: "en-us")
+            if mine == line.phonemes { same += 1 } else { print("- \(line.phonemes)\n+ \(mine)") }
+        }
+        print("\(same) of \(lines.count) sentences identical")
+    } else if args[1] == "kitten", args.count > 3 {
+        struct Reference: Decodable {
+            let phonemes: String, tokens: [Int32], durations: [Int32], style: [Float], wav: [Float], f0: [Float], n: [Float], dur_raw: [Float]
+        }
+        let ref = try JSONDecoder().decode(Reference.self, from: Data(contentsOf: URL(filePath: args[3]).appending(path: "ref.json")))
+        Kitten2.noise = false
+        let clock = ContinuousClock.now
+        let kitten = try Kitten2.load(folder: URL(filePath: args[2]))
+        print("loaded in \(ContinuousClock.now - clock), voices: \(kitten.voices.map(\.name).joined(separator: ", "))")
+        let mine = kitten.tokens(ref.phonemes)
+        print("tokens \(mine == ref.tokens ? "match" : "differ: \(mine) vs \(ref.tokens)")")
+        let start = ContinuousClock.now
+        let (audio, durations, f0, energy, raw) = kitten.run(ref.tokens, style: MLXArray(ref.style).reshaped([1, -1]), speed: 1)
+        let worst = { (a: [Float], b: [Float]) in zip(a, b).map { abs($0 - $1) }.max() ?? -1 }
+        print(String(format: "unrounded durations: max difference %.5f", worst(raw, ref.dur_raw)))
+        try JSONEncoder().encode(["f0": f0, "n": energy]).write(to: dir.appending(path: "mlx-prosody.json"))
+        print(String(format: "F0 %d vs %d values, max difference %.4f; N max difference %.4f", f0.count, ref.f0.count,
+                     worst(f0, ref.f0), worst(energy, ref.n)))
+        print("synthesized \(audio.count) samples in \(ContinuousClock.now - start) (first call)")
+        for _ in 0 ..< 2 {
+            let warm = ContinuousClock.now
+            _ = kitten.synthesize(ref.tokens, style: MLXArray(ref.style).reshaped([1, -1]), speed: 1)
+            print("warm: \(ContinuousClock.now - warm) for \(Double(audio.count) / 24_000) s of audio")
+        }
+        print("durations \(durations == ref.durations ? "match" : "differ: \(durations) vs \(ref.durations)")")
+        let n = min(audio.count, ref.wav.count)
+        let diff = zip(audio.prefix(n), ref.wav.prefix(n)).map { abs($0 - $1) }.max() ?? 0
+        let dot = zip(audio.prefix(n), ref.wav.prefix(n)).reduce(0) { $0 + $1.0 * $1.1 }
+        let norm = (audio.prefix(n).reduce(0) { $0 + $1 * $1 } * ref.wav.prefix(n).reduce(0) { $0 + $1 * $1 }).squareRoot()
+        print(String(format: "samples %d vs %d, max difference %.5f, correlation %.6f", audio.count, ref.wav.count, diff, dot / max(norm, 1e-9)))
+        try writeWAV(audio, to: dir.appending(path: "mlx.wav"))
+        try writeWAV(ref.wav, to: dir.appending(path: "torch.wav"))
+    } else if args[1] == "previews" {
         // Phonon's voices, then Pocket's when its model folder is given.
         let phonon = try await Phonon.load(models: PhononModels.defaultDirectory, language: .english)
         for voice in phonon.voices {
@@ -94,6 +144,17 @@ do {
                 try writePreview(samples, to: dir.appending(path: "pocket/\(voice).m4a"))
             }
             print("pocket: \(names.count) voices")
+        }
+        if args.count > 4 {
+            let folder = URL(filePath: args[4])
+            let kitten = try Kitten2.load(folder: folder)
+            let misaki = MisakiTextProcessor(cache: HubCache(cacheDirectory: folder.appending(path: "G2P")))
+            try await misaki.prepare()
+            let phonemes = try misaki.process(text: voiceSampleText, language: "en-us")
+            for voice in kitten.voices {
+                try writePreview(kitten.speak(phonemes, voice: voice.key), to: dir.appending(path: "kitten/\(voice.key).m4a"))
+            }
+            print("kitten: \(kitten.voices.count) voices")
         }
     } else if args[1] == "synth" {
         let text = try String(contentsOf: URL(filePath: args[2]), encoding: .utf8)
