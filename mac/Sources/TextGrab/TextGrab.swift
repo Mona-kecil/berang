@@ -37,7 +37,7 @@ public struct Run {
 
 public enum GrabError: Error, CustomStringConvertible {
     case notTrusted, noWindow
-    /// The focused editor shows no text until the app's screen reader mode is on. The app's own instructions.
+    /// The focused editor shows no text until the app's screen reader mode is on. How to turn it on.
     case editorHidden(String)
 
     public var description: String {
@@ -53,20 +53,12 @@ public enum GrabError: Error, CustomStringConvertible {
 public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws -> Page {
     let (ax, window) = try window(of: app, titled: windowTitle)
     // WebKit and Chrome build a page's accessibility tree on the first request, so the first read of a page
-    // can find only the window, or a page with no text yet. Such a read tries again. Electron apps take about
-    // 2 seconds to build theirs, and report the focused element last.
-    if app.bundleURL.map({ FileManager.default.fileExists(atPath: $0.appending(path: "Contents/Frameworks/Electron Framework.framework").path) }) == true {
-        for _ in 0..<16 where ax.element(kAXFocusedUIElementAttribute) == nil { Thread.sleep(forTimeInterval: 0.25) }
-    }
-    let focused = ax.element(kAXFocusedUIElementAttribute).map(Node.init)
-    // Code editors such as VS Code keep their text out of the accessibility tree until asked, and say how.
-    if let focused, focused.role == "AXTextArea", (focused.value ?? "").isEmpty,
-       let hint = focused.element.string(kAXDescriptionAttribute), hint.localizedCaseInsensitiveContains("screen reader") {
-        throw GrabError.editorHidden(hint)
-    }
+    // can find only the window, or a page with no text yet. Such a read tries again.
     for attempt in 0... {
         if attempt == 0, let page = readImageFile(in: window, app: app) { return page }
         let root = Node(window)
+        let focused = ax.element(kAXFocusedUIElementAttribute).map(Node.init)
+        if let focused, let hint = hiddenEditorHint(focused, in: root) { throw GrabError.editorHidden(hint) }
         if attempt == 0, let document = root.document, document.role != "AXWebArea" || document.chromePDFPages != nil,
            let page = readPDFFile(document.element, in: window, app: app) { return page }
         let (blocks, viewport) = read(root, focused: focused)
@@ -80,6 +72,17 @@ public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws
         Thread.sleep(forTimeInterval: 0.25)
     }
     fatalError("unreachable")
+}
+
+/// How to show the text of a focused editor that keeps it out of the accessibility tree, as code editors such as
+/// VS Code and Google Docs do until asked. VS Code says how.
+private func hiddenEditorHint(_ focused: Node, in window: Node) -> String? {
+    guard focused.role == "AXTextArea", (focused.value ?? "").isEmpty else { return nil }
+    if let hint = focused.element.string(kAXDescriptionAttribute), hint.localizedCaseInsensitiveContains("screen reader") { return hint }
+    if let url = window.document?.url.flatMap(URL.init(string:)), url.host() == "docs.google.com", url.path().hasPrefix("/document/") {
+        return "In Google Docs, choose Tools > Accessibility, turn on screen reader support and braille support, then press play again."
+    }
+    return nil
 }
 
 /// Copies the window that `grab` would read, for tests that run without the app. See `read(saved:)`.
@@ -126,8 +129,10 @@ private func window(of app: NSRunningApplication, titled title: String?) throws 
     guard AXIsProcessTrusted() else { throw GrabError.notTrusted }
     let ax = AXUIElementCreateApplication(app.processIdentifier)
     AXUIElementSetMessagingTimeout(ax, 1)
-    // Electron apps build their accessibility tree only when asked.
+    // Electron apps build their accessibility tree only when asked. Chrome builds a page's tree once a client asks
+    // for the application's role, as screen readers do.
     AXUIElementSetAttributeValue(ax, "AXManualAccessibility" as CFString, kCFBooleanTrue)
+    _ = ax.string(kAXRoleAttribute)
     // A locked screen or a broken app can report the application itself as its window.
     let isWindow = { (w: AXUIElement) in w.string(kAXRoleAttribute) == kAXWindowRole }
     let window: AXUIElement? = if let title {
