@@ -52,7 +52,7 @@ The first time you press play, macOS asks to let Berang control your computer us
 
 `build-app.sh` signs the app with your Developer ID or Apple Development certificate. Without one, it signs ad hoc, and macOS forgets the Accessibility permission on every rebuild.
 
-Press ⌥⎋ (Option-Escape) in any app to start or pause reading. Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. The waveform icon in the menu bar shows or hides the player and quits Berang.
+Press ⌥⎋ (Option-Escape) in any app to start or pause reading. Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before and have not scrolled, it continues from the paragraph where you stopped; Start over goes back to the top. The waveform icon in the menu bar shows or hides the player and quits Berang.
 
 ### Text grabber
 

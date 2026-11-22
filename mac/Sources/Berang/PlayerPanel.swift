@@ -66,6 +66,11 @@ struct PlayerView: View {
             }
             .buttonStyle(.borderless)
             .font(.system(size: 15, weight: .semibold))
+            if player.resumedAt != nil {
+                Button("Start over", systemImage: "arrow.counterclockwise", action: player.startOver)
+                    .buttonStyle(.borderless)
+                    .font(.caption)
+            }
             if case .failed(let message) = player.state {
                 failure(message)
             }

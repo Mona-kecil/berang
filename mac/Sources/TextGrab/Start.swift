@@ -8,11 +8,11 @@ enum Selection: Equatable {
 
 /// The block to start reading at: the selected text, the clicked block if it is still on screen, or else
 /// the first block on screen.
-func startBlock(_ selection: Selection?, firstVisible: () -> Int, isVisible: (Int) -> Bool) -> Int {
+func startBlock(_ selection: Selection?, firstVisible: () -> Int, isVisible: (Int) -> Bool) -> (block: Int, point: Page.StartPoint) {
     switch selection {
-    case .range(let block): block
-    case .caret(let block) where isVisible(block): block
-    default: firstVisible()
+    case .range(let block): (block, .selection)
+    case .caret(let block) where isVisible(block): (block, .click)
+    default: (firstVisible(), .screen)
     }
 }
 
@@ -28,18 +28,18 @@ func firstIndex(_ count: Int, notWhere isAbove: (Int) -> Bool) -> Int {
 }
 
 /// Where to start reading `blocks`, shown by `viewport`: a web area, a text area, or a window.
-func startBlock(_ blocks: [Block], in viewport: AXUIElement, clip: AXUIElement?) -> Int {
-    let start = switch viewport.string(kAXRoleAttribute) {
+func startBlock(_ blocks: [Block], in viewport: AXUIElement, clip: AXUIElement?) -> (block: Int, point: Page.StartPoint) {
+    let start: (block: Int, point: Page.StartPoint) = switch viewport.string(kAXRoleAttribute) {
     case "AXWebArea": webStart(blocks, viewport, clip)
     case kAXTextAreaRole: textAreaStart(blocks, viewport)
-    default: 0
+    default: (0, .screen)
     }
     // Past the last block, as when the user is in the References, reading starts over.
-    return start < blocks.count ? start : 0
+    return start.block < blocks.count ? start : (0, .screen)
 }
 
-private func webStart(_ blocks: [Block], _ web: AXUIElement, _ clip: AXUIElement?) -> Int {
-    guard let screen = visibleFrame(of: web, in: clip) else { return 0 }
+private func webStart(_ blocks: [Block], _ web: AXUIElement, _ clip: AXUIElement?) -> (block: Int, point: Page.StartPoint) {
+    guard let screen = visibleFrame(of: web, in: clip) else { return (0, .screen) }
     // A block that only peeks in at the top, like the last line of a paragraph, counts as above the screen.
     let isAbove = { (i: Int) in blocks[i].extent.map { $0.maxY <= screen.minY + min($0.height / 2, 24) } ?? true }
     return startBlock(webSelection(blocks, web), firstVisible: { firstIndex(blocks.count, notWhere: isAbove) },
@@ -73,7 +73,7 @@ private func webSelection(_ blocks: [Block], _ web: AXUIElement) -> Selection? {
 }
 
 /// A text area's lines are its blocks; each block's first run starts at its line's offset.
-private func textAreaStart(_ blocks: [Block], _ area: AXUIElement) -> Int {
+private func textAreaStart(_ blocks: [Block], _ area: AXUIElement) -> (block: Int, point: Page.StartPoint) {
     let range = { (attribute: String) -> CFRange? in
         guard let v = area.get(attribute), CFGetTypeID(v) == AXValueGetTypeID() else { return nil }
         var r = CFRange()
@@ -82,7 +82,10 @@ private func textAreaStart(_ blocks: [Block], _ area: AXUIElement) -> Int {
     let line = { (offset: Int) in max(firstIndex(blocks.count) { (blocks[$0].runs.first?.offset ?? 0) <= offset } - 1, 0) }
     let visible = range(kAXVisibleCharacterRangeAttribute)
     let selected = range(kAXSelectedTextRangeAttribute)
-    let selection: Selection? = selected.map { $0.length > 0 ? .range(block: line($0.location)) : .caret(block: line($0.location)) }
+    // A caret at the very start is where a document opens, not a click.
+    let selection: Selection? = selected.flatMap {
+        $0.length > 0 ? .range(block: line($0.location)) : $0.location > 0 ? .caret(block: line($0.location)) : nil
+    }
     return startBlock(selection, firstVisible: {
         visible.map { v in firstIndex(blocks.count) { (blocks[$0].runs.first?.offset ?? 0) < v.location } } ?? 0
     }, isVisible: { _ in
