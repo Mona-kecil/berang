@@ -7,7 +7,8 @@
 // --save writes the window's accessibility tree, compressed, and prints the text read back from that copy.
 // --replay prints the text read from a saved copy. --pdf prints the text read from a PDF file, and with --save also writes its lines for the tests.
 // The summary on stderr ends with the block that reading starts at (the selection, a visible click, or the top of
-// the screen) and the page address that reading positions are kept under.
+// the screen) and the page address that reading positions are kept under. A window with no text in the
+// accessibility tree is read by recognizing the text on screen, when the terminal may record the screen.
 import AppKit
 import TextGrab
 
@@ -72,9 +73,14 @@ do {
         try (JSONEncoder().encode(tree) as NSData).compressed(using: .lzma).write(to: saveTo)
         blocks = read(saved: tree)
     } else {
-        let page = try grab(app, windowTitle: title)
+        var page = try grab(app, windowTitle: title)
+        // An app that draws its text without the accessibility tree is read off the screen, as Berang does.
+        if page.blocks.isEmpty, CGPreflightScreenCaptureAccess(), let frame = page.viewportFrame {
+            page = page.with(try await readScreen(frame))
+            startAt = ", recognized on screen"
+        }
         blocks = page.blocks
-        startAt = ", starts at block \(page.start) (\(page.startPoint)), \(page.address ?? "no address")"
+        startAt += ", starts at block \(page.start) (\(page.startPoint)), \(page.address ?? "no address")"
     }
     let took = ContinuousClock.now - start
     print(markdown(blocks), terminator: "")

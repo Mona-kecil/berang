@@ -123,11 +123,19 @@ import TextGrab
                     state = .loading
                     tts = try await Voice.load()
                 }
-                let page: Page
+                var page: Page
                 switch source {
                 case .window:
                     guard let target else { throw PhononError(description: "Open a page to read, then press play.") }
                     page = try grab(target)
+                    // An app that draws its own text, like a web reader drawing on a canvas, is read off the screen.
+                    if page.blocks.isEmpty, let frame = page.viewportFrame {
+                        guard CGPreflightScreenCaptureAccess() else {
+                            CGRequestScreenCaptureAccess()
+                            throw ScreenAreaError.drawnText(app: page.app)
+                        }
+                        page = page.with(try await readScreen(frame))
+                    }
                     guard !page.blocks.isEmpty else { throw PhononError(description: "\(page.app) shows no text to read.") }
                     pageKey = page.address ?? target.bundleIdentifier.map { "\($0) \(page.window)" }
                 case .screenArea:

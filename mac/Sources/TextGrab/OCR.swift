@@ -1,4 +1,5 @@
 import AppKit
+@preconcurrency import ScreenCaptureKit
 import UniformTypeIdentifiers
 import Vision
 
@@ -43,6 +44,33 @@ public func readScreenArea(_ url: URL) -> Page? {
     readImage(url).map {
         Page(app: "", window: "", blocks: $0, viewport: AXUIElementCreateSystemWide(), clip: nil, start: 0,
              startPoint: .selection, address: nil)
+    }
+}
+
+/// The text on screen inside `frame`, in accessibility coordinates, read by recognizing it, for apps that draw
+/// their text without putting it in the accessibility tree. Leaves out this app's own windows, such as the
+/// player. Needs Screen Recording access.
+@MainActor public func readScreen(_ frame: CGRect) async throws -> [Block] {
+    let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
+    let area = { (d: SCDisplay) in d.frame.intersection(frame) }
+    guard let display = content.displays.max(by: { area($0).width * area($0).height < area($1).width * area($1).height }),
+          !area(display).isEmpty else { return [] }
+    let filter = SCContentFilter(display: display, excludingApplications: content.applications.filter { $0.processID == getpid() },
+                                 exceptingWindows: [])
+    let config = SCStreamConfiguration()
+    let shown = area(display)
+    config.sourceRect = shown.offsetBy(dx: -display.frame.minX, dy: -display.frame.minY)
+    config.width = Int(shown.width * CGFloat(filter.pointPixelScale))
+    config.height = Int(shown.height * CGFloat(filter.pointPixelScale))
+    config.showsCursor = false
+    let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
+    return ocrParagraphs(image).map(\.block)
+}
+
+extension Page {
+    /// The same page with other blocks, read from the top.
+    public func with(_ blocks: [Block]) -> Page {
+        Page(app: app, window: window, blocks: blocks, viewport: viewport, clip: clip, start: 0, startPoint: .screen, address: address)
     }
 }
 
