@@ -9,6 +9,8 @@ import TextGrab
     enum State: Equatable {
         case idle, downloading, loading, playing, paused
         case failed(String)
+
+        var isFailed: Bool { if case .failed = self { true } else { false } }
     }
 
     private(set) var state = State.idle
@@ -21,6 +23,12 @@ import TextGrab
     }
     /// The block reading continued from, on a return to a page read before. Clears once two blocks have played.
     private(set) var resumedAt: Int?
+    /// How much of the voice has downloaded, from 0 to 1, while it downloads.
+    private(set) var download: Double?
+    /// Whether Berang has read anything yet, which ends setup's last step.
+    private(set) var hasRead = UserDefaults.standard.bool(forKey: "hasRead") {
+        didSet { UserDefaults.standard.set(hasRead, forKey: "hasRead") }
+    }
 
     @ObservationIgnored private let audio = AudioOut()
     @ObservationIgnored private let highlight = Highlight()
@@ -128,10 +136,7 @@ import TextGrab
                 case .file: break
                 }
                 if tts == nil {
-                    if !Voice.isInstalled {
-                        state = .downloading
-                        try await Voice.install()
-                    }
+                    try await installVoice()
                     state = .loading
                     tts = try await Voice.load()
                 }
@@ -177,10 +182,32 @@ import TextGrab
         }
     }
 
+    /// Downloads the voice ahead of the first play, as setup offers.
+    func downloadVoice() {
+        guard !Voice.isInstalled, state == .idle || state.isFailed else { return }
+        task = Task {
+            do {
+                try await installVoice()
+                state = .idle
+            } catch {
+                state = .failed("\(error)")
+            }
+        }
+    }
+
+    private func installVoice() async throws {
+        guard !Voice.isInstalled else { return }
+        state = .downloading
+        download = 0
+        defer { download = nil }
+        try await Voice.install { [weak self] in self?.download = $0 }
+    }
+
     /// Plays from `index` to the end of the page. A skip cancels this task and starts another.
     private func read() async {
         guard let tts, let page else { return }
         state = .playing
+        hasRead = true
         timeline = Timeline()
         let first = index
         heard(first)

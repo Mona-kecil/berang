@@ -84,7 +84,8 @@ struct PlayerView: View {
 
     @ViewBuilder private var mainIcon: some View {
         switch player.state {
-        case .downloading, .loading: ProgressView().controlSize(.small)
+        case .downloading: ProgressView(value: player.download ?? 0).progressViewStyle(.circular).controlSize(.small)
+        case .loading: ProgressView().controlSize(.small)
         case .playing: Image(systemName: "pause.fill").font(.system(size: 22))
         default: Image(systemName: "play.fill").font(.system(size: 22))
         }

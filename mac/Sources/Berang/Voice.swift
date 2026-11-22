@@ -10,10 +10,14 @@ enum Voice {
     private static let sha256 = "058cde756a5e67bcdb986e7c45fe431d41a1a9073e68aabae314c80631a34b76"
 
     static var isInstalled: Bool { PhononModels.isInstalled() }
+    /// The download's size, for showing progress.
+    static let downloadSize: Int64 = 137_000_000
 
-    /// Downloads the model bundle, checks it against the pinned digest, and installs it.
-    static func install() async throws {
-        let (zip, _) = try await URLSession.shared.download(from: release.appending(path: archive))
+    /// Downloads the model bundle, checks it against the pinned digest, and installs it. `progress` gets the
+    /// fraction downloaded, in steps of a hundredth, on the main actor.
+    static func install(progress: @escaping @MainActor (Double) -> Void) async throws {
+        let watcher = DownloadProgress(progress)
+        let (zip, _) = try await URLSession.shared.download(from: release.appending(path: archive), delegate: watcher)
         defer { try? FileManager.default.removeItem(at: zip) }
         let got = SHA256.hash(data: try Data(contentsOf: zip, options: .mappedIfSafe))
             .map { String(format: "%02x", $0) }.joined()
@@ -41,5 +45,25 @@ enum Voice {
             do { try p.run() } catch { done.resume(throwing: error) }
         }
         guard status == 0 else { throw PhononError(description: "\(tool) failed with status \(status).") }
+    }
+}
+
+/// Reports a download's progress from its task's Progress.
+private final class DownloadProgress: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    private let report: @MainActor (Double) -> Void
+    private var observation: NSKeyValueObservation?
+    private var reported = -1
+
+    init(_ report: @escaping @MainActor (Double) -> Void) { self.report = report }
+
+    func urlSession(_ session: URLSession, didCreateTask task: URLSessionTask) {
+        observation = task.progress.observe(\.fractionCompleted) { [weak self] progress, _ in
+            guard let self else { return }
+            let percent = Int(progress.fractionCompleted * 100)
+            guard percent != self.reported else { return }
+            self.reported = percent
+            let report = self.report
+            Task { @MainActor in report(Double(percent) / 100) }
+        }
     }
 }
