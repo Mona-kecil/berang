@@ -26,7 +26,7 @@ func checkScreenAccess() throws {
 }
 
 /// Lets the user drag over part of the screen with the system's screenshot tool, and reads the text in it.
-/// Nil when the user presses Escape.
+/// Nil when the user presses Escape, or when the pick is cancelled, which closes the crosshair.
 @MainActor func pickScreenArea() async throws -> Page? {
     let url = FileManager.default.temporaryDirectory.appending(path: "berang-area.png")
     try? FileManager.default.removeItem(at: url)
@@ -34,11 +34,38 @@ func checkScreenAccess() throws {
     let capture = Process()
     capture.executableURL = URL(filePath: "/usr/sbin/screencapture")
     capture.arguments = ["-i", "-x", url.path]
-    try await withCheckedThrowingContinuation { (done: CheckedContinuation<Void, Error>) in
-        capture.terminationHandler = { _ in done.resume() }
-        do { try capture.run() } catch { done.resume(throwing: error) }
+    let running = RunningProcess()
+    try await withTaskCancellationHandler {
+        try await withCheckedThrowingContinuation { (done: CheckedContinuation<Void, Error>) in
+            capture.terminationHandler = { _ in done.resume() }
+            do {
+                try capture.run()
+                running.started(capture.processIdentifier)
+            } catch {
+                done.resume(throwing: error)
+            }
+        }
+    } onCancel: {
+        running.stop()
     }
-    guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+    guard !Task.isCancelled, FileManager.default.fileExists(atPath: url.path) else { return nil }
     guard let page = readScreenArea(url), !page.blocks.isEmpty else { throw ScreenAreaError.noText }
     return page
+}
+
+/// A child process that a cancelled task stops, even when the cancel comes before the process has started.
+private final class RunningProcess: @unchecked Sendable {
+    private let lock = NSLock()
+    private var pid: pid_t = 0
+    private var stopped = false
+
+    func started(_ id: pid_t) {
+        let stopNow = lock.withLock { pid = id; return stopped }
+        if stopNow { kill(id, SIGTERM) }
+    }
+
+    func stop() {
+        let id = lock.withLock { stopped = true; return pid }
+        if id > 0 { kill(id, SIGTERM) }
+    }
 }

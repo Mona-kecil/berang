@@ -46,6 +46,10 @@ import TextGrab
     /// Where Start over goes: the top of a page, or where a book's text starts.
     @ObservationIgnored private var top = 0
     @ObservationIgnored private var task: Task<Void, Never>?
+    /// Counts requests. Work begun for an older request stops at its next step without changing the player.
+    @ObservationIgnored private var generation = 0
+    /// What to read once the voice finishes downloading or loading: the latest request made meanwhile.
+    @ObservationIgnored private var pending: Source?
     /// The app to read: the last one active other than this one and System Settings. The panel never
     /// takes focus, so this is the app the user is looking at, even after granting Accessibility access.
     @ObservationIgnored private var target = NSWorkspace.shared.frontmostApplication
@@ -72,8 +76,8 @@ import TextGrab
         switch state {
         case .playing: audio.pause(); state = .paused
         case .paused: audio.resume(); state = .playing
-        case .idle, .failed: start()
-        case .downloading, .loading: break
+        case .idle, .failed: open(.window)
+        case .downloading, .loading: pending = .window
         }
     }
 
@@ -83,7 +87,8 @@ import TextGrab
         resumedAt = nil
         cancel()
         if state == .paused { audio.resume() }
-        task = Task { await read() }
+        let g = generation
+        task = Task { await read(g) }
     }
 
     func stop() {
@@ -99,10 +104,12 @@ import TextGrab
         resumedAt = nil
         cancel()
         if state == .paused { audio.resume() }
-        task = Task { await read() }
+        let g = generation
+        task = Task { await read(g) }
     }
 
     private func cancel() {
+        generation += 1
         task?.cancel()
         audio.stop()
         clock?.invalidate()
@@ -118,27 +125,44 @@ import TextGrab
 
     private enum Source { case window, screenArea, file(URL) }
 
+    /// Starts a request, replacing whatever was playing or waiting. While the voice downloads or loads, the
+    /// request waits for it instead.
     private func open(_ source: Source) {
-        guard state != .downloading, state != .loading else { return }
+        if state == .downloading || state == .loading {
+            pending = source
+            return
+        }
         stop()
         start(source)
     }
 
-    private func start(_ source: Source = .window) {
+    /// Shows the system's permission prompt the first time, before the voice download.
+    private func allow(_ source: Source) throws {
+        switch source {
+        case .window:
+            guard AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
+            else { throw GrabError.notTrusted }
+        case .screenArea: try checkScreenAccess()
+        case .file: break
+        }
+    }
+
+    private func start(_ requested: Source) {
+        let g = generation
         task = Task {
             do {
-                // Shows the system's permission prompt the first time, before the voice download.
-                switch source {
-                case .window:
-                    guard AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
-                    else { throw GrabError.notTrusted }
-                case .screenArea: try checkScreenAccess()
-                case .file: break
-                }
+                try allow(requested)
+                var source = requested
                 if tts == nil {
                     try await installVoice()
                     state = .loading
                     tts = try await Voice.load()
+                    guard g == generation else { return }
+                    if let latest = pending {
+                        pending = nil
+                        source = latest
+                        try allow(source)
+                    }
                 }
                 var page: Page
                 switch source {
@@ -152,12 +176,14 @@ import TextGrab
                             throw ScreenAreaError.drawnText(app: page.app)
                         }
                         page = page.with(try await readScreen(frame))
+                        guard g == generation else { return }
                     }
                     guard !page.blocks.isEmpty else { throw PhononError(description: "\(page.app) shows no text to read.") }
                     pageKey = page.address ?? target.bundleIdentifier.map { "\($0) \(page.window)" }
                 case .screenArea:
                     state = .idle  // not loading while the user picks
-                    guard let area = try await pickScreenArea() else { return }
+                    let area = try await pickScreenArea()
+                    guard g == generation, let area else { return }
                     page = area
                     pageKey = nil
                 case .file(let url):
@@ -175,8 +201,10 @@ import TextGrab
                     index = saved
                     resumedAt = saved
                 }
-                await read()
+                await read(g)
             } catch {
+                guard g == generation, !(error is CancellationError) else { return }
+                pending = nil
                 state = .failed("\(error)")
             }
         }
@@ -189,7 +217,12 @@ import TextGrab
             do {
                 try await installVoice()
                 state = .idle
+                if let latest = pending {
+                    pending = nil
+                    start(latest)
+                }
             } catch {
+                pending = nil
                 state = .failed("\(error)")
             }
         }
@@ -203,9 +236,9 @@ import TextGrab
         try await Voice.install { [weak self] in self?.download = $0 }
     }
 
-    /// Plays from `index` to the end of the page. A skip cancels this task and starts another.
-    private func read() async {
-        guard let tts, let page else { return }
+    /// Plays from `index` to the end of the page, for request `g`. A skip cancels this task and starts another.
+    private func read(_ g: Int) async {
+        guard g == generation, let tts, let page else { return }
         state = .playing
         hasRead = true
         timeline = Timeline()
@@ -233,9 +266,10 @@ import TextGrab
             await audio.drain()
             try Task.checkCancellation()
         } catch {
-            if !Task.isCancelled, !(error is CancellationError) { state = .failed("\(error)") }
+            if g == generation, !(error is CancellationError) { state = .failed("\(error)") }
             return
         }
+        guard g == generation else { return }
         // A page read to the end starts from the top next time.
         if let pageKey { positions[pageKey] = nil }
         stop()
