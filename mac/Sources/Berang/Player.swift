@@ -12,7 +12,13 @@ import TextGrab
     }
 
     private(set) var state = State.idle
-    var speed: Float = 1 { didSet { audio.rate = speed } }
+    /// Kept across launches.
+    var speed: Float = Player.savedSpeed {
+        didSet {
+            audio.rate = speed
+            UserDefaults.standard.set(speed, forKey: "speed")
+        }
+    }
     /// The block reading continued from, on a return to a page read before. Clears once two blocks have played.
     private(set) var resumedAt: Int?
 
@@ -37,6 +43,7 @@ import TextGrab
     @ObservationIgnored private var target = NSWorkspace.shared.frontmostApplication
 
     init() {
+        audio.rate = speed
         NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
         ) { [weak self] note in
@@ -46,6 +53,11 @@ import TextGrab
                    app.bundleIdentifier != "com.apple.systempreferences" { self?.target = app }
             }
         }
+    }
+
+    private static var savedSpeed: Float {
+        let saved = UserDefaults.standard.float(forKey: "speed")
+        return (0.5...4).contains(saved) ? saved : 1
     }
 
     func playPause() {
