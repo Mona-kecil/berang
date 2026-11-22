@@ -45,3 +45,27 @@ public func readScreenArea(_ url: URL) -> Page? {
              startPoint: .selection, address: nil)
     }
 }
+
+/// The blocks of a file: a PDF, an EPUB, an image, or plain text. Nil for other files.
+public func readFile(_ url: URL) -> [Block]? {
+    let type = UTType(filenameExtension: url.pathExtension)
+    if type?.conforms(to: .pdf) == true { return readPDF(url) }
+    if type?.conforms(to: .epub) == true || url.pathExtension.lowercased() == "epub" { return readEPUB(url)?.blocks }
+    if type?.conforms(to: .image) == true { return readImage(url) }
+    if type?.conforms(to: .plainText) == true, let text = try? String(contentsOf: url, encoding: .utf8) {
+        return text.components(separatedBy: "\n\n").compactMap { p in
+            let t = p.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+            return t.isEmpty ? nil : Block(kind: .text, text: t, runs: [])
+        }
+    }
+    return nil
+}
+
+/// A file read whole, to listen to without a window: reading positions are kept by its address.
+public func readFilePage(_ url: URL) -> Page? {
+    let book = url.pathExtension.lowercased() == "epub" ? readEPUB(url) : readFile(url).map { ($0, 0) }
+    return book.map {
+        Page(app: "", window: url.deletingPathExtension().lastPathComponent, blocks: $0.0, viewport: AXUIElementCreateSystemWide(),
+             clip: nil, start: $0.1, startPoint: .screen, address: url.absoluteString)
+    }
+}

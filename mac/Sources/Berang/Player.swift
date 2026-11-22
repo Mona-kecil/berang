@@ -29,6 +29,8 @@ import TextGrab
     @ObservationIgnored private let positions = Positions()
     /// Where this page's reading position is kept.
     @ObservationIgnored private var pageKey: String?
+    /// Where Start over goes: the top of a page, or where a book's text starts.
+    @ObservationIgnored private var top = 0
     @ObservationIgnored private var task: Task<Void, Never>?
     /// The app to read: the last one active other than this one and System Settings. The panel never
     /// takes focus, so this is the app the user is looking at, even after granting Accessibility access.
@@ -73,7 +75,7 @@ import TextGrab
 
     func startOver() {
         guard page != nil else { return }
-        index = 0
+        index = top
         resumedAt = nil
         cancel()
         if state == .paused { audio.resume() }
@@ -89,22 +91,29 @@ import TextGrab
     }
 
     /// Reads the text in an area of the screen the user drags over, stopping what is playing.
-    func readScreenArea() {
+    func readScreenArea() { open(.screenArea) }
+
+    /// Reads a PDF, EPUB, image, or text file, from where it was last left.
+    func readFile(_ url: URL) { open(.file(url)) }
+
+    private enum Source { case window, screenArea, file(URL) }
+
+    private func open(_ source: Source) {
         guard state != .downloading, state != .loading else { return }
         stop()
-        start(screenArea: true)
+        start(source)
     }
 
-    /// Reads the target app's window, or with `screenArea`, an area of the screen the user picks.
-    private func start(screenArea: Bool = false) {
+    private func start(_ source: Source = .window) {
         task = Task {
             do {
                 // Shows the system's permission prompt the first time, before the voice download.
-                if screenArea {
-                    try checkScreenAccess()
-                } else {
+                switch source {
+                case .window:
                     guard AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
                     else { throw GrabError.notTrusted }
+                case .screenArea: try checkScreenAccess()
+                case .file: break
                 }
                 if tts == nil {
                     if !Voice.isInstalled {
@@ -115,22 +124,29 @@ import TextGrab
                     tts = try await Voice.load()
                 }
                 let page: Page
-                if screenArea {
-                    state = .idle  // not loading while the user picks
-                    guard let area = try await pickScreenArea() else { return }
-                    page = area
-                } else {
+                switch source {
+                case .window:
                     guard let target else { throw PhononError(description: "Open a page to read, then press play.") }
                     page = try grab(target)
                     guard !page.blocks.isEmpty else { throw PhononError(description: "\(page.app) shows no text to read.") }
+                    pageKey = page.address ?? target.bundleIdentifier.map { "\($0) \(page.window)" }
+                case .screenArea:
+                    state = .idle  // not loading while the user picks
+                    guard let area = try await pickScreenArea() else { return }
+                    page = area
+                    pageKey = nil
+                case .file(let url):
+                    guard let file = readFilePage(url), !file.blocks.isEmpty
+                    else { throw PhononError(description: "Berang can't read \(url.lastPathComponent).") }
+                    page = file
+                    pageKey = file.address
                 }
                 self.page = page
-                // An area of the screen has no address to return to.
-                pageKey = screenArea ? nil : page.address ?? target.flatMap(\.bundleIdentifier).map { "\($0) \(page.window)" }
                 index = page.start
-                // An unscrolled page with nothing selected continues where the last reading stopped.
-                if page.startPoint == .screen, page.start == 0, let pageKey,
-                   let saved = positions[pageKey]?.index(in: page.blocks), saved > 0 {
+                top = if case .file = source { page.start } else { 0 }
+                // A file, or an unscrolled page with nothing selected, continues where the last reading stopped.
+                let resumes = if case .file = source { true } else { page.startPoint == .screen && page.start == 0 }
+                if resumes, let pageKey, let saved = positions[pageKey]?.index(in: page.blocks), saved != page.start {
                     index = saved
                     resumedAt = saved
                 }
