@@ -15,11 +15,14 @@ jobs:
   release:
     # Pull requests from forks get no secrets, so they can't sign.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # build-app.sh numbers builds by commit count
+
+      # MLX compiles Metal shaders, which needs Xcode's Metal toolchain.
+      - run: xcodebuild -downloadComponent MetalToolchain
 
       - name: Import the signing certificate
         env:

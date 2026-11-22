@@ -14,13 +14,15 @@ concurrency:
 
 jobs:
   mac:
-    runs-on: macos-15
+    runs-on: macos-26
     defaults:
       run:
         working-directory: mac
     steps:
       - uses: actions/checkout@v4
       - run: swift --version
+      # MLX compiles Metal shaders, which needs Xcode's Metal toolchain.
+      - run: xcodebuild -downloadComponent MetalToolchain
       # The app, with MLX, builds below through Xcode; this builds the text grabber alone.
       - run: swift build -c release --product berang-grab
       - run: swift test
