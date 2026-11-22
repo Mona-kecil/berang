@@ -98,3 +98,27 @@ private func bursts(_ starts: [Double], length: Double, total: Double) -> [Float
     #expect(wordStarts("quiet words", samples: [Float](repeating: 0, count: 24_000)) == [0, 0])
     #expect(wordStarts("", samples: []).isEmpty)
 }
+
+@Test func hearsTheChunkAndWordPlayingAtASample() {
+    let text = "One two three. Four five six."
+    let chunks = prepare(text)
+    #expect(chunks.count == 2)
+    var timeline = Timeline()
+    #expect(timeline.heard(at: 0) == nil)
+    timeline.append(block: 0, chunk: chunks[0], start: 1000)
+    timeline.timeLast(bursts([0.2, 0.7, 1.2], length: 0.35, total: 1.8), sampleRate: 24_000)
+    timeline.append(block: 1, chunk: chunks[1], start: 1000 + 43_200)
+    let word = { (sample: Int) -> String? in
+        timeline.heard(at: sample)?.word.map { (text as NSString).substring(with: NSRange($0)) }
+    }
+    #expect(timeline.heard(at: 999) == nil)
+    #expect(timeline.heard(at: 1000)?.block == 0)
+    #expect(word(1000) == nil)
+    #expect(word(1000 + 24_000 * 3 / 10) == "One")
+    #expect(word(1000 + 24_000 * 8 / 10) == "two")
+    #expect(word(1000 + 24_000 * 13 / 10) == "three.")
+    let second = timeline.heard(at: 1000 + 43_200)
+    #expect(second?.block == 1 && second?.chunk == chunks[1])
+    // Words are timed only once the chunk's audio is complete.
+    #expect(second?.word == nil)
+}

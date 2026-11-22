@@ -20,21 +20,47 @@ import AVFoundation
         set { pitch.rate = newValue }
     }
 
-    /// Returns once the last chunk has been heard, not just generated. Throws when the task is cancelled.
-    func play(_ chunks: AsyncThrowingStream<[Float], Error>) async throws {
-        if !engine.isRunning { try engine.start() }
+    /// Where the next queued sample goes on the queue's timeline, which counts voice samples from the last stop().
+    private var end = 0
+    /// The last sample rendered; the player reports none while paused.
+    private var rendered = 0
+    /// Seconds from the player to the speaker. Asking the device costs about 2 ms, so it is asked when the engine starts,
+    /// which it does again after the output device changes.
+    private var delay = 0.0
+
+    /// The sample being heard now, on the queue's timeline. Speed changes count voice samples, not output time.
+    var position: Int {
+        render() - Int(delay * format.sampleRate * Double(rate))
+    }
+
+    /// Samples queued but not yet played.
+    var queued: Int { max(end - render(), 0) }
+
+    /// Queues `samples` and returns the timeline sample they start at.
+    func enqueue(_ samples: [Float]) throws -> Int {
+        if !engine.isRunning {
+            try engine.start()
+            delay = pitch.latency + engine.outputNode.presentationLatency
+        }
         if !isPaused { node.play() }
-        for try await chunk in chunks {
-            try Task.checkCancellation()
-            node.scheduleBuffer(buffer(chunk), completionHandler: nil)
-        }
-        try Task.checkCancellation()
-        // Completes after every buffer before it has played, or when stop() clears the queue.
-        let last = buffer([0])
+        // The timeline runs on while the queue is empty, so audio queued after a gap starts at the current sample.
+        let start = max(end, render())
+        end = start + samples.count
+        node.scheduleBuffer(buffer(samples), completionHandler: nil)
+        return start
+    }
+
+    /// Returns once everything queued has been heard, or the queue was stopped.
+    func drain() async {
+        guard engine.isRunning else { return }
         await withCheckedContinuation { (done: CheckedContinuation<Void, Never>) in
-            node.scheduleBuffer(last, completionCallbackType: .dataPlayedBack) { _ in done.resume() }
+            node.scheduleBuffer(buffer([0]), completionCallbackType: .dataPlayedBack) { _ in done.resume() }
         }
-        try Task.checkCancellation()
+    }
+
+    private func render() -> Int {
+        if let t = node.lastRenderTime, let p = node.playerTime(forNodeTime: t) { rendered = Int(p.sampleTime) }
+        return rendered
     }
 
     func pause() {
@@ -47,10 +73,12 @@ import AVFoundation
         node.play()
     }
 
-    /// Drops all queued audio. Cancel the task inside play() first, so it does not queue more.
+    /// Drops all queued audio and restarts the timeline. Cancel the task that queues audio first.
     func stop() {
         isPaused = false
         node.stop()
+        end = 0
+        rendered = 0
     }
 
     private func buffer(_ samples: [Float]) -> AVAudioPCMBuffer {

@@ -41,7 +41,7 @@ echo 'Dr. Patel raised $3.5M on 2026-11-22.' | python3 bench/clean/clean.py
 
 ## Mac app
 
-`mac/` holds Berang.app, a floating player that reads the window you were last in, using the Phonon 31m voice and highlighting the paragraph being read. Requires macOS 15 on Apple silicon, and Xcode to build.
+`mac/` holds Berang.app, a floating player that reads the window you were last in, using the Phonon 31m voice and highlighting the sentence and the word being read. Requires macOS 15 on Apple silicon, and Xcode to build.
 
 ```sh
 mac/build-app.sh

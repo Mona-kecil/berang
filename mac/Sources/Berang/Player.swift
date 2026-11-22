@@ -4,7 +4,7 @@ import PhononTTS
 import Speakable
 import TextGrab
 
-/// Reads the window the user was last in, one block at a time, highlighting each block as it plays.
+/// Reads the window the user was last in, highlighting the sentence and word being heard.
 @MainActor @Observable final class Player {
     enum State: Equatable {
         case idle, downloading, loading, playing, paused
@@ -20,7 +20,12 @@ import TextGrab
     @ObservationIgnored private let highlight = Highlight()
     @ObservationIgnored private var tts: Phonon?
     @ObservationIgnored private var page: Page?
+    /// The block being heard, or about to be.
     @ObservationIgnored private var index = 0
+    /// What the queued audio says when, from the block reading started at.
+    @ObservationIgnored private var timeline = Timeline()
+    /// Follows the audio to move the highlight and the saved position.
+    @ObservationIgnored private var clock: Timer?
     @ObservationIgnored private let positions = Positions()
     /// Where this page's reading position is kept.
     @ObservationIgnored private var pageKey: String?
@@ -78,6 +83,8 @@ import TextGrab
     private func cancel() {
         task?.cancel()
         audio.stop()
+        clock?.invalidate()
+        clock = nil
         highlight.hide()
     }
 
@@ -118,22 +125,54 @@ import TextGrab
     private func read() async {
         guard let tts, let page else { return }
         state = .playing
-        while index < page.blocks.count {
-            let block = page.blocks[index]
-            if let pageKey { positions[pageKey] = SavedPosition(block, at: index) }
-            if let r = resumedAt, index >= r + 2 { resumedAt = nil }
-            highlight.show(block, in: page)
-            let spoken = prepare(block.text).map(\.text).joined(separator: " ")
-            do {
-                if !spoken.isEmpty { try await audio.play(tts.stream(spoken)) }
-            } catch {
-                if !Task.isCancelled { state = .failed("\(error)") }
-                return
+        timeline = Timeline()
+        let first = index
+        heard(first)
+        clock = Timer.scheduledTimer(withTimeInterval: 1.0 / 30, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.tick() }
+        }
+        do {
+            for b in first..<page.blocks.count {
+                for chunk in prepare(page.blocks[b].text) {
+                    // Synthesis runs ahead of playback by a few seconds, enough to play on without gaps.
+                    while audio.queued > lookahead { try await Task.sleep(for: .milliseconds(100)) }
+                    var samples: [Float] = []
+                    for try await part in tts.stream(chunk.text) {
+                        try Task.checkCancellation()
+                        let start = try audio.enqueue(part)
+                        if samples.isEmpty { timeline.append(block: b, chunk: chunk, start: start) }
+                        samples += part
+                    }
+                    if !samples.isEmpty { timeline.timeLast(samples, sampleRate: Phonon.sampleRate) }
+                }
             }
-            index += 1
+            try Task.checkCancellation()
+            await audio.drain()
+            try Task.checkCancellation()
+        } catch {
+            if !Task.isCancelled, !(error is CancellationError) { state = .failed("\(error)") }
+            return
         }
         // A page read to the end starts from the top next time.
         if let pageKey { positions[pageKey] = nil }
         stop()
     }
+
+    private func tick() {
+        guard let page, let now = timeline.heard(at: audio.position) else { return }
+        if now.block != index { heard(now.block) }
+        highlight.show(page, block: now.block, sentence: now.chunk.source, word: now.word)
+    }
+
+    /// Called as block `b` starts to be heard.
+    private func heard(_ b: Int) {
+        guard let page else { return }
+        index = b
+        if let pageKey { positions[pageKey] = SavedPosition(page.blocks[b], at: b) }
+        if let r = resumedAt, b >= r + 2 { resumedAt = nil }
+        page.blocks[b].scrollToVisible()
+    }
 }
+
+/// Five seconds of voice audio.
+private let lookahead = Int(Phonon.sampleRate) * 5
