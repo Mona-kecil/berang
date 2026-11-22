@@ -3,7 +3,7 @@ import Foundation
 import PhononTTS
 
 /// Phonon 31m (Apache-2.0), fetched from the Phonon GitHub release on first use.
-enum Voice {
+enum PhononVoice {
     private static let release = URL(string: "https://github.com/gradium-ai/xn-ptts/releases/download/v0.7.1/")!
     private static let archive = "phonon-31m-en-coreml.zip"
     /// The release's SHA256SUMS leaves out the model archive, so the digest GitHub records for it is pinned here.
@@ -19,8 +19,6 @@ enum Voice {
         let names = bundle["voices"] as? [String] ?? []
         return names.contains("default") ? ["default"] + names.filter { $0 != "default" } : names
     }
-    /// The download's size, for showing progress.
-    static let downloadSize: Int64 = 137_000_000
 
     /// Downloads the model bundle, checks it against the pinned digest, and installs it. `progress` gets the
     /// fraction downloaded, in steps of a hundredth, on the main actor.

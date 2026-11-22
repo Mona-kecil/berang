@@ -33,6 +33,7 @@ To finish a step later, choose Set Up Berang from the menu bar.
 | Read part of the screen | Press ⌥⇧⎋ (Option-Shift-Escape) and drag over it |
 | Listen to a whole book or file | Choose Open File from the menu bar, or open the file with Berang in Finder |
 | Skip, change speed, or stop | Use the floating player |
+| Hear and choose a voice | Choose Voices from the menu bar |
 | Show or hide the player, or quit | Click the waveform icon in the menu bar |
 
 Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before, Berang continues where you stopped; Start over goes back to the top. Berang remembers the speed you choose.
@@ -53,7 +54,7 @@ In PDFs and Apple Books, Berang highlights the paragraph rather than the word. V
 
 ## Privacy
 
-Berang reads and speaks on your Mac. It connects to the internet only to download its voice, once, from the [Phonon release](https://github.com/gradium-ai/xn-ptts/releases/tag/v0.7.1), and checks the download against a known fingerprint. It asks for two permissions:
+Berang reads and speaks on your Mac. It connects to the internet only to download a voice engine, once: Phonon from the [Phonon release](https://github.com/gradium-ai/xn-ptts/releases/tag/v0.7.1), checked against a known fingerprint, and Pocket, if you choose one of its voices, from [Hugging Face](https://huggingface.co/mlx-community/pocket-tts). It asks for two permissions:
 
 - **Accessibility**, to read the text of other apps.
 - **Screen Recording**, only if you use ⌥⇧⎋ or read an app that draws its own text. Berang recognizes the text on your Mac and keeps no images.
@@ -63,7 +64,8 @@ Berang reads and speaks on your Mac. It connects to the internet only to downloa
 Quit Berang from the menu bar, then delete:
 
 - Berang from your Applications folder.
-- The voice, about 300 MB, in `~/Library/Application Support/PhononTTS`.
+- The Phonon voice engine, about 300 MB, in `~/Library/Application Support/PhononTTS`.
+- The Pocket voice engine, if you downloaded it, 229 MB, in `~/Library/Application Support/Berang`.
 - Your reading positions and speed, in `~/Library/Preferences/io.github.mona-kecil.berang.plist`.
 
 You can also remove Berang from System Settings > Privacy & Security > Accessibility and Screen & System Audio Recording.

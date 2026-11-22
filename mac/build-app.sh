@@ -6,8 +6,9 @@
 set -e
 cd "$(dirname "$0")"
 
+# Xcode builds a package's scheme with code coverage on, which adds counters to every function.
 xcodebuild -scheme Berang -configuration Release -destination 'platform=macOS,arch=arm64' \
-  -derivedDataPath .xcbuild -quiet build
+  -derivedDataPath .xcbuild -quiet CLANG_COVERAGE_MAPPING=NO build
 
 app=build/Berang.app
 rm -rf "$app"
@@ -18,6 +19,13 @@ if [ -n "${VERSION:-}" ]; then
     -c "Set :CFBundleVersion $(git rev-list --count HEAD)" "$app/Contents/Info.plist"
 fi
 cp .xcbuild/Build/Products/Release/Berang "$app/Contents/MacOS/"
+# Symbols for crash reports stay in .xcbuild/Build/Products/Release/Berang.dSYM.
+strip -S -x "$app/Contents/MacOS/Berang"
+# Package resources, such as MLX's Metal shaders, which the app finds in Contents/Resources.
+mkdir -p "$app/Contents/Resources"
+for bundle in .xcbuild/Build/Products/Release/*.bundle; do
+  [ -e "$bundle" ] && cp -R "$bundle" "$app/Contents/Resources/"
+done
 
 identities=$(security find-identity -v -p codesigning)
 # The Berang certificate is self-signed, so macOS lists it as not trusted, which codesign accepts.
