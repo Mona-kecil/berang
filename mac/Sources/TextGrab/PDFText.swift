@@ -56,6 +56,8 @@ func pdfParagraphs(_ pages: [[PDFLine]], heights: [CGFloat]) -> [PDFParagraph] {
     }
     let running = runningLines(pages.map { $0.map(\.text) })
     let lineHeight = median(pages.flatMap { $0.map(\.bounds.height) }) ?? 10
+    // The space between lines of a paragraph. Vision's line boxes are taller than PDFKit's, so this is smaller for an image.
+    let leading = median(pages.flatMap { zip($0, $0.dropFirst()).map { $0.bounds.minY - $1.bounds.maxY }.filter { $0 >= -lineHeight / 4 && $0 < lineHeight } }) ?? 0
 
     var out: [PDFParagraph] = []
     var lines: [PDFLine] = [], start = (page: 0, top: CGFloat(0)), lastPage = 0
@@ -71,7 +73,7 @@ func pdfParagraphs(_ pages: [[PDFLine]], heights: [CGFloat]) -> [PDFParagraph] {
     for (p, page) in pages.enumerated() {
         let kept = page.indices.filter { !running.contains([p, $0]) }.map { page[$0] }
         for (i, line) in kept.enumerated() {
-            if let last = lines.last, breaks(after: last, before: line, next: kept[safe: i + 1], lineHeight: lineHeight,
+            if let last = lines.last, breaks(after: last, before: line, next: kept[safe: i + 1], lineHeight: lineHeight, leading: leading,
                                              samePage: lastPage == p) { flush() }
             if lines.isEmpty { start = (p, heights[safe: p].map { $0 - line.bounds.maxY } ?? 0) }
             lines.append(line)
@@ -83,7 +85,7 @@ func pdfParagraphs(_ pages: [[PDFLine]], heights: [CGFloat]) -> [PDFParagraph] {
 }
 
 /// Whether a new paragraph starts at `line`, which follows `last`.
-private func breaks(after last: PDFLine, before line: PDFLine, next: PDFLine?, lineHeight: CGFloat, samePage: Bool) -> Bool {
+private func breaks(after last: PDFLine, before line: PDFLine, next: PDFLine?, lineHeight: CGFloat, leading: CGFloat, samePage: Bool) -> Bool {
     // The first line of a paragraph is often set in from the lines after it.
     let indented = next.map { line.bounds.minX > $0.bounds.minX + 4 && abs(line.bounds.minX - $0.bounds.minX) < 40 } ?? false
     if !samePage || line.bounds.maxY > last.bounds.minY + lineHeight {
@@ -93,7 +95,7 @@ private func breaks(after last: PDFLine, before line: PDFLine, next: PDFLine?, l
     let gap = last.bounds.minY - line.bounds.maxY
     // A heading or caption is set in another size.
     let resized = abs(line.bounds.height - last.bounds.height) > 0.2 * min(line.bounds.height, last.bounds.height)
-    return gap > 0.9 * lineHeight || resized || indented && endsSentence(last.text) || line.bounds.minX > last.bounds.maxX
+    return gap > leading + 0.5 * lineHeight || resized || indented && endsSentence(last.text) || line.bounds.minX > last.bounds.maxX
 }
 
 /// Leaves out footnotes: from a line in the bottom fifth of the page that starts with a footnote mark, like "∗" or a

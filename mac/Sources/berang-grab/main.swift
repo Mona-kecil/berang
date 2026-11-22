@@ -2,6 +2,7 @@
 // usage: berang-grab [--save page.json.lzma] [bundle-id-or-pid [window-title-prefix]]   (default: the frontmost app's focused window)
 //        berang-grab --replay page.json.lzma
 //        berang-grab --pdf file.pdf [--save lines.json.lzma]
+//        berang-grab --image file.png
 // --save writes the window's accessibility tree, compressed, and prints the text read back from that copy.
 // --replay prints the text read from a saved copy. --pdf prints the text read from a PDF file, and with --save also writes its lines for the tests.
 // The summary on stderr ends with the block that reading starts at (the selection, a visible click, or the top of
@@ -13,8 +14,10 @@ var args = Array(CommandLine.arguments.dropFirst())
 if args.first == "--replay", args.count > 1 {
     do {
         let packed = try Data(contentsOf: URL(filePath: args[1]))
-        let tree = try JSONDecoder().decode(SavedNode.self, from: (packed as NSData).decompressed(using: .lzma) as Data)
-        print(markdown(read(saved: tree)), terminator: "")
+        let data = try (packed as NSData).decompressed(using: .lzma) as Data
+        let blocks = try (try? JSONDecoder().decode(SavedPDF.self, from: data))?.read()
+            ?? read(saved: JSONDecoder().decode(SavedNode.self, from: data))
+        print(markdown(blocks), terminator: "")
         exit(0)
     } catch {
         FileHandle.standardError.write(Data("\(error)\n".utf8))
@@ -33,6 +36,16 @@ if args.first == "--pdf", args.count > 1 {
     if args.count > 3, args[2] == "--save" {
         try! (try! JSONEncoder().encode(pdf) as NSData).compressed(using: .lzma).write(to: URL(filePath: args[3]))
     }
+    print(markdown(blocks), terminator: "")
+    exit(0)
+}
+if args.first == "--image", args.count > 1 {
+    let clock = ContinuousClock.now
+    guard let blocks = readImage(URL(filePath: args[1])) else {
+        FileHandle.standardError.write(Data("\(args[1]) is not an image\n".utf8))
+        exit(1)
+    }
+    FileHandle.standardError.write(Data("\(blocks.count) blocks, \((ContinuousClock.now - clock) / .milliseconds(1)) ms\n".utf8))
     print(markdown(blocks), terminator: "")
     exit(0)
 }
