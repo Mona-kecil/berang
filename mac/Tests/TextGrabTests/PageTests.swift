@@ -5,20 +5,26 @@ import TextGrab
 /// A page saved by Pages/record.sh: its accessibility tree and the text the grabber read from it.
 struct SavedPage: CustomTestStringConvertible, Sendable {
     let name: String
+    /// A PDF saves its lines, not an accessibility tree.
+    let isPDF: Bool
     var testDescription: String { name }
 
     static let folder = URL(filePath: #filePath).deletingLastPathComponent().appending(path: "Pages")
     static let all: [SavedPage] = {
         let tsv = try! String(contentsOf: folder.appending(path: "pages.tsv"), encoding: .utf8)
-        return tsv.split(separator: "\n").dropFirst().map { SavedPage(name: String($0.split(separator: "\t")[0])) }
+        return tsv.split(separator: "\n").dropFirst().map {
+            let fields = $0.split(separator: "\t")
+            return SavedPage(name: String(fields[0]), isPDF: fields[1] == "pdf")
+        }
     }()
 }
 
 @Test(arguments: SavedPage.all)
 func readsSavedPage(_ page: SavedPage) throws {
     let packed = try Data(contentsOf: SavedPage.folder.appending(path: "\(page.name).json.lzma"))
-    let tree = try JSONDecoder().decode(SavedNode.self, from: (packed as NSData).decompressed(using: .lzma) as Data)
-    let got = markdown(read(saved: tree))
+    let data = try (packed as NSData).decompressed(using: .lzma) as Data
+    let got = page.isPDF ? markdown(try JSONDecoder().decode(SavedPDF.self, from: data).read())
+        : markdown(read(saved: try JSONDecoder().decode(SavedNode.self, from: data)))
     let want = try String(contentsOf: SavedPage.folder.appending(path: "\(page.name).md"), encoding: .utf8)
     guard got != want else { return }
     let (g, w) = (got.split(separator: "\n", omittingEmptySubsequences: false), want.split(separator: "\n", omittingEmptySubsequences: false))

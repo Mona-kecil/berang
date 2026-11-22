@@ -1,8 +1,9 @@
 // Prints the main text of a window as Markdown: headings as "# ", blocks separated by blank lines.
 // usage: berang-grab [--save page.json.lzma] [bundle-id-or-pid [window-title-prefix]]   (default: the frontmost app's focused window)
 //        berang-grab --replay page.json.lzma
+//        berang-grab --pdf file.pdf [--save lines.json.lzma]
 // --save writes the window's accessibility tree, compressed, and prints the text read back from that copy.
-// --replay prints the text read from a saved copy.
+// --replay prints the text read from a saved copy. --pdf prints the text read from a PDF file, and with --save also writes its lines for the tests.
 // The summary on stderr ends with the block that reading starts at (the selection, a visible click, or the top of
 // the screen) and the page address that reading positions are kept under.
 import AppKit
@@ -19,6 +20,21 @@ if args.first == "--replay", args.count > 1 {
         FileHandle.standardError.write(Data("\(error)\n".utf8))
         exit(1)
     }
+}
+if args.first == "--pdf", args.count > 1 {
+    let url = URL(filePath: args[1])
+    let clock = ContinuousClock.now
+    guard let pdf = SavedPDF(url: url) else {
+        FileHandle.standardError.write(Data("\(args[1]) is not a PDF\n".utf8))
+        exit(1)
+    }
+    let blocks = pdf.read()
+    FileHandle.standardError.write(Data("\(blocks.count) blocks, \((ContinuousClock.now - clock) / .milliseconds(1)) ms\n".utf8))
+    if args.count > 3, args[2] == "--save" {
+        try! (try! JSONEncoder().encode(pdf) as NSData).compressed(using: .lzma).write(to: URL(filePath: args[3]))
+    }
+    print(markdown(blocks), terminator: "")
+    exit(0)
 }
 var saveTo: URL?
 if args.first == "--save", args.count > 1 {
