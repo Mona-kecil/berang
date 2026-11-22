@@ -13,20 +13,15 @@ import re
 import statistics
 import sys
 
-d = sys.argv[1]
 norm = lambda w: re.sub(r"[^a-z']", "", w.lower())
-references = json.load(open(os.path.join(d, "reference.json")))
 
 
-def reference(wav):
-    return [(norm(w), t) for w, t in references[wav]]
-
-
-def errors(starts_of):
-    """Signed errors (estimate minus reference) over all words both sides agree on."""
+def errors(d, starts_of):
+    """Signed errors (estimate minus reference) over all words both sides agree on, in DIR d."""
+    references = json.load(open(os.path.join(d, "reference.json")))
     out = []
-    for e in estimates:
-        ref = reference(e["wav"])
+    for e in json.load(open(os.path.join(d, "estimates.json"))):
+        ref = [(norm(w), t) for w, t in references[e["wav"]]]
         ours = [norm(w) for w in e["words"]]
         starts = starts_of(e)
         sm = difflib.SequenceMatcher(None, ours, [w for w, _ in ref], autojunk=False)
@@ -35,11 +30,10 @@ def errors(starts_of):
     return out
 
 
-def report(name, errs):
+def summary(errs):
     a = sorted(abs(x) for x in errs)
-    within = sum(x <= 0.15 for x in a) / len(a)
-    print(f"{name:28} words {len(a):5}  median {statistics.median(a)*1000:4.0f} ms  p90 {a[int(len(a)*0.9)]*1000:4.0f} ms"
-          f"  within 150 ms {within:5.1%}  bias {statistics.mean(errs)*1000:+4.0f} ms")
+    return {"words": len(a), "median": statistics.median(a), "p90": a[int(len(a) * 0.9)],
+            "within150": sum(x <= 0.15 for x in a) / len(a), "bias": statistics.mean(errs)}
 
 
 def by_characters(e):
@@ -52,6 +46,8 @@ def by_characters(e):
     return out
 
 
-estimates = json.load(open(os.path.join(d, "estimates.json")))
-report("spread by characters", errors(by_characters))
-report("berang estimate", errors(lambda e: e["starts"]))
+if __name__ == "__main__":
+    for name, starts_of in [("spread by characters", by_characters), ("berang estimate", lambda e: e["starts"])]:
+        s = summary(errors(sys.argv[1], starts_of))
+        print(f"{name:28} words {s['words']:5}  median {s['median']*1000:4.0f} ms  p90 {s['p90']*1000:4.0f} ms"
+              f"  within 150 ms {s['within150']:5.1%}  bias {s['bias']*1000:+4.0f} ms")

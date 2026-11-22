@@ -1,6 +1,8 @@
 // Speaks text the way Berang does, chunk by chunk, for measuring word timing against a reference.
 // usage: berang-say synth <text-file> <dir>   Paragraphs are separated by blank lines. Writes one 24 kHz WAV per
-//                                            chunk and manifest.json, which lists each WAV with its text.
+//                                            chunk, manifest.json, which lists each WAV with its text, and
+//                                            first-word.json: per paragraph, the seconds from its text to its
+//                                            first word's sound, on a warm voice.
 //        berang-say estimate <dir>           Writes estimates.json: each chunk's words with their estimated starts.
 import Foundation
 import PhononTTS
@@ -48,15 +50,27 @@ do {
         let text = try String(contentsOf: URL(filePath: args[2]), encoding: .utf8)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let tts = try await Phonon.load(models: PhononModels.defaultDirectory, language: .english)
-        var entries: [Entry] = []
+        // The app keeps the voice loaded, so the first utterance's setup is not part of a reading.
+        _ = try await tts.synthesize("This sentence warms the voice up.")
+        var entries: [Entry] = [], firstWords: [Double] = []
         for (p, paragraph) in text.components(separatedBy: "\n\n").enumerated() where !paragraph.isEmpty {
+            let clock = ContinuousClock.now
             for (c, chunk) in prepare(paragraph).enumerated() {
+                var samples: [Float] = [], firstAudio: Duration?
+                for try await part in tts.stream(chunk.text) {
+                    firstAudio = firstAudio ?? ContinuousClock.now - clock
+                    samples += part
+                }
+                if c == 0, let firstAudio, let start = wordStarts(chunk.text, samples: samples).first {
+                    firstWords.append(firstAudio / .seconds(1) + start)
+                }
                 let name = "p\(p)c\(c).wav"
-                try writeWAV(try await tts.synthesize(chunk.text), to: dir.appending(path: name))
+                try writeWAV(samples, to: dir.appending(path: name))
                 entries.append(Entry(wav: name, text: chunk.text))
             }
         }
         try JSONEncoder().encode(entries).write(to: dir.appending(path: "manifest.json"))
+        try JSONEncoder().encode(firstWords).write(to: dir.appending(path: "first-word.json"))
         print("\(entries.count) chunks")
     } else {
         let entries = try JSONDecoder().decode([Entry].self, from: Data(contentsOf: dir.appending(path: "manifest.json")))
