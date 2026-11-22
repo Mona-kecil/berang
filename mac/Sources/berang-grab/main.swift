@@ -3,6 +3,7 @@
 //        berang-grab --replay page.json.lzma
 //        berang-grab --pdf file.pdf [--save lines.json.lzma]
 //        berang-grab --image file.png
+//        berang-grab --file book.epub   (a PDF, EPUB, image, or text file)
 // --save writes the window's accessibility tree, compressed, and prints the text read back from that copy.
 // --replay prints the text read from a saved copy. --pdf prints the text read from a PDF file, and with --save also writes its lines for the tests.
 // The summary on stderr ends with the block that reading starts at (the selection, a visible click, or the top of
@@ -39,14 +40,14 @@ if args.first == "--pdf", args.count > 1 {
     print(markdown(blocks), terminator: "")
     exit(0)
 }
-if args.first == "--image", args.count > 1 {
+if args.first == "--image" || args.first == "--file", args.count > 1 {
     let clock = ContinuousClock.now
-    guard let blocks = readImage(URL(filePath: args[1])) else {
-        FileHandle.standardError.write(Data("\(args[1]) is not an image\n".utf8))
+    guard let page = readFilePage(URL(filePath: args[1])) else {
+        FileHandle.standardError.write(Data("\(args[1]) is not a file Berang reads\n".utf8))
         exit(1)
     }
-    FileHandle.standardError.write(Data("\(blocks.count) blocks, \((ContinuousClock.now - clock) / .milliseconds(1)) ms\n".utf8))
-    print(markdown(blocks), terminator: "")
+    FileHandle.standardError.write(Data("\(page.blocks.count) blocks, \((ContinuousClock.now - clock) / .milliseconds(1)) ms, starts at block \(page.start)\n".utf8))
+    print(markdown(page.blocks), terminator: "")
     exit(0)
 }
 var saveTo: URL?
