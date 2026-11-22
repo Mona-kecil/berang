@@ -41,7 +41,17 @@ echo 'Dr. Patel raised $3.5M on 2026-11-22.' | python3 bench/clean/clean.py
 
 ## Mac app
 
-`mac/` holds Berang.app, a floating player that reads the window you were last in, using the Phonon 31m voice and highlighting the sentence and the word being read. Requires macOS 15 on Apple silicon, and Xcode to build.
+`mac/` holds Berang.app, a floating player that reads the window you were last in, using the Phonon 31m voice and highlighting the sentence and the word being read. Requires macOS 15 on Apple silicon.
+
+To install Berang, or update it, run:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Mona-kecil/berang/main/install.sh | sh
+```
+
+The script downloads the latest release, checks that it is signed with Berang's certificate, puts it in Applications, and opens it. Releases are signed but not notarized by Apple. If you download `Berang.zip` from the releases page in a browser instead, macOS says it can't open Berang the first time: click Open Anyway in System Settings > Privacy & Security.
+
+To build it yourself, which needs Xcode:
 
 ```sh
 mac/build-app.sh
@@ -50,7 +60,7 @@ open mac/build/Berang.app
 
 The first time you press play, macOS asks to let Berang control your computer using accessibility features. Berang needs this to read text from other apps. Turn Berang on in System Settings > Privacy & Security > Accessibility, then press play again. On the first play, Berang downloads the voice (137 MB) from the Phonon release and checks its SHA-256.
 
-`build-app.sh` signs the app with your Developer ID or Apple Development certificate. Without one, it signs ad hoc, and macOS forgets the Accessibility permission on every rebuild.
+`build-app.sh` signs the app with the Berang certificate if your keychain has it, or else your Developer ID or Apple Development certificate. Without one, it signs ad hoc, and macOS forgets the Accessibility permission on every rebuild. To publish a release, push a tag such as `v0.2.0`; the Release workflow builds, signs, and attaches `Berang.zip` to it.
 
 Press ⌥⎋ (Option-Escape) in any app to start or pause reading. Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before and have not scrolled, it continues from the paragraph where you stopped; Start over goes back to the top. Berang also reads PDFs in Preview, Safari, and Chrome, the text in images open in Preview, and the page in front of you in Apple Books, highlighting the paragraph rather than the word. In VS Code and editors built on it, such as Cursor, Berang reads the open file from the cursor once screen reader mode is on (⇧⌥F1). In Google Docs, it reads the whole document once screen reader support and braille support are on, under Tools > Accessibility. Neither shows a highlight. Press ⌥⇧⎋ (Option-Shift-Escape), or choose Read Screen Area from the menu bar, and drag over any part of the screen to hear the text in it, such as a screenshot, a video frame, or an app that draws its own text. The first time, macOS asks to let Berang record the screen; Berang needs this to see the area, and recognizes the text on your Mac. With that access, ⌥⎋ also reads an app that shows no text to Berang, such as a web reader that draws its pages as images, by recognizing the text in the app's window. To listen to a whole book or document, choose Open File from the menu bar, or open the file with Berang from Finder: an EPUB, a PDF, an image, or a text file. A book starts where its text starts, after the cover and contents, and continues where you stopped. The waveform icon in the menu bar shows or hides the player and quits Berang.
 
