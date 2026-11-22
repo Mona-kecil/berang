@@ -52,6 +52,7 @@ public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws
     // WebKit builds a page's accessibility tree on the first request, so the first read of a page
     // can find only the window. A read that finds no page or text area and little text tries again.
     for attempt in 0... {
+        if attempt == 0, let page = readImageFile(in: window, app: app) { return page }
         let root = Node(window)
         if attempt == 0, let document = root.document, document.role != "AXWebArea",
            let page = readPDFFile(document.element, in: window, app: app) { return page }
