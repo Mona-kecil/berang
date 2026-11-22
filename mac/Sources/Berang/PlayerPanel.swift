@@ -73,7 +73,6 @@ struct PlayerView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 22))
-        .contextMenu { Button("Quit Berang") { NSApp.terminate(nil) } }
     }
 
     private var reading: Bool { player.state == .playing || player.state == .paused }

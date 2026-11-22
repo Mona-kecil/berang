@@ -52,7 +52,7 @@ The first time you press play, macOS asks to let Berang control your computer us
 
 `build-app.sh` signs the app with your Developer ID or Apple Development certificate. Without one, it signs ad hoc, and macOS forgets the Accessibility permission on every rebuild.
 
-Right-click the player to quit.
+Press ⌥⎋ (Option-Escape) in any app to start or pause reading. The waveform icon in the menu bar shows or hides the player and quits Berang.
 
 ### Text grabber
 
