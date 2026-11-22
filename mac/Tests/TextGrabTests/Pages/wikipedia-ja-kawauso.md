@@ -170,7 +170,7 @@ MSW3 (Wozencraft, 2005) ではニホンカワウソを独立種Lutra nipponと�
 
 [脚注の使い方]
 
-^Appendices I, II and III <https://cites.org/eng> (Accessed 01 August 2018)
+Appendices I, II and III <https://cites.org/eng> (Accessed 01 August 2018)
 
 ^ a以下の位置に戻る:bcW. Christopher Wozencraft(2005),“Order Carnivora”,inDon E. Wilson & DeeAnn M. Reeder,Mammal Species of the World,1(3rd ed.),Johns Hopkins University Press,pp. 532-628
 
@@ -184,11 +184,11 @@ MSW3 (Wozencraft, 2005) ではニホンカワウソを独立種Lutra nipponと�
 
 ^ a以下の位置に戻る:bcVera de Ferran, Henrique Vieira Figueiró, Fernanda de Jesus Trindade, Oliver Smith, Mikkel-Holger S. Sinding, Cristine S. Trinca, Gabriele Zenato Lazzari, Géraldine Veron, Juliana A. Vianna, Filippo Barbanera, Sergei Kliver, Natalia Serdyukova, Tatiana Bulyonkova, Oliver A. Ryder, M. Thomas P. Gilbert, Klaus-Peter Koepfli & Eduardo Eizirik(2022).“Phylogenomics of the world’s otters”.Current Biology32(16): 3650-3658.doi:10.1016/j.cub.2022.06.036.
 
-^Beatrice Moretti, Omar F. Al-Sheikhly, Monica Guerrini, Meryl Theng, Brij K. Gupta, Mukhtar K. Haba, Waseem A. Khan, Aleem A. Khan & Filippo Barbanera, “Phylogeography of the smooth-coated otter (Lutrogale perspicillata): distinct evolutionary lineages and hybridization with the Asian small-clawed otter (Aonyx cinereus),” Scientific Reports, Volume 7, Article number: 41611 (2017).
+Beatrice Moretti, Omar F. Al-Sheikhly, Monica Guerrini, Meryl Theng, Brij K. Gupta, Mukhtar K. Haba, Waseem A. Khan, Aleem A. Khan & Filippo Barbanera, “Phylogeography of the smooth-coated otter (Lutrogale perspicillata): distinct evolutionary lineages and hybridization with the Asian small-clawed otter (Aonyx cinereus),” Scientific Reports, Volume 7, Article number: 41611 (2017).
 
 ^ a以下の位置に戻る:bcdPat Morris, Amy-Jane Beer 「イタチ科」鈴木聡訳『知られざる動物の世界 8 小型肉食獣のなかま』 本川雅治監訳、朝倉書店、2013年、26-81頁。
 
-^Jacques, H., Reed-Smith, J., Davenport, C & Somers, M.J. 2015. Aonyx congicus.The IUCN Red List of Threatened Species 2015: e.T1794A14164772. https://doi.org/10.2305/IUCN.UK.2015-2.RLTS.T1794A14164772.en. Downloaded on 01 August 2018.
+Jacques, H., Reed-Smith, J., Davenport, C & Somers, M.J. 2015. Aonyx congicus. The IUCN Red List of Threatened Species 2015: e.T1794A14164772. https://doi.org/10.2305/IUCN.UK.2015-2.RLTS.T1794A14164772.en. Downloaded on 01 August 2018.
 
 Wilson, D.E.; Reeder, D.M., eds. (2005). Mammal Species of the World: A Taxonomic and Geographic Reference (3rd ed.). Johns Hopkins University Press. ISBN 978-0-8018-8221-0. OCLC 62265494.
 
@@ -220,7 +220,7 @@ Lutra lutra: Roos, A., Loy, A., de Silva, P., Hajkova, P. & Zemanová, B., IUCN,
 
 ^ a以下の位置に戻る:b本川雅治、下稲葉さやか、鈴木聡「日本産哺乳類の最近の分類体系 ―阿部（2005）とWilson and Reeder（2005）の比較―」『哺乳類科学』第46巻第2号、日本哺乳類学会、2006年、181-191頁、doi:10.11238/mammalianscience.46.181。
 
-^ a以下の位置に戻る:bcd「カワウソを飼いたい！」その前に。知ってもらいたい「カワウソのホント」を、大人気カワウソの飼い主さん... - テレ東プラス
+「カワウソを飼いたい！」その前に。知ってもらいたい「カワウソのホント」を、大人気カワウソの飼い主さん... - テレ東プラス
 
 “カワウソと獺祭（だっさい） | 海遊館日記”. 海遊館. 2021年1月29日閲覧。
 
@@ -236,7 +236,7 @@ Corporationテレビ東京-TV TOKYO『「カワウソを飼いたい！」その
 
 Christina Zhou (2019年4月13日). “Japan's otter and owl cafes are Instagram hotspots, but experts warn of 'a lifetime of cruelty'”. ABCニュース (オーストラリア).
 
-^ a以下の位置に戻る:b荒俣宏 「カワウソ」『普及版 世界大博物図鑑 5 哺乳類』平凡社、2021年（原著1988年）、174頁。
+荒俣宏 「カワウソ」『普及版 世界大博物図鑑 5 哺乳類』平凡社、2021年（原著1988年）、174頁。
 
 “獺祭魚と李商隠（山口県医師会報 第1878号）”. 山口県医師会 (2017年2月). 2021年1月12日閲覧。
 
@@ -258,23 +258,23 @@ Christina Zhou (2019年4月13日). “Japan's otter and owl cafes are Instagram 
 
 香川雅信 著「カッパは緑色か?」、吉良浩一 編『怪』 vol.0037、角川書店〈カドカワムック〉、2012年、34頁。ISBN 978-4-04-130038-1。
 
-^向田邦子『思い出トランプ』新潮社、1980年、7-23頁。かわうその描写は15‐16頁。
+向田邦子『思い出トランプ』新潮社、1980年、7-23頁。かわうその描写は15‐16頁。
 
-^ a以下の位置に戻る:bcカワウソ - アイヌと自然デジタル図鑑
+カワウソ - アイヌと自然デジタル図鑑
 
-^ a以下の位置に戻る:bカワウソ - アイヌ民族博物館
+カワウソ - アイヌ民族博物館
 
 知里真志保「えぞおばけ列伝」『アイヌ民譚集』岩波書店〈岩波文庫〉、1981年（原著1937年）、198-200頁。ISBN 978-4-00-320811-3。
 
-^ラッコ - アイヌ民族博物館
+ラッコ - アイヌ民族博物館
 
 小倉貞男『物語ヴェトナムの歴史 一億人国家のダイナミズム』〈中公新書〉、63-64頁。ISBN 4-12-101372-7。
 
 Swanton, John Reed (1909). Tlingit myths and texts, recorded by John R. Swanton. University of California Libraries. Washington, Govt. print. off
 
-^ビーバーとカワウソが出会ったら
+ビーバーとカワウソが出会ったら
 
-^かわうそキーオネクは釣り名人
+かわうそキーオネクは釣り名人
 
 # 関連項目
 

@@ -227,12 +227,13 @@ struct BlockBuilder {
     }
 
     /// Finds each piece in `source`, in order, then makes one block per line of `source`. Each block spans
-    /// its first piece to its last, which drops list markers and nested blocks. Nil when a piece is missing.
+    /// its first piece to its last, which drops list markers and nested blocks. A piece the browser does not
+    /// show, like a media player's "Elapsed: 0 seconds", is left out. Nil when most of the text is missing.
     private func align(_ kind: Block.Kind, _ source: String) -> [Block]? {
         let hay = Array(squash(source, keepingLines: true).utf16)
         // `beforeSkip` is where the search stood before skipped text moved it on. The browser can put skipped
         // text, like a floated caption, after the next piece, so that piece is searched for from there too.
-        var cursor = 0, lines: [[Run]] = [], line = -1, newlines = 0, beforeSkip: Int?
+        var cursor = 0, lines: [[Run]] = [], line = -1, newlines = 0, beforeSkip: Int?, found = 0, missing = 0
         for p in pieces {
             let raw = p.text.replacing("\u{FFFC}", with: "")
             let piece = squash(raw)
@@ -251,13 +252,18 @@ struct BlockBuilder {
                 cursor = start
             }
             beforeSkip = nil
-            guard let at = find(needle, in: hay, from: cursor) else { return nil }
+            guard let at = find(needle, in: hay, from: cursor) else {
+                missing += needle.count
+                continue
+            }
+            found += needle.count
             let lead = raw.utf16.count - raw.drop(while: \.isWhitespace).utf16.count
             let run = Run(element: p.element, range: at..<at + piece.utf16.count, offset: p.offset + lead)
             newlines += hay[cursor..<at].count(where: { $0 == newline })
             if newlines == line { lines[lines.count - 1].append(run) } else { lines.append([run]); line = newlines }
             cursor = run.range.upperBound
         }
+        if missing > found { return nil }
         return lines.map { runs in
             let start = runs[0].range.lowerBound, end = runs[runs.count - 1].range.upperBound
             let text = String(decoding: hay[start..<end].map { $0 == newline ? space : $0 }, as: UTF16.self)
