@@ -85,6 +85,10 @@ open mac/build/Berang.app
 
 `build-app.sh` signs the app with the Berang certificate if your keychain has it, or else your Developer ID or Apple Development certificate. Without one, it signs ad hoc, and macOS forgets the Accessibility permission on every rebuild. To publish a release, push a tag such as `v0.2.0`; the Release workflow builds Berang, signs it with the Berang certificate from the repository secrets, and attaches `Berang.zip` to the release. `install.sh` installs only a Berang signed with that certificate.
 
+### Player model
+
+`mac/Model/Player.tla` is a TLA+ model of the player: what each request does, step by step, while the voice downloads, loads, waits for an area, or reads. TLC checks that Berang never reads two things at once, never shows playing when nothing plays, keeps the highlight and saved position on what you hear, and reads a request made while the voice gets ready. CI runs it; to run it yourself, see the command at the top of the file. Update it with any change to how `Player.swift` handles requests.
+
 ### Engine benchmark
 
 `bench/` measures berang's three voices on an M1 MacBook Air (8 GB). 2 CPU threads stand in for an iPhone 13. Full table: [`bench/results/summary.md`](bench/results/summary.md). The three were picked from 11 local models and the macOS system voice; that comparison is in commit 30e6f5e.
