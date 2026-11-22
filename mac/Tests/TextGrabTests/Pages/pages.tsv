@@ -1,0 +1,22 @@
+name	source	url	license
+wikipedia-otter	webkit	https://en.wikipedia.org/wiki/Otter	CC BY-SA 4.0
+wikipedia-photosynthesis	webkit	https://en.wikipedia.org/wiki/Photosynthesis	CC BY-SA 4.0
+wikipedia-ada-lovelace	webkit	https://en.wikipedia.org/wiki/Ada_Lovelace	CC BY-SA 4.0
+wikipedia-python	webkit	https://en.wikipedia.org/wiki/Python_(programming_language)	CC BY-SA 4.0
+wikipedia-speech-synthesis	webkit	https://en.wikipedia.org/wiki/Speech_synthesis	CC BY-SA 4.0
+wikipedia-apollo-11	webkit	https://en.wikipedia.org/wiki/Apollo_11	CC BY-SA 4.0
+wikipedia-solar-system	webkit	https://en.wikipedia.org/wiki/Solar_System	CC BY-SA 4.0
+wikipedia-coffee	webkit	https://en.wikipedia.org/wiki/Coffee	CC BY-SA 4.0
+wikipedia-jakarta	webkit	https://en.wikipedia.org/wiki/Jakarta	CC BY-SA 4.0
+wikipedia-main-page	webkit	https://en.wikipedia.org/wiki/Main_Page	CC BY-SA 4.0
+simple-wikipedia-otter	webkit	https://simple.wikipedia.org/wiki/Otter	CC BY-SA 4.0
+wikipedia-id-berang-berang	webkit	https://id.wikipedia.org/wiki/Berang-berang	CC BY-SA 4.0
+wikipedia-fr-loutre	webkit	https://fr.wikipedia.org/wiki/Loutre	CC BY-SA 4.0
+wikipedia-de-fischotter	webkit	https://de.wikipedia.org/wiki/Fischotter	CC BY-SA 4.0
+wikipedia-es-nutria	webkit	https://es.wikipedia.org/wiki/Lutrinae	CC BY-SA 4.0
+wikipedia-ja-kawauso	webkit	https://ja.wikipedia.org/wiki/カワウソ	CC BY-SA 4.0
+wikivoyage-jakarta	webkit	https://en.wikivoyage.org/wiki/Jakarta	CC BY-SA 4.0
+wikibooks-cookbook-pancake	webkit	https://en.wikibooks.org/wiki/Cookbook:Pancake	CC BY-SA 4.0
+chrome-wikipedia-otter	chrome	https://en.wikipedia.org/wiki/Otter	CC BY-SA 4.0
+textedit-plain	textedit	fixtures/plain.txt	GPL-3.0 (this repository)
+textedit-rich	textedit	fixtures/rich.rtf	GPL-3.0 (this repository)
