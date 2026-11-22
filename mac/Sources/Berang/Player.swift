@@ -19,8 +19,8 @@ import TextGrab
     @ObservationIgnored private var page: Page?
     @ObservationIgnored private var index = 0
     @ObservationIgnored private var task: Task<Void, Never>?
-    /// The app to read: the last one active other than this one. The panel never takes focus,
-    /// so this is the app the user is looking at.
+    /// The app to read: the last one active other than this one and System Settings. The panel never
+    /// takes focus, so this is the app the user is looking at, even after granting Accessibility access.
     @ObservationIgnored private var target = NSWorkspace.shared.frontmostApplication
 
     init() {
@@ -29,7 +29,8 @@ import TextGrab
         ) { [weak self] note in
             let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
             MainActor.assumeIsolated {
-                if let app, app.processIdentifier != ProcessInfo.processInfo.processIdentifier { self?.target = app }
+                if let app, app.processIdentifier != ProcessInfo.processInfo.processIdentifier,
+                   app.bundleIdentifier != "com.apple.systempreferences" { self?.target = app }
             }
         }
     }
@@ -66,6 +67,9 @@ import TextGrab
     private func start() {
         task = Task {
             do {
+                // Shows the system's Accessibility prompt the first time, before the voice download.
+                guard AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
+                else { throw GrabError.notTrusted }
                 if tts == nil {
                     if !Voice.isInstalled {
                         state = .downloading

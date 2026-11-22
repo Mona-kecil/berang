@@ -17,4 +17,5 @@ bench/listen/*
 !bench/listen/align.py
 .build/
 .swiftpm/
-spikes/*/.xcbuild/
+.xcbuild/
+mac/build/

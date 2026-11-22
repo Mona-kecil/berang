@@ -23,6 +23,7 @@ jobs:
       - run: swift --version
       - run: swift build -c release
       - run: swift test
+      - run: ./build-app.sh
 
   cleanup:
     runs-on: ubuntu-latest
