@@ -32,6 +32,8 @@ func startBlock(_ blocks: [Block], in viewport: AXUIElement, clip: AXUIElement?)
     let start: (block: Int, point: Page.StartPoint) = switch viewport.string(kAXRoleAttribute) {
     case "AXWebArea": webStart(blocks, viewport, clip)
     case kAXTextAreaRole: textAreaStart(blocks, viewport)
+    // A PDF's pages, like a web page, are taller than the screen and scroll inside it.
+    case _ where pdfDocumentSubroles.contains(viewport.string(kAXSubroleAttribute) ?? ""): webStart(blocks, viewport, clip)
     default: (0, .screen)
     }
     // Past the last block, as when the user is in the References, reading starts over.

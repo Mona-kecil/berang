@@ -1,6 +1,7 @@
 #!/bin/sh
 # Records saved pages: opens each page, saves its accessibility tree to <name>.json.lzma, and writes the
-# text read back from that copy to <name>.md. Review the .md diffs before committing them.
+# text read back from that copy to <name>.md. A PDF saves its lines instead of a tree. Review the .md diffs
+# before committing them.
 # usage: Tests/TextGrabTests/Pages/record.sh [name ...]   (default: every page in pages.tsv)
 # Needs Accessibility access for the terminal. Chrome pages use a throwaway profile.
 set -e
@@ -14,6 +15,12 @@ trap 'rm -rf "$profile"' EXIT
 tail -n +2 pages.tsv | while IFS="$(printf '\t')" read -r name source url license; do
   if [ $# -gt 0 ] && ! echo " $* " | grep -q " $name "; then continue; fi
   title=
+  if [ "$source" = pdf ]; then
+    file=$url
+    case $url in http*) file="$profile/$name.pdf"; curl -sL -o "$file" "$url" ;; esac
+    "$bin/berang-grab" --pdf "$file" --save "$name.json.lzma" > "$name.md" || echo "FAILED $name"
+    continue
+  fi
   case $url in http*) ;; *) url="file://$here/$url" ;; esac
   case $source in
     webkit)
@@ -25,18 +32,19 @@ tail -n +2 pages.tsv | while IFS="$(printf '\t')" read -r name source url licens
         --force-renderer-accessibility --new-window "$url"
       sleep 10
       pid=$(pgrep -f "MacOS/Google Chrome --user-data-dir=$profile/chrome" | head -1) ;;
-    textedit)
-      open -a TextEdit "${url#file://}"
+    textedit|preview)
+      app=$([ "$source" = textedit ] && echo TextEdit || echo Preview)
+      open -a "$app" "${url#file://}"
       sleep 2
-      pid=$(pgrep -x TextEdit)
+      pid=$(pgrep -x "$app")
       title=$(basename "$url") ;;
   esac
   # The first read makes the app build its accessibility tree.
   "$bin/berang-grab" "$pid" ${title:+"$title"} > /dev/null 2>&1 || true
   sleep 1
   "$bin/berang-grab" --save "$name.json.lzma" "$pid" ${title:+"$title"} > "$name.md" || echo "FAILED $name"
-  if [ "$source" = textedit ]; then
-    osascript -e "tell application \"TextEdit\"" \
+  if [ "$source" = textedit ] || [ "$source" = preview ]; then
+    osascript -e "tell application \"$app\"" \
       -e "close (first document whose path is \"${url#file://}\") saving no" \
       -e "if (count of documents) is 0 then quit" -e "end tell"
   else

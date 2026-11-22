@@ -53,6 +53,8 @@ public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws
     // can find only the window. A read that finds no page or text area and little text tries again.
     for attempt in 0... {
         let root = Node(window)
+        if attempt == 0, let document = root.document, document.role != "AXWebArea",
+           let page = readPDFFile(document.element, in: window, app: app) { return page }
         let (blocks, viewport) = read(root, focused: ax.element(kAXFocusedUIElementAttribute).map(Node.init))
         if viewport !== root || attempt == 3 || blocks.reduce(0, { $0 + $1.text.utf16.count }) >= 200 {
             let clip = scrollArea(around: viewport.element) ?? window
@@ -89,14 +91,14 @@ public func markdown(_ blocks: [Block]) -> String {
 }
 
 /// The window's document, or the web area's URL, without a #fragment so every section of a page shares one address.
-private func address(_ window: AXUIElement, _ viewport: AXUIElement) -> String? {
+func address(_ window: AXUIElement, _ viewport: AXUIElement) -> String? {
     let url = (window.get("AXDocument") as? String).flatMap(URL.init(string:)) ?? viewport.get("AXURL") as? URL
     guard let url, var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
     parts.fragment = nil
     return parts.string
 }
 
-private func scrollArea(around element: AXUIElement) -> AXUIElement? {
+func scrollArea(around element: AXUIElement) -> AXUIElement? {
     var parent = element.element(kAXParentAttribute)
     for _ in 0..<4 {
         guard let p = parent else { return nil }
@@ -125,7 +127,12 @@ private func window(of app: NSRunningApplication, titled title: String?) throws 
 
 private func read(_ window: Node, focused: Node?) -> (blocks: [Block], viewport: Node) {
     var reader = Reader()
-    if let web = window.first(depth: 30, where: { $0.role == "AXWebArea" }) {
+    let document = window.document
+    if let document, document.role != "AXWebArea" {
+        reader.readPages(document.children.filter { $0.role == "AXPage" })
+        return (reader.blocks, document)
+    }
+    if let web = document {
         // One article is the content (a post, a README). Several articles are a feed, read whole from main.
         var main: Node?, articles: [Node] = []
         web.visit(depth: 40) { n in
@@ -181,11 +188,11 @@ private let figureNames: Set = {
 private let maxDepth = 200
 
 /// Section headings that end the readable part of an article.
-private let backMatter: Set = [
+let backMatter: Set = [
     "references", "notes", "citations", "sources", "bibliography", "footnotes", "external links", "further reading", "see also",
 ]
 
-private struct Reader {
+struct Reader {
     var blocks: [Block] = []
     var web = false
     /// Read header-less tables. Only pages without a main or article landmark still lay out text with tables.
@@ -341,7 +348,7 @@ private func renderedText(_ element: AXUIElement) -> String? {
 }
 
 /// One element with the attributes the reader needs, fetched in a single call, or read from a saved copy.
-private final class Node {
+final class Node {
     let element: AXUIElement
     let role: String?
     let subrole: String?
@@ -398,6 +405,11 @@ private final class Node {
     }
     /// Whether the reader would make a block here and so ask for `rendered`.
     fileprivate var startsBlock: Bool { role == "AXHeading" || children.contains { $0.role == "AXStaticText" } }
+
+    /// The web area, or the element holding a PDF's pages, whichever is shallowest.
+    var document: Node? {
+        first(depth: 30) { $0.role == "AXWebArea" || pdfDocumentSubroles.contains($0.subrole ?? "") }
+    }
 
     /// Breadth-first search, so the shallowest match wins.
     func first(depth: Int, where match: (Node) -> Bool) -> Node? {
