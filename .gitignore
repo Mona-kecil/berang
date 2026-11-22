@@ -23,3 +23,5 @@ mac/build/
 bench/timing/corpus.txt
 bench/timing/held-out.txt
 *.profraw
+# Voice previews the app ships, made by berang-say previews; no other audio is committed.
+!mac/App/Previews/*/*.m4a

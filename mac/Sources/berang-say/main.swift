@@ -4,9 +4,11 @@
 //                                            first-word.json: per paragraph, the seconds from its text to its
 //                                            first word's sound, on a warm voice.
 //        berang-say estimate <dir>           Writes estimates.json: each chunk's words with their estimated starts.
-//        berang-say voices <dir> <text>      Writes <voice>.wav for each Phonon voice speaking <text>, and prints
-//                                            the voice a fresh load speaks with.
+//        berang-say previews <dir> [pocket]  Writes <dir>/<engine>/<voice>.m4a: each voice saying the sample, at
+//                                            one loudness, for the app's preview clips. [pocket] is Pocket's model
+//                                            folder, as Berang installs it.
 import Foundation
+import MLXAudioTTS
 import PhononTTS
 import Speakable
 
@@ -23,8 +25,8 @@ struct Estimate: Codable {
 }
 
 let args = CommandLine.arguments
-guard args.count >= 3, ["synth", "estimate", "voices"].contains(args[1]) else {
-    FileHandle.standardError.write(Data("usage: berang-say synth <text-file> <dir> | estimate <dir> | voices <dir> <text>\n".utf8))
+guard args.count >= 3, ["synth", "estimate", "previews"].contains(args[1]) else {
+    FileHandle.standardError.write(Data("usage: berang-say synth <text-file> <dir> | estimate <dir> | previews <dir> [pocket]\n".utf8))
     exit(2)
 }
 
@@ -46,19 +48,53 @@ func readWAV(_ url: URL) throws -> [Float] {
     }
 }
 
+/// Writes `samples` as a small AAC clip at -20 dBFS RMS, its peaks held under -1 dBFS, so voices compare by sound
+/// and not by loudness.
+func writePreview(_ samples: [Float], to url: URL) throws {
+    let rms = (samples.reduce(0) { $0 + $1 * $1 } / Float(max(samples.count, 1))).squareRoot()
+    let peak = samples.map(abs).max() ?? 1
+    let gain = min(0.1 / max(rms, 1e-6), 0.89 / max(peak, 1e-6))
+    let wav = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString + ".wav")
+    defer { try? FileManager.default.removeItem(at: wav) }
+    try writeWAV(samples.map { $0 * gain }, to: wav)
+    try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+    let convert = Process()
+    convert.executableURL = URL(filePath: "/usr/bin/afconvert")
+    convert.arguments = ["-f", "m4af", "-d", "aac", "-b", "32000", wav.path, url.path]
+    try convert.run()
+    convert.waitUntilExit()
+    guard convert.terminationStatus == 0 else { throw PhononError(description: "afconvert failed for \(url.lastPathComponent)") }
+}
+
 let dir = URL(filePath: args[args[1] == "synth" ? 3 : 2])
 do {
-    if args[1] == "voices", args.count > 3 {
-        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        let tts = try await Phonon.load(models: PhononModels.defaultDirectory, language: .english)
-        print("fresh load speaks with: \(tts.voice)")
-        for voice in tts.voices {
-            try await tts.setVoice(voice)
+    if args[1] == "previews" {
+        // Phonon's voices, then Pocket's when its model folder is given.
+        let phonon = try await Phonon.load(models: PhononModels.defaultDirectory, language: .english)
+        for voice in phonon.voices {
+            try await phonon.setVoice(voice)
             var samples: [Float] = []
-            for chunk in prepare(args[3]) { for try await part in tts.stream(chunk.text) { samples += part } }
-            try writeWAV(samples, to: dir.appending(path: "\(voice).wav"))
+            for chunk in prepare(voiceSampleText) { for try await part in phonon.stream(chunk.text) { samples += part } }
+            try writePreview(samples, to: dir.appending(path: "phonon/\(voice).m4a"))
         }
-        print("\(tts.voices.count) voices")
+        print("phonon: \(phonon.voices.count) voices")
+        if args.count > 3 {
+            let folder = URL(filePath: args[3])
+            let pocket = try await TTS.loadModel(modelRepo: folder.path)
+            let names = try FileManager.default.contentsOfDirectory(atPath: folder.appending(path: "embeddings").path)
+                .filter { $0.hasSuffix(".safetensors") }.map { String($0.dropLast(".safetensors".count)) }.sorted()
+            for voice in names {
+                var samples: [Float] = []
+                for try await event in pocket.generateStream(
+                    text: voiceSampleText, voice: voice, refAudio: nil, refText: nil, language: nil,
+                    generationParameters: pocket.defaultGenerationParameters, streamingInterval: 0.32
+                ) {
+                    if case .audio(let chunk) = event { samples += chunk.asArray(Float.self) }
+                }
+                try writePreview(samples, to: dir.appending(path: "pocket/\(voice).m4a"))
+            }
+            print("pocket: \(names.count) voices")
+        }
     } else if args[1] == "synth" {
         let text = try String(contentsOf: URL(filePath: args[2]), encoding: .utf8)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

@@ -1,3 +1,4 @@
+import AVFoundation
 import AppKit
 import Observation
 import PhononTTS
@@ -37,6 +38,8 @@ import TextGrab
 
     @ObservationIgnored private let audio = AudioOut()
     @ObservationIgnored private let highlight = Highlight()
+    /// A voice's recorded preview, playing.
+    @ObservationIgnored private var clip: AVAudioPlayer?
     @ObservationIgnored private var tts: (any Speech)?
     /// The engine `tts` runs, which differs from `engine` after a voice of another engine is chosen.
     @ObservationIgnored private var ttsEngine: Engine?
@@ -119,10 +122,16 @@ import TextGrab
     private func cancel() {
         generation += 1
         task?.cancel()
+        endPreview()
         audio.stop()
         clock?.invalidate()
         clock = nil
         highlight.hide()
+    }
+
+    private func endPreview() {
+        clip?.stop()
+        clip = nil
     }
 
     /// Reads the text in an area of the screen the user drags over, stopping what is playing.
@@ -218,13 +227,30 @@ import TextGrab
         }
     }
 
-    /// Downloads an engine ahead of reading, as setup and the Voices window offer.
-    func downloadVoice(_ engine: Engine) {
+    /// Plays a voice's recorded preview, which needs no download. While a voice downloads or loads it plays
+    /// beside that; otherwise it replaces what was playing.
+    func preview(_ engine: Engine, _ name: String) {
+        guard let url = engine.preview(name) else { return }
+        if state == .downloading || state == .loading {
+            endPreview()
+        } else {
+            stop()
+        }
+        clip = try? AVAudioPlayer(contentsOf: url)
+        clip?.play()
+    }
+
+    /// Downloads an engine ahead of reading, as setup and the Voices window offer, then reads with `voice`.
+    func downloadVoice(_ engine: Engine, then voice: String? = nil) {
         guard !engine.isInstalled, state == .idle || state.isFailed else { return }
         task = Task {
             do {
                 try await installVoice(engine)
                 state = .idle
+                if let voice, pending == nil {
+                    choose(engine, voice)
+                    return
+                }
                 if let latest = pending {
                     pending = nil
                     start(latest)
@@ -273,8 +299,9 @@ import TextGrab
                     }
                 }
                 guard let tts else { return }
+                endPreview()
                 try await tts.setVoice(voice)
-                for chunk in prepare(sampleText) {
+                for chunk in prepare(voiceSampleText) {
                     for try await part in tts.stream(chunk.text) {
                         try Task.checkCancellation()
                         _ = try audio.enqueue(part)
@@ -313,6 +340,7 @@ import TextGrab
     /// Plays from `index` to the end of the page, for request `g`. A skip cancels this task and starts another.
     private func read(_ g: Int) async {
         guard g == generation, let tts, let page else { return }
+        endPreview()
         state = .playing
         hasRead = true
         timeline = Timeline()
@@ -364,9 +392,6 @@ import TextGrab
         page.blocks[b].scrollToVisible()
     }
 }
-
-/// What a voice says when chosen.
-private let sampleText = "Here is how I sound, reading the page in front of you."
 
 /// Five seconds of voice audio.
 private let lookahead = Int(Engine.sampleRate) * 5

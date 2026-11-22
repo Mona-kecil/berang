@@ -19,7 +19,7 @@ Prefer not to use Terminal? Download `Berang.zip` from the [latest release](http
 When Berang first opens, Set Up Berang walks you through what it needs:
 
 1. **Accessibility**, so Berang can read other apps. Click Allow, then turn Berang on in System Settings.
-2. **The voice**, 137 MB, downloaded once.
+2. **A voice.** Hear each one, then download its engine once: Phonon (137 MB, 38 voices) or Pocket (240 MB, 8 voices).
 3. **Screen Recording**, if you want to read parts of the screen. This is optional.
 4. **Try it**: press ⌥⎋ (Option-Escape) on any page.
 
@@ -33,7 +33,7 @@ To finish a step later, choose Set Up Berang from the menu bar.
 | Read part of the screen | Press ⌥⇧⎋ (Option-Shift-Escape) and drag over it |
 | Listen to a whole book or file | Choose Open File from the menu bar, or open the file with Berang in Finder |
 | Skip, change speed, or stop | Use the floating player |
-| Hear and choose a voice | Choose Voices from the menu bar |
+| Hear and choose a voice | Choose Voices from the menu bar, and select a voice to hear it |
 | Show or hide the player, or quit | Click the waveform icon in the menu bar |
 
 Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before, Berang continues where you stopped; Start over goes back to the top. Berang remembers the speed you choose.
@@ -90,6 +90,10 @@ open mac/build/Berang.app
 ### Player model
 
 `mac/Model/Player.tla` is a TLA+ model of the player: what each request does, step by step, while the voice downloads, loads, waits for an area, or reads. TLC checks that Berang never reads two things at once, never shows playing when nothing plays, keeps the highlight and saved position on what you hear, and reads a request made while the voice gets ready. CI runs it; to run it yourself, see the command at the top of the file. Update it with any change to how `Player.swift` handles requests.
+
+### Voice previews
+
+`mac/App/Previews` holds a few seconds of each voice, so you can hear it before downloading its engine. `berang-say previews mac/App/Previews <Pocket's model folder>` makes them again. The Phonon clips come from Phonon 31m by Gradium (Apache-2.0), and the Pocket clips from Pocket TTS by Kyutai (CC-BY-4.0).
 
 ### Engine benchmark
 
