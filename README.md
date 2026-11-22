@@ -56,7 +56,7 @@ Press ⌥⎋ (Option-Escape) in any app to start or pause reading. The waveform 
 
 ### Text grabber
 
-`berang-grab` in `mac/` uses the macOS Accessibility API to print a window's main text as Markdown. It reads the article and skips menus, sidebars, buttons, data tables, and back matter such as References. With no arguments, it reads the focused window of the frontmost app.
+`berang-grab` in `mac/` uses the macOS Accessibility API to print a window's main text as Markdown. It reads the article and skips menus, sidebars, buttons, data tables, code blocks, figures with their captions, ad slots, and back matter such as References. With no arguments, it reads the focused window of the frontmost app.
 
 ```sh
 cd mac && swift build -c release

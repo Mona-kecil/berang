@@ -18,8 +18,6 @@ The word otter derives from the Old English word otoror oter. This and cognate w
 
 # Life cycle
 
-A sea otter playing in captivity.
-
 The gestation period in otters is about 60 to 86 days. The newborn pup is cared for by the female, male, and older offspring. Females reach sexual maturity at approximately two years of age, and males at approximately three years. The den or "holt"[4] is built under tree roots or a rocky cairn, more common in Scotland. It is lined with moss and grass.
 
 After one month, the pup can leave the den, and after two months, it can swim. The pup lives with its family for approximately one year. Otters live up to 16 years; they are by nature playful and frolic in the water with their pups. Its usual food is fish, and further downriver, eels, but it may also sample frogs and birds.
@@ -108,8 +106,6 @@ Genus †Vishnuonyx – Europe, Asia and Africa, Late Miocene to Early Pliocene[
 
 # Relation with humans
 
-Sign warning drivers in Benbeculain the Outer Hebrides to beware of otters on the road
-
 # Hunting
 
 Otters have been hunted for their pelts from at least the 1700s, although it may have begun well before then. Early hunting methods included darts, arrows, nets and snares but later, traps were set on land and guns used.
@@ -147,8 +143,6 @@ In popular Korean mythology, it is told that people who see an otter (soodal) wi
 In the Buddhist Jataka tales, The Otters and The Wolf, two otters agreed to let a wolf settle their dispute in dividing their caught fish but it was taken away by the cunning wolf.[37]
 
 # Japanese folklore
-
-Kawauso (獺) from the Gazu Hyakki Yagyō by Sekien Toriyama
 
 In Japanese, otters are called "kawauso" (獺、川獺). In Japanese folklore, they fool humans in the same way as foxes (kitsune) and tanuki.
 

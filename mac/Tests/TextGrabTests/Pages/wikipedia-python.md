@@ -12,8 +12,6 @@ Python is widely taught as an introductory programming language.[42]
 
 Main article: History of Python
 
-The designer of Python, Guido van Rossum, at PyCon US 2024
-
 Python was conceived in the late 1980s[11] by Guido van Rossum at Centrum Wiskunde & Informatica (CWI) in the Netherlands.[43] It was designed as a successor to the ABC programming language, which was inspired by SETL,[44] capable of exception handling and interfacing with the Amoeba operating system.[18] Python implementation began in December 1989.[43] Van Rossum first released it in 1991 as Python 0.9.0.[43] Van Rossum assumed sole responsibility for the project, as the lead developer, until 12 July 2018, when he announced his "permanent vacation" from responsibilities as Python's "benevolent dictator for life" (BDFL); this title was bestowed on him by the Python community to reflect his long-term commitment as the project's chief decision-maker.[45][c] In January 2019, active Python core developers elected a five-member Steering Council to lead the project.[46][47]
 
 The name Python derives from the British comedy series Monty Python's Flying Circus.[48] (See § Naming.)
@@ -172,8 +170,6 @@ A statement cannot be part of an expression; because of this restriction, expres
 
 # Typing
 
-The standard type hierarchy in Python 3
-
 Python uses duck typing, and it has typed objects but untyped variable names. Type constraints are not checked at definition time; rather, operations on an object may fail at usage time, indicating that the object is not of an appropriate type. Despite being dynamically typed, Python is strongly typed, forbidding operations that are poorly defined (e.g., adding a number and a string) rather than quietly attempting to interpret them.
 
 Python allows programmers to define their own types using classes, most often for object-oriented programming. New instances of classes are constructed by calling the class, for example, SpamClass() or EggsClass()); the classes are instances of the metaclass type (which is an instance of itself), thereby allowing metaprogramming and reflection.
@@ -208,31 +204,13 @@ Due to Python's extensive mathematics library and the third-party library NumPy,
 
 Functions are created in Python by using the def keyword. A function is defined similarly to how it is called, by first providing the function name and then the required parameters. Here is an example of a function that prints its inputs:
 
-def printer(input1, input2 = "already there"):
-
-print(input1)
-
-print(input2)
-
-printer("hello")
-
-# Example output:
-
-# hello
-
-# already there
-
 To assign a default value to a function parameter in case no actual value is provided at run time, variable-definition syntax can be used inside the function header.
 
 # Code examples
 
 "Hello, World!" program:
 
-print('Hello, World!')
-
 Program to calculate the factorial of a non-negative integer:
-
-1text=input('Type a number, and its factorial will be printed: ')23iftext.isdigit():4n=int(text)5else:6raiseTypeError('You must input a number')78ifn<0:9raiseValueError('You must enter a non-negative integer')1011factorial=112foriinrange(2,n+1):13factorial*=i1415print(factorial)
 
 # Libraries
 

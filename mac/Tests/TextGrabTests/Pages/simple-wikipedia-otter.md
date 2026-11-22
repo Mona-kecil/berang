@@ -58,10 +58,6 @@ change source
 
 The European otter (Lutra lutra) was common as recently as the 1950s, but became rare because of DDT pesticides, habitat loss and water pollution. Hunting of otters was also common. They stayed relatively common in parts of Scotland and Ireland, but numbers in England reached a low point in the 1980s. They are now recovering strongly. Otters are now quite common, especially in the west of England. Roadkill deaths are now happening more.
 
-Oriental small-clawed otter
-
-Giant otter
-
 # Species
 
 change

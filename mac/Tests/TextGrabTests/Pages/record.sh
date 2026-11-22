@@ -14,6 +14,7 @@ trap 'rm -rf "$profile"' EXIT
 tail -n +2 pages.tsv | while IFS="$(printf '\t')" read -r name source url license; do
   if [ $# -gt 0 ] && ! echo " $* " | grep -q " $name "; then continue; fi
   title=
+  case $url in http*) ;; *) url="file://$here/$url" ;; esac
   case $source in
     webkit)
       "$bin/page-viewer" "$url" > "$profile/viewer.out" 2>&1 &
@@ -25,7 +26,7 @@ tail -n +2 pages.tsv | while IFS="$(printf '\t')" read -r name source url licens
       sleep 10
       pid=$(pgrep -f "MacOS/Google Chrome --user-data-dir=$profile/chrome" | head -1) ;;
     textedit)
-      open -a TextEdit "$here/$url"
+      open -a TextEdit "${url#file://}"
       sleep 2
       pid=$(pgrep -x TextEdit)
       title=$(basename "$url") ;;
@@ -34,5 +35,11 @@ tail -n +2 pages.tsv | while IFS="$(printf '\t')" read -r name source url licens
   "$bin/berang-grab" "$pid" ${title:+"$title"} > /dev/null 2>&1 || true
   sleep 1
   "$bin/berang-grab" --save "$name.json.lzma" "$pid" ${title:+"$title"} > "$name.md" || echo "FAILED $name"
-  [ "$source" = textedit ] || kill "$pid"
+  if [ "$source" = textedit ]; then
+    osascript -e "tell application \"TextEdit\"" \
+      -e "close (first document whose path is \"${url#file://}\") saving no" \
+      -e "if (count of documents) is 0 then quit" -e "end tell"
+  else
+    kill "$pid"
+  fi
 done
