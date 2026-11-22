@@ -83,7 +83,8 @@ import TextGrab
                let last = block.frame(of: end - 1..<end) {
                 sentence = lineShape(bounds: bounds, first: first, last: last)
             } else {
-                sentence = block.frame(of: target.sentence).map { [$0] } ?? []
+                // Books gives no frames for parts of a paragraph, only the paragraph's.
+                sentence = (block.frame(of: target.sentence) ?? block.frame).map { [$0] } ?? []
             }
         }
         word = target.word.flatMap(block.frame(of:))

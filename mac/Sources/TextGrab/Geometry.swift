@@ -37,8 +37,9 @@ extension Block {
 }
 
 extension Page {
-    /// The part of the viewport on screen.
-    public var viewportFrame: CGRect? { visibleFrame(of: viewport, in: clip) }
+    /// The part of the viewport on screen. Books lays a chapter out in columns and reports the frame of the
+    /// whole chapter, off screen, so then the clip is the viewport.
+    public var viewportFrame: CGRect? { visibleFrame(of: viewport, in: clip) ?? clip?.get("AXFrame").flatMap(rect) }
 }
 
 func visibleFrame(of element: AXUIElement, in clip: AXUIElement?) -> CGRect? {

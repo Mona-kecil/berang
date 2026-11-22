@@ -181,6 +181,14 @@
     "Code block.",
     "After code."
    ]
+  },
+  {
+   "in": "“Is it safe?” she asked. “Yes.” He left.",
+   "out": [
+    "“Is it safe?” she asked.",
+    "“Yes.”",
+    "He left."
+   ]
   }
  ],
  "spans": {
