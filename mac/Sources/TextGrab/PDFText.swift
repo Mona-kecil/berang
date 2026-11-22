@@ -92,10 +92,21 @@ private func breaks(after last: PDFLine, before line: PDFLine, next: PDFLine?, l
         // A new page or column: the paragraph goes on unless the last one ended a sentence and this one starts anew.
         return endsSentence(last.text) && (indented || line.text.first?.isLowercase == false)
     }
+    if startsListItem(line.text) { return true }
     let gap = last.bounds.minY - line.bounds.maxY
     // A heading or caption is set in another size.
     let resized = abs(line.bounds.height - last.bounds.height) > 0.2 * min(line.bounds.height, last.bounds.height)
     return gap > leading + 0.5 * lineHeight || resized || indented && endsSentence(last.text) || line.bounds.minX > last.bounds.maxX
+}
+
+/// "• Item", "- Item", "3. Item", "12) Item", or "(a) Item".
+private func startsListItem(_ text: String) -> Bool {
+    let t = text.drop { $0.isWhitespace }
+    guard let space = t.firstIndex(of: " ") else { return false }
+    let marker = t[..<space]
+    if marker.count == 1 { return "•◦▪‣–-*".contains(marker.first!) }
+    return marker.count <= 4 && marker.dropLast().allSatisfy(\.isNumber) && ".)".contains(marker.last!)
+        || marker.count == 3 && marker.first == "(" && marker.last == ")"
 }
 
 /// Leaves out footnotes: from a line in the bottom fifth of the page that starts with a footnote mark, like "∗" or a
