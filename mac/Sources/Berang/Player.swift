@@ -13,12 +13,17 @@ import TextGrab
 
     private(set) var state = State.idle
     var speed: Float = 1 { didSet { audio.rate = speed } }
+    /// The block reading continued from, on a return to a page read before. Clears once two blocks have played.
+    private(set) var resumedAt: Int?
 
     @ObservationIgnored private let audio = AudioOut()
     @ObservationIgnored private let highlight = Highlight()
     @ObservationIgnored private var tts: Phonon?
     @ObservationIgnored private var page: Page?
     @ObservationIgnored private var index = 0
+    @ObservationIgnored private let positions = Positions()
+    /// Where this page's reading position is kept.
+    @ObservationIgnored private var pageKey: String?
     @ObservationIgnored private var task: Task<Void, Never>?
     /// The app to read: the last one active other than this one and System Settings. The panel never
     /// takes focus, so this is the app the user is looking at, even after granting Accessibility access.
@@ -48,6 +53,7 @@ import TextGrab
     func skip(_ delta: Int) {
         guard let page, state == .playing || state == .paused else { return }
         index = min(max(index + delta, 0), page.blocks.count - 1)
+        resumedAt = nil
         cancel()
         if state == .paused { audio.resume() }
         task = Task { await read() }
@@ -56,7 +62,17 @@ import TextGrab
     func stop() {
         cancel()
         page = nil
+        resumedAt = nil
         state = .idle
+    }
+
+    func startOver() {
+        guard page != nil else { return }
+        index = 0
+        resumedAt = nil
+        cancel()
+        if state == .paused { audio.resume() }
+        task = Task { await read() }
     }
 
     private func cancel() {
@@ -83,7 +99,14 @@ import TextGrab
                 let page = try grab(target)
                 guard !page.blocks.isEmpty else { throw PhononError(description: "\(page.app) shows no text to read.") }
                 self.page = page
+                pageKey = page.address ?? target.bundleIdentifier.map { "\($0) \(page.window)" }
                 index = page.start
+                // An unscrolled page with nothing selected continues where the last reading stopped.
+                if page.startPoint == .screen, page.start == 0, let pageKey,
+                   let saved = positions[pageKey]?.index(in: page.blocks), saved > 0 {
+                    index = saved
+                    resumedAt = saved
+                }
                 await read()
             } catch {
                 state = .failed("\(error)")
@@ -97,6 +120,8 @@ import TextGrab
         state = .playing
         while index < page.blocks.count {
             let block = page.blocks[index]
+            if let pageKey { positions[pageKey] = SavedPosition(block, at: index) }
+            if let r = resumedAt, index >= r + 2 { resumedAt = nil }
             highlight.show(block, in: page)
             let spoken = prepare(block.text).map(\.text).joined(separator: " ")
             do {
@@ -107,6 +132,8 @@ import TextGrab
             }
             index += 1
         }
+        // A page read to the end starts from the top next time.
+        if let pageKey { positions[pageKey] = nil }
         stop()
     }
 }

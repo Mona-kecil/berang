@@ -12,6 +12,11 @@ public struct Page {
     let clip: AXUIElement?
     /// The block to start reading at: the selected text, the clicked block if it is on screen, or the first block on screen.
     public let start: Int
+    public let startPoint: StartPoint
+    /// The page's URL or the document's file URL, when the app reports one.
+    public let address: String?
+
+    public enum StartPoint: Sendable { case selection, click, screen }
 }
 
 /// A paragraph, heading, or list item.
@@ -51,8 +56,10 @@ public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws
         let (blocks, viewport) = read(root, focused: ax.element(kAXFocusedUIElementAttribute).map(Node.init))
         if viewport !== root || attempt == 3 || blocks.reduce(0, { $0 + $1.text.utf16.count }) >= 200 {
             let clip = scrollArea(around: viewport.element) ?? window
+            let start = startBlock(blocks, in: viewport.element, clip: clip)
             return Page(app: app.localizedName ?? "", window: window.string(kAXTitleAttribute) ?? "", blocks: blocks,
-                        viewport: viewport.element, clip: clip, start: startBlock(blocks, in: viewport.element, clip: clip))
+                        viewport: viewport.element, clip: clip, start: start.block, startPoint: start.point,
+                        address: address(window, viewport.element))
         }
         Thread.sleep(forTimeInterval: 0.25)
     }
@@ -79,6 +86,14 @@ public func read(saved window: SavedNode) -> [Block] {
 /// Blocks as Markdown: headings start with "# ", and a blank line separates blocks.
 public func markdown(_ blocks: [Block]) -> String {
     blocks.map { $0.kind == .heading ? "# \($0.text)" : $0.text }.joined(separator: "\n\n") + "\n"
+}
+
+/// The window's document, or the web area's URL, without a #fragment so every section of a page shares one address.
+private func address(_ window: AXUIElement, _ viewport: AXUIElement) -> String? {
+    let url = (window.get("AXDocument") as? String).flatMap(URL.init(string:)) ?? viewport.get("AXURL") as? URL
+    guard let url, var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+    parts.fragment = nil
+    return parts.string
 }
 
 private func scrollArea(around element: AXUIElement) -> AXUIElement? {

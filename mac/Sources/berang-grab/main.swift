@@ -3,7 +3,8 @@
 //        berang-grab --replay page.json.lzma
 // --save writes the window's accessibility tree, compressed, and prints the text read back from that copy.
 // --replay prints the text read from a saved copy.
-// The summary on stderr ends with the block that reading starts at: the selection, a visible click, or the top of the screen.
+// The summary on stderr ends with the block that reading starts at (the selection, a visible click, or the top of
+// the screen) and the page address that reading positions are kept under.
 import AppKit
 import TextGrab
 
@@ -35,7 +36,7 @@ do {
     let title = args.count > 1 ? args[1] : nil
     let start = ContinuousClock.now
     let blocks: [Block]
-    var startBlock = 0
+    var startAt = ""
     if let saveTo {
         let tree = try save(app, windowTitle: title)
         try (JSONEncoder().encode(tree) as NSData).compressed(using: .lzma).write(to: saveTo)
@@ -43,12 +44,12 @@ do {
     } else {
         let page = try grab(app, windowTitle: title)
         blocks = page.blocks
-        startBlock = page.start
+        startAt = ", starts at block \(page.start) (\(page.startPoint)), \(page.address ?? "no address")"
     }
     let took = ContinuousClock.now - start
     print(markdown(blocks), terminator: "")
     let chars = blocks.reduce(0) { $0 + $1.text.count }
-    FileHandle.standardError.write(Data("\(app.localizedName ?? "") | \(blocks.count) blocks, \(chars) chars, \(Int(took / .milliseconds(1))) ms, starts at block \(startBlock)\n".utf8))
+    FileHandle.standardError.write(Data("\(app.localizedName ?? "") | \(blocks.count) blocks, \(chars) chars, \(Int(took / .milliseconds(1))) ms\(startAt)\n".utf8))
 } catch {
     FileHandle.standardError.write(Data("\(error)\n".utf8))
     exit(1)
