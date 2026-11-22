@@ -24,10 +24,17 @@ extension Block {
 }
 
 extension Page {
-    public var viewportFrame: CGRect? { viewport.get("AXFrame").flatMap(rect) }
+    /// The part of the viewport on screen.
+    public var viewportFrame: CGRect? { visibleFrame(of: viewport, in: clip) }
 }
 
-private func rect(_ value: AnyObject) -> CGRect? {
+func visibleFrame(of element: AXUIElement, in clip: AXUIElement?) -> CGRect? {
+    let frame = element.get("AXFrame").flatMap(rect)
+    guard let bounds = clip?.get("AXFrame").flatMap(rect) else { return frame }
+    return frame.map { $0.intersection(bounds) }.flatMap { $0.isNull ? nil : $0 }
+}
+
+func rect(_ value: AnyObject) -> CGRect? {
     guard CFGetTypeID(value) == AXValueGetTypeID() else { return nil }
     var r = CGRect.zero
     guard AXValueGetValue(value as! AXValue, .cgRect, &r), r.width > 0, r.height > 0 else { return nil }
