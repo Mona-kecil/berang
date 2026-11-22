@@ -3,11 +3,16 @@ import TextGrab
 
 enum ScreenAreaError: Error, CustomStringConvertible {
     case notAllowed, noText
+    /// The app draws its text without telling the accessibility tree, and Berang may not record the screen to read it.
+    case drawnText(app: String)
+
+    static let turnOn = "Turn on Screen Recording for Berang in System Settings > Privacy & Security > Screen & System Audio Recording."
 
     var description: String {
         switch self {
-        case .notAllowed: "Screen Recording access is off for Berang. Turn it on in System Settings > Privacy & Security > Screen & System Audio Recording."
+        case .notAllowed: Self.turnOn
         case .noText: "No text found in that area."
+        case .drawnText(let app): "\(app) draws its text as images. To read it, Berang recognizes the text on screen. \(Self.turnOn)"
         }
     }
 }
