@@ -6,11 +6,13 @@
 # Needs Accessibility access for the terminal. Chrome pages use a throwaway profile.
 set -e
 cd "$(dirname "$0")"
-here=$PWD
 (cd ../../.. && swift build -c release -q)
 bin=$(cd ../../.. && swift build -c release --show-bin-path)
 profile=$(mktemp -d)
-trap 'rm -rf "$profile"' EXIT
+# Fixtures open from a fixed folder, so saved pages hold no home folder path.
+copy=/tmp/berang-pages
+rm -rf "$copy" && mkdir -p "$copy" && cp -R fixtures "$copy/"
+trap 'rm -rf "$profile" "$copy"' EXIT
 
 tail -n +2 pages.tsv | while IFS="$(printf '\t')" read -r name source url license; do
   if [ $# -gt 0 ] && ! echo " $* " | grep -q " $name "; then continue; fi
@@ -21,7 +23,7 @@ tail -n +2 pages.tsv | while IFS="$(printf '\t')" read -r name source url licens
     "$bin/berang-grab" --pdf "$file" --save "$name.json.lzma" > "$name.md" || echo "FAILED $name"
     continue
   fi
-  case $url in http*) ;; *) url="file://$here/$url" ;; esac
+  case $url in http*) ;; *) url="file://$copy/$url" ;; esac
   case $source in
     webkit)
       "$bin/page-viewer" "$url" > "$profile/viewer.out" 2>&1 &
