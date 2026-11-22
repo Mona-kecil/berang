@@ -72,7 +72,7 @@ You can also remove Berang from System Settings > Privacy & Security > Accessibi
 
 ## What's next
 
-Your own cloned voice, more languages, an onboarding guide, settings, and an iPhone app are planned. See the [milestones](https://github.com/Mona-kecil/berang/milestones).
+Your own cloned voice, more languages, more settings, and an iPhone app are planned. See the [milestones](https://github.com/Mona-kecil/berang/milestones).
 
 ## For developers
 
