@@ -10,6 +10,15 @@ enum Voice {
     private static let sha256 = "058cde756a5e67bcdb986e7c45fe431d41a1a9073e68aabae314c80631a34b76"
 
     static var isInstalled: Bool { PhononModels.isInstalled() }
+
+    /// The voices of the installed model, read from its bundle without loading it.
+    static var names: [String] {
+        let url = PhononModels.defaultDirectory.appending(path: "bundle.json")
+        guard let data = try? Data(contentsOf: url),
+              let bundle = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [] }
+        let names = bundle["voices"] as? [String] ?? []
+        return names.contains("default") ? ["default"] + names.filter { $0 != "default" } : names
+    }
     /// The download's size, for showing progress.
     static let downloadSize: Int64 = 137_000_000
 

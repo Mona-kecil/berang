@@ -1,6 +1,6 @@
 ---- MODULE Player ----
 \* Berang's player, Sources/Berang/Player.swift. Each request (press play, read an area, open a file, skip)
-\* runs as a task that steps through stages. A request replaces the work before it, replaced work changes
+\* runs as a task that steps through stages; choosing a voice while nothing reads plays a sample in it. A request replaces the work before it, replaced work changes
 \* nothing, and a request made while the voice downloads or loads waits for it.
 \* Check: java -cp tla2tools.jar tlc2.TLC -config Player.cfg Player.tla
 EXTENDS Naturals, FiniteSets, Sequences
@@ -22,6 +22,7 @@ Preparing == ui \in {"downloading", "loading"}
 \* Where a request goes once the voice is ready: an area waits for a drag; a page or file reads,
 \* unless the page's app draws its own text, which is recognized first.
 Ready(src) == CASE src = "area" -> {<<"pick", "idle">>}
+                [] src = "sample" -> {<<"sample", "idle">>}
                 [] src = "file" -> {<<"read", "playing">>}
                 [] OTHER -> {<<"read", "playing">>, <<"ocr", "idle">>}
 FirstStages(src) ==
@@ -59,6 +60,14 @@ YouSkip ==
     /\ tasks' = Append(Cancelled(tasks), [src |-> tasks[current].src, stage |-> "read", cancelled |-> FALSE])
     /\ current' = Len(tasks) + 1 /\ ui' = "playing"
     /\ UNCHANGED <<shown, voice, loaded, reason, ignored, pending>>
+
+\* choose(): while reading, the next sentence takes the voice, which changes no state here; otherwise a sample.
+YouChooseVoice ==
+    /\ ui \in {"idle", "failed"} /\ voice = "installed"
+    /\ \E st \in FirstStages("sample") :
+        /\ tasks' = Append(Cancelled(tasks), [src |-> "sample", stage |-> st[1], cancelled |-> FALSE])
+        /\ current' = Len(tasks) + 1 /\ ui' = st[2] /\ shown' = "none"
+    /\ UNCHANGED <<voice, loaded, reason, ignored, pending>>
 
 YouDownloadInSetup ==
     /\ voice = "missing" /\ ui \in {"idle", "failed"}
@@ -108,6 +117,10 @@ TextRecognizedOf(i) ==
     /\ tasks' = Set(i, "stage", "read") /\ ui' = "playing" /\ shown' = "window"
     /\ UNCHANGED <<voice, loaded, current, reason, ignored, pending>>
 
+SampleEndsOf(i) ==
+    /\ tasks[i].stage = "sample" /\ Live(i) /\ tasks' = Set(i, "stage", "done")
+    /\ UNCHANGED <<ui, voice, loaded, current, shown, reason, ignored, pending>>
+
 PageEndsOf(i) ==
     /\ tasks[i].stage = "read" /\ Live(i) /\ ui = "playing"
     /\ tasks' = Set(i, "stage", "done") /\ ui' = "idle" /\ shown' = "none"
@@ -126,17 +139,19 @@ YouDragAnArea == \E i \in Ids : YouDragAnAreaOf(i)
 YouPressEscape == \E i \in Ids : YouPressEscapeOf(i)
 TextRecognized == \E i \in Ids : TextRecognizedOf(i)
 PageEnds == \E i \in Ids : PageEndsOf(i)
+SampleEnds == \E i \in Ids : SampleEndsOf(i)
 StaleWorkEnds == \E i \in Ids : StaleWorkEndsOf(i)
 
 Next ==
-    \/ YouPressPlay \/ YouOpenArea \/ YouOpenFile \/ YouPressStop \/ YouSkip \/ YouDownloadInSetup
+    \/ YouPressPlay \/ YouOpenArea \/ YouOpenFile \/ YouPressStop \/ YouSkip \/ YouDownloadInSetup \/ YouChooseVoice
     \/ DownloadFinishes \/ DownloadFails \/ LoadFinishes \/ YouDragAnArea \/ YouPressEscape
-    \/ TextRecognized \/ PageEnds \/ StaleWorkEnds
+    \/ TextRecognized \/ PageEnds \/ SampleEnds \/ StaleWorkEnds
 
 Spec == Init /\ [][Next]_vars
 
 LiveReaders == {i \in Ids : tasks[i].stage = "read" /\ ~tasks[i].cancelled}
-OneThingAtATime == Cardinality(LiveReaders) <= 1
+\* Readings and samples both play sound.
+OneThingAtATime == Cardinality({i \in Ids : tasks[i].stage \in {"read", "sample"} /\ ~tasks[i].cancelled}) <= 1
 PlayingMeansSound == ui = "playing" => LiveReaders # {}
 NoErrorFromStopping == reason # "cancelled"
 NoIgnoredRequest == ~ignored

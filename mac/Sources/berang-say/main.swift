@@ -4,6 +4,8 @@
 //                                            first-word.json: per paragraph, the seconds from its text to its
 //                                            first word's sound, on a warm voice.
 //        berang-say estimate <dir>           Writes estimates.json: each chunk's words with their estimated starts.
+//        berang-say voices <dir> <text>      Writes <voice>.wav for each Phonon voice speaking <text>, and prints
+//                                            the voice a fresh load speaks with.
 import Foundation
 import PhononTTS
 import Speakable
@@ -21,8 +23,8 @@ struct Estimate: Codable {
 }
 
 let args = CommandLine.arguments
-guard args.count >= 3, ["synth", "estimate"].contains(args[1]) else {
-    FileHandle.standardError.write(Data("usage: berang-say synth <text-file> <dir> | estimate <dir>\n".utf8))
+guard args.count >= 3, ["synth", "estimate", "voices"].contains(args[1]) else {
+    FileHandle.standardError.write(Data("usage: berang-say synth <text-file> <dir> | estimate <dir> | voices <dir> <text>\n".utf8))
     exit(2)
 }
 
@@ -46,7 +48,18 @@ func readWAV(_ url: URL) throws -> [Float] {
 
 let dir = URL(filePath: args[args[1] == "synth" ? 3 : 2])
 do {
-    if args[1] == "synth" {
+    if args[1] == "voices", args.count > 3 {
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let tts = try await Phonon.load(models: PhononModels.defaultDirectory, language: .english)
+        print("fresh load speaks with: \(tts.voice)")
+        for voice in tts.voices {
+            try await tts.setVoice(voice)
+            var samples: [Float] = []
+            for chunk in prepare(args[3]) { for try await part in tts.stream(chunk.text) { samples += part } }
+            try writeWAV(samples, to: dir.appending(path: "\(voice).wav"))
+        }
+        print("\(tts.voices.count) voices")
+    } else if args[1] == "synth" {
         let text = try String(contentsOf: URL(filePath: args[2]), encoding: .utf8)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let tts = try await Phonon.load(models: PhononModels.defaultDirectory, language: .english)

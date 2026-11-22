@@ -15,8 +15,9 @@ final class Opener: NSObject, NSApplicationDelegate {
 }
 let opener = Opener()
 app.delegate = opener
-let setup = SetupWindow(player: player)
+let voices = VoicesWindow(player: player)
+let setup = SetupWindow(player: player, showVoices: voices.show)
 if SetupWindow.isNeeded { setup.show() }
-let menuBar = MenuBar(player: player, panel: panel, setup: setup, shortcut: hotkey.isRegistered ? ("\u{1b}", .option) : nil,
+let menuBar = MenuBar(player: player, panel: panel, setup: setup, voices: voices, shortcut: hotkey.isRegistered ? ("\u{1b}", .option) : nil,
                       areaShortcut: areaHotkey.isRegistered ? ("\u{1b}", [.option, .shift]) : nil)
 app.run()
