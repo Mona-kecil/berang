@@ -22,7 +22,7 @@ func checkScreenAccess() throws {
 
 /// Lets the user drag over part of the screen with the system's screenshot tool, and reads the text in it.
 /// Nil when the user presses Escape.
-func pickScreenArea() async throws -> Page? {
+@MainActor func pickScreenArea() async throws -> Page? {
     let url = FileManager.default.temporaryDirectory.appending(path: "berang-area.png")
     try? FileManager.default.removeItem(at: url)
     defer { try? FileManager.default.removeItem(at: url) }
