@@ -37,11 +37,14 @@ public struct Run {
 
 public enum GrabError: Error, CustomStringConvertible {
     case notTrusted, noWindow
+    /// The focused editor shows no text until the app's screen reader mode is on. The app's own instructions.
+    case editorHidden(String)
 
     public var description: String {
         switch self {
         case .notTrusted: "Accessibility access is off for this app. Turn it on in System Settings > Privacy & Security > Accessibility."
         case .noWindow: "The app has no window to read."
+        case .editorHidden(let howToShow): howToShow
         }
     }
 }
@@ -50,13 +53,23 @@ public enum GrabError: Error, CustomStringConvertible {
 public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws -> Page {
     let (ax, window) = try window(of: app, titled: windowTitle)
     // WebKit and Chrome build a page's accessibility tree on the first request, so the first read of a page
-    // can find only the window, or a page with no text yet. Such a read tries again.
+    // can find only the window, or a page with no text yet. Such a read tries again. Electron apps take about
+    // 2 seconds to build theirs, and report the focused element last.
+    if app.bundleURL.map({ FileManager.default.fileExists(atPath: $0.appending(path: "Contents/Frameworks/Electron Framework.framework").path) }) == true {
+        for _ in 0..<16 where ax.element(kAXFocusedUIElementAttribute) == nil { Thread.sleep(forTimeInterval: 0.25) }
+    }
+    let focused = ax.element(kAXFocusedUIElementAttribute).map(Node.init)
+    // Code editors such as VS Code keep their text out of the accessibility tree until asked, and say how.
+    if let focused, focused.role == "AXTextArea", (focused.value ?? "").isEmpty,
+       let hint = focused.element.string(kAXDescriptionAttribute), hint.localizedCaseInsensitiveContains("screen reader") {
+        throw GrabError.editorHidden(hint)
+    }
     for attempt in 0... {
         if attempt == 0, let page = readImageFile(in: window, app: app) { return page }
         let root = Node(window)
         if attempt == 0, let document = root.document, document.role != "AXWebArea" || document.chromePDFPages != nil,
            let page = readPDFFile(document.element, in: window, app: app) { return page }
-        let (blocks, viewport) = read(root, focused: ax.element(kAXFocusedUIElementAttribute).map(Node.init))
+        let (blocks, viewport) = read(root, focused: focused)
         if (viewport !== root && !blocks.isEmpty) || attempt == 3 || blocks.reduce(0, { $0 + $1.text.utf16.count }) >= 200 {
             let clip = scrollArea(around: viewport.element) ?? window
             let start = startBlock(blocks, in: viewport.element, clip: clip)
@@ -128,6 +141,11 @@ private func window(of app: NSRunningApplication, titled title: String?) throws 
 
 private func read(_ window: Node, focused: Node?) -> (blocks: [Block], viewport: Node) {
     var reader = Reader()
+    // A focused editor with text, such as a code editor in an Electron app, is what the user is reading.
+    if let focused, focused.role == "AXTextArea", !(focused.value ?? "").isEmpty {
+        reader.readTextArea(focused)
+        return (reader.blocks, focused)
+    }
     let document = window.document
     if let document, document.role != "AXWebArea" {
         reader.readPages(document.children.filter { $0.role == "AXPage" })
@@ -150,7 +168,7 @@ private func read(_ window: Node, focused: Node?) -> (blocks: [Block], viewport:
         reader.walk(articles.count == 1 ? articles[0] : main ?? web)
         return (reader.blocks, web)
     }
-    if let area = textArea(in: window, focused: focused) {
+    if let area = textArea(in: window), !(area.value ?? "").isEmpty {
         reader.readTextArea(area)
         return (reader.blocks, area)
     }
@@ -158,13 +176,11 @@ private func read(_ window: Node, focused: Node?) -> (blocks: [Block], viewport:
     return (reader.blocks, window)
 }
 
-/// The focused text area, or else the one holding the most text.
-private func textArea(in window: Node, focused: Node?) -> Node? {
-    let isArea = { (n: Node) in n.role == "AXTextArea" && !(n.value ?? "").isEmpty }
-    if let focused, isArea(focused) { return focused }
+/// The text area holding the most text.
+private func textArea(in window: Node) -> Node? {
     var best: Node?
     window.visit(depth: 30) { n in
-        if isArea(n), n.value!.utf16.count > (best?.value?.utf16.count ?? 0) { best = n }
+        if n.role == "AXTextArea", let v = n.value, v.utf16.count > (best?.value?.utf16.count ?? 0) { best = n }
         return n.role != "AXTextArea"
     }
     return best

@@ -1,0 +1,13 @@
+Meeting notes
+
+The team met on 2026-11-22 to plan the next release. We agreed to ship the reader first and the voice picker after it.
+
+Action items:
+
+- Write the release notes.
+
+- Test the player on three laptops.
+
+- Measure memory while reading a long page.
+
+Budget: $3,500 for testing devices, about 40% of last quarter.
