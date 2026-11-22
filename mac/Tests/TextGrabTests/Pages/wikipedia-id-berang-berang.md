@@ -18,8 +18,6 @@ sunting
 
 sunting sumber
 
-Berang-berang laut sedang bermain
-
 Masa kehamilan berang-berang adalah sekitar 60 hingga 86 hari. Anak berang-berang yang baru lahir dirawat oleh berang-berang betina, berang berang jantan, dan anak yang lebih tua. Berang-berang betina mencapai kematangan seksual pada usia sekitar dua tahun dan berang-berang jantan pada usia sekitar tiga tahun. Sarang berang-berang dibangun di bawah akar pohon atau piramida dari batu kasar, lebih umum di Skotlandia. Itu dilapisi dengan lumut dan rumput.
 
 Setelah satu bulan, anak berang-berang dapat meninggalkan sarangnya dan setelah dua bulan, ia dapat berenang. Anak berang-berang itu tinggal bersama keluarganya selama kurang lebih satu tahun. Berang-berang hidup hingga 16 tahun; mereka pada dasarnya suka bermain, dan bermain-main di air bersama anak-anaknya. Sumber makanannya yang biasa adalah ikan, dan di daerah hilir,belut, tetapi mungkin juga memakan katak dan burung.
@@ -82,7 +80,7 @@ Paino, Christopel (26 September 2023). "Nasib Berang-berang, Minim Perhatian dan
 
 ^ aLompat ke:bcKruuk H (2007). Otters: ecology, behavior and conservation. Oxford Biology. hlm. 99–116.ISBN 978-0-19-856587-1.
 
-^ aLompat ke:bSivasothi;Nor, N.;B. H. M. (1994). "A review of otters (Carnivora: Mustelidae: Lutrinae) in Malaysia and Singapore". https://link.springer.com/chapter/10.1007/978-94-011-0958-1_16. Springer. Diarsipkan dari [file:///C:/Users/user/Downloads/978-94-011-0958-1_16.pdf asli] (PDF)tanggal 6 Januari 1994. Diakses tanggal 1 Februari 2026.{{cite web}}: Periksa nilai |url=;Tautan eksternal dalam |website=
+^ aLompat ke:bSivasothi;Nor, N.;B. H. M. (1994). "A review of otters (Carnivora: Mustelidae: Lutrinae) in Malaysia and Singapore". https://link.springer.com/chapter/10.1007/978-94-011-0958-1_16. Springer. Diarsipkan dari [file:///C:/Users/user/Downloads/978-94-011-0958-1_16.pdf asli] (PDF)tanggal 6 Januari 1994. Diakses tanggal 1 Februari 2026.{{cite web}}: Periksa nilai |url=;Tautan eksternal dalam
 
 # Pranala luar
 

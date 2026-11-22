@@ -30,8 +30,6 @@ Main article: Formation and evolution of the Solar System
 
 # Past
 
-Diagram of the early Solar System's protoplanetary disk, out of which Earth and other Solar System bodies formed
-
 The Solar System formed at least 4.568 billion years ago from the gravitational collapse of a region within a large molecular cloud.[b] This initial cloud was likely several light-years across and probably birthed several stars.[22] As is typical of molecular clouds, this one consisted mostly of hydrogen, with some helium, and small amounts of heavier elements fused by previous generations of stars.[23]
 
 As the pre-solar nebula[23] collapsed, conservation of angular momentum caused it to rotate faster. The center, where most of the mass collected, became increasingly hotter than the surroundings.[22] As the contracting nebula spun faster, it began to flatten into a protoplanetary disc with a diameter of roughly 200 AU[22][24] and a hot, dense protostar at the center.[25][26] The planets formed by accretion from this disc,[27] in which dust and gas gravitationally attracted each other, coalescing to form ever larger bodies. Hundreds of protoplanets may have existed in the early Solar System, but they either merged or were destroyed or ejected, leaving the planets, dwarf planets, and leftover minor bodies.[28][29]
@@ -48,15 +46,11 @@ Following the dissipation of the protoplanetary disk, the Nice model proposes th
 
 The Solar System remains in a relatively stable, slowly evolving state by following isolated, gravitationally bound orbits around the Sun.[38] Although the Solar System has been fairly stable for billions of years, it is technically chaotic,[39] and may eventually be disrupted. There is a small chance that another star will pass through the Solar System in the next few billion years. Although this could destabilize the system and eventually lead millions of years later to expulsion of planets, collisions of planets, or planets hitting the Sun, it would most likely leave the Solar System much as it is today.[40]
 
-The current Sun compared to its peak size in the red-giant phase
-
 The Sun's main-sequence phase, from beginning to end, will last about 10 billion years for the Sun compared to around two billion years for all other subsequent phases of the Sun's pre-remnant life combined.[41] The Solar System will remain roughly as it is known today until the hydrogen in the core of the Sun has been entirely converted to helium, which will occur roughly 5 billion years from now. This will mark the end of the Sun's main-sequence life. At that time, the core of the Sun will contract with hydrogen fusion occurring along a shell surrounding the inert helium, and the energy output will be greater than at present. The outer layers of the Sun will expand to roughly 260 times its current diameter, and the Sun will become a red giant. Because of its increased surface area, the surface of the Sun will be cooler (2,600 K (4,220 °F) at its coolest) than it is on the main sequence.[41]
 
 The expanding Sun is expected to vaporize Mercury as well as Venus, and render Earth and Mars uninhabitable (possibly destroying Earth as well).[42][43] Eventually, the core will be hot enough for helium fusion; the Sun will burn helium for a fraction of the time it burned hydrogen in the core. The Sun is not massive enough to commence the fusion of heavier elements, and nuclear reactions in the core will dwindle. Its outer layers will be ejected into space, leaving behind a dense white dwarf, half the original mass of the Sun but only the size of Earth.[41] The ejected outer layers may form a planetary nebula, returning some of the material that formed the Sun – but now enriched with heavier elements like carbon – to the interstellar medium.[44][45]
 
 # General characteristics
-
-A color enhanced photograph from the Moon of a range of components of the Solar System. The three dots at the lower left are from left to right the planets Saturn, Mars, and Mercury, and in the middle of the picture rises the Sun's corona over the dark limb of the Moon, which is from the right lit by earthshine.
 
 Astronomers sometimes divide the Solar System structure into separate regions. The inner Solar System includes Mercury, Venus, Earth, Mars, and the bodies in the asteroid belt. The outer Solar System includes Jupiter, Saturn, Uranus, Neptune, and the bodies in the Kuiper belt.[46] Since the discovery of the Kuiper belt, the outermost parts of the Solar System are considered a distinct region consisting of the objects beyond Neptune.[47]
 
@@ -70,10 +64,6 @@ The Sun is composed of roughly 98% hydrogen and helium,[52] as are Jupiter and S
 
 # Orbits
 
-Animations of the Solar System's inner planets orbiting. Each frame represents 2 days of motion.
-
-Animations of the Solar System's outer planets orbiting. This animation is 100 times faster than the inner planet animation.
-
 The planets and other large objects in orbit around the Sun lie near the invariable plane of the Solar System, as does Earth's orbit, known as the ecliptic, and most closely the orbit of Jupiter, with an inclination to it of 0.3219°.[56] Smaller icy objects such as comets frequently orbit at significantly greater angles to this plane.[57][58] Most of the planets in the Solar System have secondary systems of their own, being orbited by natural satellites called moons. All of the largest natural satellites are in synchronous rotation, with one face permanently turned toward their parent. The four giant planets have planetary rings, thin discs of tiny particles that orbit them in unison.[59]
 
 As a result of the formation of the Solar System, planets and most other objects orbit the Sun in the same direction that the Sun is rotating. That is, counter-clockwise, as viewed from above Earth's north pole.[60] There are exceptions, such as Halley's Comet.[61] Most of the larger moons orbit their planets in prograde direction, matching the direction of planetary rotation; Neptune's moon Triton is the largest to orbit in the opposite, retrograde manner.[62] Most larger objects rotate around their own axes in the prograde direction relative to their orbit, though the rotation of Venus is retrograde.[63]
@@ -84,8 +74,6 @@ The angular momentum of the Solar System is a measure of the total amount of orb
 
 # Distances and scales
 
-Relative orbital distances in the Solar System visualized as a condensed rectangle
-
 The radius of the Sun is 0.0047 AU (700,000 km; 400,000 mi).[71] Thus, the Sun occupies 0.00001% (1 part in 107) of the volume of a sphere with a radius the size of Earth's orbit, whereas Earth's volume is roughly 1 millionth (10−6) that of the Sun. Jupiter, the largest planet, is 5.2 AU from the Sun and has a radius of 71,000 km (0.00047 AU; 44,000 mi), whereas the most distant planet, Neptune, is 30 AU from the Sun.[54][72]
 
 With a few exceptions, the farther a planet or belt is from the Sun, the larger the distance between its orbit and the orbit of the next nearest object to the Sun. For example, Venus is approximately 0.33 AU farther out from the Sun than Mercury, whereas Saturn is 4.3 AU out from Jupiter, and Neptune lies 10.5 AU out from Uranus. Attempts have been made to determine a relationship between these orbital distances, like the Titius–Bode law[73] and Johannes Kepler's model based on the Platonic solids,[74] but ongoing discoveries have invalidated these hypotheses.[75]
@@ -93,8 +81,6 @@ With a few exceptions, the farther a planet or belt is from the Sun, the larger 
 Some Solar System models attempt to convey the relative scales involved in the Solar System in human terms. Some are small in scale (and may be mechanical – called orreries) – whereas others extend across cities or regional areas.[76] The largest such scale model, the Sweden Solar System, uses the 110-meter (361-foot) Avicii Arena in Stockholm as its substitute Sun, and, following the scale, Jupiter is a 7.5-meter (25-foot) sphere at Stockholm Arlanda Airport, 40 km (25 mi) away, whereas the farthest current object, Sedna, is a 10 cm (4 in) sphere in Luleå, 912 km (567 mi) away.[77][78] At that scale, the distance to Proxima Centauri would be roughly 8 times further than the Moon is from Earth.
 
 If the Sun–Neptune distance is scaled to 100 metres (330 ft), then the Sun would be about 3 cm (1.2 in) in diameter (roughly two-thirds the diameter of a golf ball), the giant planets would be all smaller than about 3 mm (0.12 in), and Earth's diameter along with that of the other terrestrial planets would be smaller than a flea (0.3 mm or 0.012 in) at this scale.[79]
-
-Comparison of the distances between planets, with the white bar showing orbital variations. The size of the planets is not to scale.
 
 # Habitability
 
@@ -124,8 +110,6 @@ The orbits of Solar System planets are nearly circular. Compared to many other s
 
 Main article: Sun
 
-The Sun in true color as viewed through a solar filter
-
 The Sun is the Solar System's star and by far its most massive component. Its large mass (332,900 Earth masses),[92] which comprises 99.86% of all the mass in the Solar System,[48] produces temperatures and densities in its core high enough to sustain nuclear fusion of hydrogen into helium.[93] This releases an enormous amount of energy, mostly radiated into space as electromagnetic radiation peaking in visible light.[94][95]
 
 The Sun is classified as a G-type main-sequence star, where the type designation refers to its effective temperature and that it currently fuses hydrogen into helium. Stars brighter and hotter than the Sun are rare, whereas substantially dimmer and cooler stars, known as red dwarfs, make up about 75% of the fusor stars in the Milky Way.[96]
@@ -143,8 +127,6 @@ The inner Solar System is the region comprising the terrestrial planets and the 
 # Inner planets
 
 Main article: Terrestrial planet
-
-The four terrestrial planets Mercury, Venus, Earth and Mars
 
 The four terrestrial or inner planets have dense, rocky compositions, few or no moons, and no ring systems. They are composed largely of refractory minerals such as silicates—which form their crusts and mantles—and metals such as iron and nickel which form their cores. Three of the four inner planets (Venus, Earth, and Mars) have atmospheres substantial enough to generate weather; all have impact craters and tectonic surface features, such as rift valleys and volcanoes.[107]
 
@@ -166,8 +148,6 @@ Deimos is Mars's outer moon. Like Phobos, it is irregularly shaped, with a mean 
 
 Main article: Asteroid
 
-Overview of the inner Solar System up to Jupiter's orbit
-
 Asteroids, except for the largest, Ceres, are classified as small Solar System bodies and are composed mainly of carbonaceous, refractory rocky and metallic minerals, with some ice.[143][144] They range from a few meters to hundreds of kilometers in size. Many asteroids are divided into asteroid groups and families based on their orbital characteristics. Some asteroids have natural satellites that orbit them, that is, asteroids that orbit larger asteroids.[145]
 
 Mercury-crossing asteroids are those with perihelia within the orbit of Mercury. At least 362 are known to date, and include the closest objects to the Sun known in the Solar System.[146] No vulcanoids, asteroids between the orbit of Mercury and the Sun, have been discovered.[147][148] As of 2024, one asteroid has been discovered to orbit completely within Venus's orbit, 594913 ꞌAylóꞌchaxnim.[149]
@@ -183,8 +163,6 @@ Mars-crossing asteroids are those with perihelia above 1.3 AU which cross the or
 Main article: Asteroid belt
 
 The asteroid belt occupies a torus-shaped region between 2.3 and 3.3 AU from the Sun, which lies between the orbits of Mars and Jupiter. It is thought to be remnants from the Solar System's formation that failed to coalesce because of the gravitational interference of Jupiter.[157] The asteroid belt contains tens of thousands, possibly millions, of objects over one kilometer in diameter.[158] Despite this, the total mass of the asteroid belt is unlikely to be more than a thousandth of that of Earth.[51] The asteroid belt is very sparsely populated; spacecraft routinely pass through without incident.[159]
-
-The four largest asteroids: Ceres, Vesta, Pallas, Hygiea. Only Ceres and Vesta have been visited by a spacecraft and thus have a detailed picture.
 
 Below are the descriptions of the three largest bodies in the asteroid belt. They are all considered to be relatively intact protoplanets, a precursor stage before becoming a fully-formed planet (see List of exceptional asteroids):[160][161][162]
 
@@ -205,8 +183,6 @@ The outer region of the Solar System is home to the giant planets and their larg
 # Outer planets
 
 Main article: Giant planet
-
-The outer planets Jupiter, Saturn, Uranus and Neptune, compared to the inner planets Earth, Venus, Mars, and Mercury at the bottom right
 
 The four outer planets, called giant planets or Jovian planets, collectively make up 99% of the mass orbiting the Sun.[f] All four giant planets have multiple moons and a ring system, although only Saturn's rings are easily observed from Earth.[107] Jupiter and Saturn are composed mainly of gases with extremely low melting points, such as hydrogen, helium, and neon,[183] hence their designation as gas giants.[184] Uranus and Neptune are ice giants,[185] meaning they are largely composed of 'ice' in the astronomical sense (chemical compounds with melting points of up to a few hundred kelvins[183] such as water, methane, ammonia, hydrogen sulfide, and carbon dioxide.[186]) Icy substances comprise the majority of the satellites of the giant planets and small objects that lie beyond Neptune's orbit.[186][187]
 
@@ -258,10 +234,6 @@ Beyond the orbit of Neptune lies the area of the "trans-Neptunian region", with 
 
 Main article: Kuiper belt
 
-Plot of objects around the Kuiper belt and other asteroid populations. J, S, U and N denotes Jupiter, Saturn, Uranus and Neptune.
-
-Orbit classification of Kuiper belt objects. Some clusters that are subject to orbital resonance are marked.
-
 The Kuiper belt is a great ring of debris similar to the asteroid belt, but consisting mainly of objects composed primarily of ice.[212] It extends between 30 and 50 AU from the Sun. It is composed mainly of small Solar System bodies, although the largest few are probably large enough to be dwarf planets.[213] There are estimated to be over 100,000 Kuiper belt objects with a diameter greater than 50 km (30 mi), but the total mass of the Kuiper belt is thought to be only a tenth or even a hundredth the mass of Earth.[50] Many Kuiper belt objects have satellites,[214] and most have orbits that are substantially inclined (~10°) to the plane of the ecliptic.[215]
 
 The Kuiper belt can be roughly divided into the "classical" belt and the resonant trans-Neptunian objects.[212] The latter have orbits whose periods are in a simple ratio to that of Neptune: for example, going around the Sun twice for every three times that Neptune does, or once for every two. The classical belt consists of objects having no resonance with Neptune, and extends from roughly 39.4 to 47.7 AU.[216] Members of the classical Kuiper belt are sometimes called "cubewanos", after the first of their kind to be discovered, originally designated 1992 QB1, (and has since been named Albion); they are still in near primordial, low-eccentricity orbits.[217]
@@ -284,8 +256,6 @@ Quaoar (41.9–45.5 AU) is the second-largest known object in the classical Kuip
 
 Main article: Scattered disc
 
-The orbital eccentricities and inclinations of the scattered disc population compared to the classical and resonant Kuiper belt objects
-
 The scattered disc, which overlaps the Kuiper belt but extends out to near 500 AU, is thought to be the source of short-period comets. Scattered-disc objects are believed to have been perturbed into erratic orbits by the gravitational influence of Neptune's early outward migration. Most scattered disc objects have perihelia within the Kuiper belt but aphelia far beyond it (some more than 150 AU from the Sun). SDOs' orbits can be inclined up to 46.8° from the ecliptic plane.[233] Some astronomers consider the scattered disc to be merely another region of the Kuiper belt and describe scattered-disc objects as "scattered Kuiper belt objects".[234] Some astronomers classify centaurs as inward-scattered Kuiper belt objects along with the outward-scattered residents of the scattered disc.[235]
 
 Currently, there is strong consensus among astronomers that two of the bodies in the scattered disc are dwarf planets:
@@ -297,8 +267,6 @@ Gonggong (33.8–101.2 AU) is a dwarf planet in a comparable orbit to Eris, exce
 # Extreme trans-Neptunian objects
 
 Main article: Extreme trans-Neptunian object
-
-The current orbits of Sedna, 2012 VP113, Leleākūhonua (pink), and other very distant objects (red, brown and cyan) along with the predicted orbit of the hypothetical Planet Nine (dark blue)
 
 Some objects in the Solar System have a very large orbit, and therefore are much less affected by the known giant planets than other minor planet populations. These bodies are called extreme trans-Neptunian objects, or ETNOs for short.[239] Generally, ETNOs' semi-major axes are at least 150–250 AU wide.[239][240] For example, 541132 Leleākūhonua orbits the Sun once every ~32,000 years, with a distance of 65–2000 AU from the Sun.[D 10]
 
@@ -312,8 +280,6 @@ Statistical variance has been observed in the orbits of some extreme trans-Neptu
 
 # Oort cloud
 
-An artist's impression of the Oort cloud, a region still well within the sphere of influence of the Solar System, including a depiction of the much further inside Kuiper belt (inset); the sizes of objects are over-scaled for visibility.
-
 The Oort cloud is a theorized spherical shell of up to a trillion icy objects that is thought to be the source for all long-period comets,[247][248] which were originally ejected from the planetary region by gravitational interactions with the gas giants.[249] Oort cloud objects move very slowly, and can be perturbed by infrequent events, such as collisions, the gravitational effects of a passing star, or the galactic tide, the tidal force exerted by the Milky Way.[247][248] No direct observation of the Oort cloud is possible with present imaging technology.[250] The probe that is currently nearest to the Oort cloud, Voyager 1, is expected to reach it in 300 years.[251]
 
 The Oort cloud is theorized to surround the Solar System from potentially ~2,000 AU from the Sun to up to ~200,000 AU. Lower estimates for the radius of the Oort cloud, by contrast, do not place it farther than 50,000 AU.[252] Most of the mass is orbiting in the region between 3,000 and 100,000 AU.[253] The furthest known objects, such as Comet West, have aphelia around 70,000 AU from the Sun.[254]
@@ -323,8 +289,6 @@ The Oort cloud is theorized to surround the Solar System from potentially ~2,000
 # Meteoroids, meteors and dust
 
 Main articles: Meteoroid, Interplanetary dust cloud, and Cosmic dust
-
-The planets, zodiacal light and meteor shower (top left of image)
 
 Solid objects smaller than one meter are usually called meteoroids and micrometeoroids (grain-sized), with the exact division between the two categories being debated over the years.[255] By 2017, the IAU designated any solid object having a diameter between ~30 micrometers and 1 meter as meteoroids, and depreciated the micrometeoroid categorization, instead terms smaller particles simply as 'dust particles'.[256]
 
@@ -336,8 +300,6 @@ The inner Solar System is home to the zodiacal dust cloud, which is visible as t
 
 Main article: Comet
 
-The sparse plasma (blue) and dust (white) in the tail of comet Hale–Bopp are being shaped by pressure from solar radiation and the solar wind, respectively.
-
 Comets are small Solar System bodies, typically only a few kilometers across, composed largely of volatile ices. They have highly eccentric orbits, generally a perihelion within the orbits of the inner planets and an aphelion far beyond Pluto. When a comet enters the inner Solar System, its proximity to the Sun causes its icy surface to sublimate and ionise, creating a coma: a long tail of gas and dust often visible to the naked eye.[262]
 
 Short-period comets have orbits lasting less than two hundred years. Long-period comets have orbits lasting thousands of years. Short-period comets are thought to originate in the Kuiper belt, whereas long-period comets, such as Hale–Bopp, are thought to originate in the Oort cloud. Many comet groups, such as the Kreutz sungrazers, formed from the breakup of a single parent.[263] Some comets with hyperbolic orbits may originate outside the Solar System, but determining their precise orbits is difficult.[264] Old comets whose volatiles have mostly been driven out by solar warming are often categorized as asteroids.[265]
@@ -346,8 +308,6 @@ Short-period comets have orbits lasting less than two hundred years. Long-period
 
 See also: List of Solar System objects by greatest aphelion
 
-The Solar System (left) within the interstellar medium, with the different regions and their distances on a logarithmic scale
-
 Much of the outer reaches of the Solar System is still unknown. The region beyond 100 AU away is virtually unexplored and learning about this region of space is difficult. Study of this region depends upon inferences from those few objects whose orbits happen to be perturbed such that they fall closer to the Sun, and even then, detecting these objects has often been possible only when they happened to become bright enough to register as comets.[266] Many objects are yet to be discovered in the Solar System's outer region.[267]
 
 The Sun's Hill sphere, its gravitational potential reaching the galactic potential, the potential of the galactic nucleus, and thus the effective range of its gravitational influence, is thought to encompass the Oort cloud,[30][268] and extend to up to 230,000 AU from the Sun.[8]
@@ -355,8 +315,6 @@ The Sun's Hill sphere, its gravitational potential reaching the galactic potenti
 The boundaries of the heliosphere and of the Hill sphere, the Sun's gravitational potential in respect to the interstellar medium and the galactic gravitational potential, at the edge of the Oort cloud, represent the boundaries of the Solar System with the galactic environment.
 
 # Edge of the heliosphere
-
-Diagram of the Sun's magnetosphere and heliosheath
 
 The Sun's stellar-wind bubble, the heliosphere, a region of space dominated by the Sun, has its boundary at the termination shock. Based on the Sun's peculiar motion relative to the local standard of rest, this boundary is roughly 80–100 AU from the Sun upwind of the interstellar medium and roughly 200 AU from the Sun downwind.[269] Here the solar wind collides with the interstellar medium[270] and dramatically slows, condenses and becomes more turbulent, forming a great oval structure known as the heliosheath.[269]
 
@@ -367,8 +325,6 @@ The shape and form of the outer edge of the heliosphere is likely affected by th
 # Celestial neighborhood
 
 Main articles: List of nearest stars, List of nearest exoplanets, and List of nearby stellar associations and moving groups
-
-Diagram of the Local Interstellar Cloud, the G-Cloud and surrounding stars. As of 2022, the exact position of the Solar System within the interstellar clouds remains an unresolved question in astronomy.[277]
 
 Within 10 light-years of the Sun there are relatively few stars, the closest being the triple star system Alpha Centauri, which is about 4.4 light-years away and may be in the Local Bubble's G-Cloud.[278] Alpha Centauri A and B are a closely tied pair of Sun-like stars, whereas the closest star to the Sun, the small red dwarf Proxima Centauri, orbits the pair at a distance of 0.2 light-years. In 2016, a potentially habitable exoplanet was found to be orbiting Proxima Centauri, called Proxima Centauri b, the closest confirmed exoplanet to the Sun.[279]
 
@@ -384,8 +340,6 @@ Stellar flybys that pass within 0.8 light-years of the Sun occur roughly once ev
 
 See also: Location of Earth, Galactic year, and Orbit of the Sun
 
-Diagram of the Milky Way, with galactic features and the relative position of the Solar System labeled.
-
 The Solar System is located in the Milky Way, a barred spiral galaxy with a diameter of about 100,000 light-years containing more than 100 billion stars.[287] The Sun is part of one of the Milky Way's outer spiral arms, known as the Orion–Cygnus Arm or Local Spur.[288][289] It is a member of the thin disk population of stars orbiting close to the galactic plane.[290]
 
 Its speed around the center of the Milky Way is about 220 km/s, so that it completes one revolution every 240 million years.[287] This revolution is known as the Solar System's galactic year.[291] The solar apex, the direction of the Sun's path through interstellar space, is near the constellation Hercules in the direction of the current location of the bright star Vega.[292] The plane of the ecliptic lies at an angle of about 60° to the galactic plane.[c]
@@ -398,15 +352,11 @@ The Solar System's location in the Milky Way is a factor in the evolutionary his
 
 Main article: Discovery and exploration of the Solar System
 
-The motion of 'lights' moving across the sky is the basis of the classical definition of planets: wandering stars.
-
 Humanity's knowledge of the Solar System has grown incrementally over the centuries. Although the ancient Greek philosopher Aristarchus of Samos had speculated on a heliocentric reordering of the cosmos, up to the Late Middle Ages–Renaissance, astronomers from Europe to India believed Earth to be stationary at the center of the universe[298] and categorically different from the divine or ethereal objects that moved through the sky. Nicolaus Copernicus was the first person known to have developed a mathematically predictive heliocentric system.[299][300]
 
 Heliocentrism did not triumph immediately over geocentrism, but the work of Copernicus had its champions, notably Johannes Kepler. Using a heliocentric model that improved upon Copernicus by allowing orbits to be elliptical, and the precise observational data of Tycho Brahe, Kepler produced the Rudolphine Tables, which enabled accurate computations of the positions of the then-known planets. Pierre Gassendi used them to predict a transit of Mercury in 1631, and Jeremiah Horrocks did the same for a transit of Venus in 1639. This provided a strong vindication of heliocentrism and Kepler's elliptical orbits.[301][302]
 
 In the 17th century, Galileo publicized the use of the telescope in astronomy; he and Simon Marius independently discovered that Jupiter had four satellites in orbit around it.[303] Christiaan Huygens followed on from these observations by discovering Saturn's moon Titan and the shape of the rings of Saturn.[304] In 1677, Edmond Halley observed a transit of Mercury across the Sun, leading him to realize that observations of the solar parallax of a planet (more ideally using the transit of Venus) could be used to trigonometrically determine the distances between Earth, Venus, and the Sun.[305] Halley's friend Isaac Newton, in his magisterial Principia Mathematica of 1687, demonstrated that celestial bodies are not quintessentially different from Earthly ones: the same laws of motion and of gravity apply on Earth and in the skies.[64]: 142
-
-Solar system diagram by Emanuel Bowen in 1747, when neither Uranus, Neptune, nor the asteroid belts had yet been discovered. Orbits of planets are to scale, but the orbits of moons and the sizes of bodies are not.
 
 The term "Solar System" entered the English language by 1704, when John Locke used it to refer to the Sun, planets, and comets.[306] In 1705, Halley realized that repeated sightings of a comet were of the same object, returning regularly once every 75–76 years. This was the first evidence that anything other than the planets repeatedly orbited the Sun,[307] though Seneca had theorized this about comets in the 1st century.[308] Careful observations of the 1769 transit of Venus allowed astronomers to calculate the average Earth–Sun distance as 93,726,900 miles (150,838,800 km), only 0.8% greater than the modern value.[309]
 
@@ -415,5 +365,3 @@ Uranus, having occasionally been observed since 1690 and possibly from antiquity
 In the 20th century, humans began their space exploration around the Solar System, starting with placing telescopes in space since the 1960s.[314] By 1989, all eight planets have been visited by space probes.[315] Probes have returned samples from comets[316] and asteroids,[317] as well as flown through the Sun's corona[318] and visited two dwarf planets (Pluto and Ceres).[319][320] To save on fuel, some space missions make use of gravity assist maneuvers, such as the two Voyager probes accelerating when flying by planets in the outer Solar System[321] and the Parker Solar Probe decelerating closer towards the Sun after its flyby of Venus.[322]
 
 Humans have landed on the Moon during the Apollo program in the 1960s and 1970s[323] and are planning to return to the Moon in the 2020s with the Artemis program.[324] Discoveries in the 20th and 21st century has prompted the redefinition of the term planet in 2006, hence the reclassification of Pluto as a dwarf planet,[325] and further interest in trans-Neptunian objects.[326]
-
-All active Solar System space probes in 2026 (and a list of upcoming ones)

@@ -4,10 +4,6 @@ From Wikipedia, the free encyclopedia
 
 For other uses, see Photosynthesis (disambiguation).
 
-Schematic of photosynthesis in plants. The carbohydrates produced are stored in or used by the plant.
-
-Composite image showing the global distribution of photosynthesis, including both oceanic phytoplankton and terrestrial vegetation. Dark red and blue-green indicate regions of high photosynthetic activity in the ocean and on land, respectively.
-
 Photosynthesis[note 1] is a system of biological processes by which photopigment-bearing autotrophic organisms, such as most plants, algae and cyanobacteria, convert light energy—typically from sunlight—into the chemical energy necessary to fuel their metabolism. The term photosynthesis usually refers to oxygenic photosynthesis, a process that releases oxygen as a byproduct of water splitting. Photosynthetic organisms store the converted chemical energy within the bonds of intracellular organic compounds (complex compounds containing carbon), typically carbohydrates like sugars (mainly glucose, fructose and sucrose), starches, phytoglycogen and cellulose. When needing to use this stored energy, an organism's cells then metabolize the organic compounds through cellular respiration. Photosynthesis plays a critical role in producing and maintaining the oxygen content of the Earth's atmosphere, and it supplies most of the biological energy necessary for complex life on Earth.[2]
 
 Some organisms also perform anoxygenic photosynthesis, which does not produce oxygen. Some bacteria (e.g. purple bacteria) use bacteriochlorophyll to split hydrogen sulfide as a reductant instead of water, releasing sulfur instead of oxygen, which was a dominant form of photosynthesis in the euxinic Canfield oceans during the Boring Billion.[3][4] Archaea such as Halobacterium also perform a type of non-carbon-fixing anoxygenic photosynthesis, where the simpler photopigment retinal and its microbial rhodopsin derivatives are used to absorb green light and produce a proton (hydron) gradient across the cell membrane, and the subsequent ion movement powers transmembrane proton pumps to directly synthesize adenosine triphosphate (ATP), the "energy currency" of cells. Such archaeal photosynthesis might have been the earliest form of photosynthesis that evolved on Earth, as far back as the Paleoarchean, preceding that of cyanobacteria (see Purple Earth hypothesis).[5]
@@ -21,8 +17,6 @@ The first photosynthetic organisms probably evolved early in the evolutionary hi
 # Overview
 
 Main article: Biological carbon fixation
-
-Photosynthesis changes sunlight into chemical energy, splits water to liberate O2, and fixes CO2 into sugar.
 
 Most photosynthetic organisms are photoautotrophs, which means that they are able to synthesize food directly from carbon dioxide and water using energy from light. However, not all organisms use carbon dioxide as a source of carbon atoms to carry out photosynthesis; photoheterotrophs use organic compounds, rather than carbon dioxide, as a source of carbon.[2]
 
@@ -200,8 +194,6 @@ Although all cells in the green parts of a plant have chloroplasts, the majority
 
 Main article: Photosystem
 
-Light-dependent reactions of photosynthesis at the thylakoid membrane
-
 In the light-dependent reactions, one molecule of the pigment chlorophyll absorbs one photon and loses one electron. This electron is taken up by a modified form of chlorophyll called pheophytin, which passes the electron to a quinone molecule, starting the flow of electrons down an electron transport chain that leads to the ultimate reduction of NADP to NADPH. In addition, this creates a proton gradient (energy gradient) across the chloroplast membrane, which is used by ATP synthase in the synthesis of ATP. The chlorophyll molecule ultimately regains the electron it lost when a water molecule is split in a process called photolysis, which releases oxygen.
 
 The overall equation for the light-dependent reactions under the conditions of non-cyclic electron flow in green plants is:[30]
@@ -211,8 +203,6 @@ The overall equation for the light-dependent reactions under the conditions of n
 Not all wavelengths of light can support photosynthesis. The photosynthetic action spectrum depends on the type of accessory pigments present. For example, in green plants, the action spectrum resembles the absorption spectrum for chlorophylls and carotenoids with absorption peaks in violet-blue and red light. In red algae, the action spectrum is blue-green light, which allows these algae to use the blue end of the spectrum to grow in the deeper waters that filter out the longer wavelengths (red light) used by above-ground green plants. The non-absorbed part of the light spectrum is what gives photosynthetic organisms their color (e.g., green plants, red algae, purple bacteria) and is the least effective for photosynthesis in the respective organisms.
 
 # Z scheme
-
-The "Z scheme"
 
 In plants, light-dependent reactions occur in the thylakoid membranes of the chloroplasts where they drive the synthesis of ATP and NADPH. The light-dependent reactions are of two forms: cyclic and non-cyclic.
 
@@ -236,8 +226,6 @@ In the light-independent (or "dark") reactions, the enzyme RuBisCO captures CO2 
 
 3 CO2 + 9 ATP + 6 NADPH + 6 H+ → C3H6O3-phosphate + 9 ADP + 8 Pi + 6 NADP+ + 3 H2O
 
-Overview of the Calvin cycle and carbon fixation
-
 Carbon fixation produces the three-carbon sugar intermediate, which is then converted into the final carbohydrate products. The simple carbon sugars photosynthesis produces are then used to form other organic compounds, such as the building material cellulose, the precursors for lipid and amino acid biosynthesis, or as a fuel in cellular respiration. The latter occurs not only in plants but also in animals when the carbon and energy from plants is passed through a food chain.
 
 The fixation or reduction of carbon dioxide is a process in which carbon dioxide combines with a five-carbon sugar, ribulose 1,5-bisphosphate, to yield two molecules of a three-carbon compound, glycerate 3-phosphate, also known as 3-phosphoglycerate. Glycerate 3-phosphate, in the presence of ATP and NADPH produced during the light-dependent stages, is reduced to glyceraldehyde 3-phosphate. This product is also referred to as 3-phosphoglyceraldehyde (PGAL) or, more generically, as triose phosphate. Most (five out of six molecules) of the glyceraldehyde 3-phosphate produced are used to regenerate ribulose 1,5-bisphosphate so the process can continue. The triose phosphates not thus "recycled" often condense to form hexose phosphates, which ultimately yield sucrose, starch, and cellulose, as well as glucose and fructose. The sugars produced during carbon metabolism yield carbon skeletons that can be used for other metabolic reactions like the production of amino acids and lipids.
@@ -247,8 +235,6 @@ The fixation or reduction of carbon dioxide is a process in which carbon dioxide
 # On land
 
 Main articles: C4 carbon fixation, CAM photosynthesis, and Alarm photosynthesis
-
-Overview of C4 carbon fixation. (This image mistakenly shows lactic acid instead of pyruvate, and all the species ending in "-ate" are shown as unionized acids, such as malic acid and so on).
 
 In hot and dry conditions, plants close their stomata to prevent water loss. Under these conditions, CO2 will decrease and oxygen gas, produced by the light reactions of photosynthesis, will increase, causing an increase of photorespiration by the oxygenase activity of ribulose-1,5-bisphosphate carboxylase/oxygenase (RuBisCO) and decrease in carbon fixation. Some plants have evolved mechanisms to increase the CO2 concentration in the leaves under these conditions.[32]
 
@@ -326,95 +312,11 @@ Because that quantum walking takes place at temperatures far higher than quantum
 
 Main article: Evolution of photosynthesis
 
-Life timeline
-
-This box: view · talk · edit
-
-−4500 —
-
-−4000 —
-
-−3500 —
-
-−3000 —
-
-−2500 —
-
-−2000 —
-
-−1500 —
-
-−1000 —
-
-−500 —
-
-0 —
-
-Water
-
-Single-celled life
-
-Photosynthesis
-
-Multicellular life
-
-Plants
-
-Arthropods
-
-Molluscs
-
-Flowers
-
-Dinosaurs
-
-Mammals
-
-Birds
-
-Primates
-
-Hadean
-
-Archean
-
-Proterozoic
-
-Phanerozoic
-
-Earth formed
-
-Earliest water
-
-LUCA
-
-Earliest fossils
-
-Great Oxygenation Event
-
-Sexual reproduction
-
-Earliest fungi
-
-Neoproterozoic oxygenation event
-
-Ediacaran biota
-
-Cambrian explosion
-
-Earliest tetrapods
-
-Earliest hominoid
-
-(million years ago)
-
 Fossils of what are thought to be filamentous photosynthetic organisms have been dated at 3.4 billion years old.[61][62] More recent studies also suggest that photosynthesis may have begun about 3.4 billion years ago,[63][64] though the first direct evidence of photosynthesis comes from thylakoid membranes preserved in 1.75-billion-year-old cherts.[65]
 
 Oxygenic photosynthesis is the main source of oxygen in the Earth's atmosphere, and its earliest appearance is sometimes referred to as the oxygen catastrophe. Geological evidence suggests that oxygenic photosynthesis, such as that in cyanobacteria, became important during the Paleoproterozoic era around two billion years ago. Modern photosynthesis in plants and most photosynthetic prokaryotes is oxygenic, using water as an electron donor, which is oxidized to molecular oxygen in the photosynthetic reaction center.
 
 # Symbiosis and the origin of chloroplasts
-
-Plant cells with visible chloroplasts (from a moss, Plagiomnium affine)
 
 Several groups of animals have formed symbiotic relationships with photosynthetic algae. These are most common in corals, sponges, and sea anemones. Scientists presume that this is due to the particularly simple body plans and large surface areas of these animals compared to their volumes.[66] In addition, a few marine mollusks, such as Elysia viridis and Elysia chlorotica, also maintain a symbiotic relationship with chloroplasts they capture from the algae in their diet and then store in their bodies (see Kleptoplasty). This allows the mollusks to survive solely by photosynthesis for several months at a time.[67][68] Some of the genes from the plant cell nucleus have even been transferred to the slugs, so that the chloroplasts can be supplied with proteins they need to survive.[69]
 
@@ -474,8 +376,6 @@ The biochemical capacity to use water as the source for electrons in photosynthe
 
 Although some of the steps in photosynthesis are still not completely understood, the overall photosynthetic equation has been known since the 19th century.
 
-Portrait of Jan Baptist van Helmont by Mary Beale, c. 1674
-
 Jan van Helmont began the research of the process in the mid-17th century when he carefully measured the mass of the soil a plant was using and the mass of the plant as it grew. After noticing that the soil mass changed very little, he hypothesized that the mass of the growing plant must come from the water, the only substance he added to the potted plant. His hypothesis was partially accurate – much of the gained mass comes from carbon dioxide as well as water. However, this was a signaling point to the idea that the bulk of a plant's biomass comes from the inputs of photosynthesis, not the soil itself.
 
 Joseph Priestley, a chemist and minister, discovered that when he isolated a volume of air under an inverted jar and burned a candle in it (which gave off CO2), the candle would burn out very quickly, much before it ran out of wax. He further discovered that a mouse could similarly "injure" air. He then showed that a plant could restore the air the candle and the mouse had "injured".[90]
@@ -495,8 +395,6 @@ Robert Hill thought that a complex of reactions consisted of an intermediate to 
 2 H2O + 2 A + (light, chloroplasts) → 2 AH2 + O2
 
 A is the electron acceptor. Therefore, in light, the electron acceptor is reduced and oxygen is evolved. Samuel Ruben and Martin Kamen used radioactive isotopes to determine that the oxygen liberated in photosynthesis came from the water.
-
-Melvin Calvin works in his photosynthesis laboratory.
 
 Melvin Calvin and Andrew Benson, along with James Bassham, elucidated the path of carbon assimilation (the photosynthetic carbon reduction cycle) in plants. The carbon reduction cycle is known as the Calvin cycle, but many scientists refer to it as the Calvin-Benson, Benson-Calvin, or even Calvin-Benson-Bassham (or CBB) Cycle.
 
@@ -520,8 +418,6 @@ Later in 1958–1963 at Cornell University, field grown maize was reported to ha
 
 # Factors
 
-The leaf is the primary site of photosynthesis in plants.
-
 There are four main factors influencing photosynthesis and several corollary factors. The four main are:[113]
 
 Light irradiance and wavelength
@@ -540,8 +436,6 @@ Total photosynthesis is limited by a range of environmental factors. These inclu
 
 See also: PI (photosynthesis-irradiance) curve
 
-Absorbance spectra of free chlorophyll a (blue) and b (red) in a solvent. The action spectra of chlorophyll molecules are slightly modified in vivo depending on specific pigment–protein interactions.
-
 The process of photosynthesis provides the main input of free energy into the biosphere, and is one of four main ways in which radiation is important for plant life.[115]
 
 The radiation climate within plant communities is extremely variable, in both time and space.
@@ -555,8 +449,6 @@ At low irradiance, increasing the temperature has little influence on the rate o
 These two experiments illustrate several important points: First, it is known that, in general, photochemical reactions are not affected by temperature. However, these experiments clearly show that temperature affects the rate of carbon assimilation, so there must be two sets of reactions in the full process of carbon assimilation. These are the light-dependent 'photochemical' temperature-independent stage, and the light-independent, temperature-dependent stage. Second, Blackman's experiments illustrate the concept of limiting factors. Another limiting factor is the wavelength of light. Cyanobacteria, which reside several meters underwater, cannot receive the correct wavelengths required to cause photoinduced charge separation in conventional photosynthetic pigments. To combat this problem, Cyanobacteria have a light-harvesting complex called Phycobilisome.[116] This complex is made up of a series of proteins with different pigments which surround the reaction center.
 
 # Carbon dioxide levels and photorespiration
-
-Photorespiration
 
 As carbon dioxide concentrations rise, the rate at which sugars are made by the light-independent reactions increases until limited by other factors. RuBisCO, the enzyme that captures carbon dioxide in the light-independent reactions, has a binding affinity for both carbon dioxide and oxygen. When the concentration of carbon dioxide is high, RuBisCO will fix carbon dioxide. However, if the carbon dioxide concentration is low, RuBisCO will bind oxygen instead of carbon dioxide. This process, called photorespiration, uses energy, but does not produce sugars.
 

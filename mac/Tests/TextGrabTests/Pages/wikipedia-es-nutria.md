@@ -6,15 +6,11 @@ Los lutrinos (Lutrinae), conocidos comúnmente como nutrias, son una subfamilia 
 
 editar
 
-Pelaje impermeable de una nutria
-
 Poseen un tupido pelaje impermeable que les permite conservar el calor de su cuerpo. Son grandes nadadoras y pueden cerrar sus fosas nasales bajo el agua, pudiendo permanecer bajo el agua hasta cuatro minutos sin salir a la superficie para respirar. Realizan movimiento de patas y cola, de arriba abajo, cuando se desplazan por el agua a gran velocidad. Solo utilizan sus patas delanteras cuando nadan lentamente. En el agua pueden alcanzar velocidades de hasta 12 km/h. Al ser mamíferos que pasan la mayor parte del tiempo en el agua (incluso cuando duermen), se cogen de la mano con el fin de evitar que la corriente del agua los arrastre y los separe del grupo. De este modo, las nutrias marinas se aseguran de que no van a despertarse solas. Las nutrias son animales inteligentes y cariñosos. Usan herramientas[3] para distintos fines; para procurarse alimentos, jugar y protegerse.
 
 # Historia natural
 
 editar
-
-Nutria del valle de Ossau (Pirineos franceses), 2002.
 
 Las nutrias entran en celo en cualquier época del año; sin embargo, su reproducción es lenta e irregular, aunque se observan mayor cantidad de partos durante la primavera. De cada uno de ellos pueden resultar dos o tres crías, que nacen ciegas y sin dientes. Su período de lactancia es de unos dos meses, abandonando el territorio materno después de aproximadamente un año, cuando comienzan a vagar en busca de establecer su propio territorio, cosa que efectúan aproximadamente después de dos años de haber nacido. Su fisionomía adaptada a una vida acuática presenta una evolución convergente con Puijila darwini (el ancestro de las focas y leones marinos), y en menor medida con el Coipo.
 
@@ -39,10 +35,6 @@ En Argentina, Colombia, Brasil, Ecuador, Guyana, Venezuela, Paraguay, Uruguay ha
 # Clasificación
 
 editar
-
-Nutria gigante (Pteronura brasiliensis).
-
-Nutria eurosiática (Lutra lutra).
 
 Se reconocen 15 especies, agrupadas en cinco géneros:[4]
 
@@ -85,8 +77,6 @@ Lutra sumatrana (J. E. Gray, 1865)
 Género Pteronura
 
 Pteronura brasiliensis (Boddaert, 1785)
-
-Filogenia de la subfamilia Lutrinae basada en los resultados obtenidos por de Ferran (2022)[6] por el método de máxima verosimilitud (MV) con genomas las especies actualmente existentes (13 especies). Los números presentes en los nodos son los tiempos de divergencia en millones de años estimada de los clados.
 
 Además, se conocen los siguientes géneros extintos:
 

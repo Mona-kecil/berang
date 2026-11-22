@@ -41,6 +41,34 @@ private func build(_ pieces: [String], rendered: String?, kind: Block.Kind = .te
     #expect(blocks[0].runs[1].offset == 2)
 }
 
+@Test func skippedTextDoesNotCatchARepeat() {
+    var b = BlockBuilder()
+    let el = AXUIElementCreateSystemWide()
+    b.skip("KAI Commuter", from: el)
+    b.append("KAI Commuter", from: el, at: 0)
+    b.append(" connects the city.", from: el, at: 0)
+    #expect(b.build(.text, rendered: "KAI Commuter\nKAI Commuter connects the city.").map(\.text) == ["KAI Commuter connects the city."])
+}
+
+@Test func splitsAtLineBreaksInsideSkippedText() {
+    var b = BlockBuilder()
+    let el = AXUIElementCreateSystemWide()
+    b.append("Before.", from: el, at: 0)
+    b.skip("Caption\nline two", from: el)
+    b.append("After.", from: el, at: 0)
+    #expect(b.build(.text, rendered: "Before.\nCaption\nline two\nAfter.").map(\.text) == ["Before.", "After."])
+}
+
+@Test func findsAPieceTheBrowserPutBeforeSkippedText() {
+    var b = BlockBuilder()
+    let el = AXUIElementCreateSystemWide()
+    b.append("Intro.", from: el, at: 0)
+    b.skip("Floated caption", from: el)
+    b.append("Next.", from: el, at: 0)
+    b.append("Last.", from: el, at: 0)
+    #expect(b.build(.text, rendered: "Intro.\nNext.\nFloated caption\nLast.").map(\.text) == ["Intro.", "Next.", "Last."])
+}
+
 @Test func dropsBlocksWithoutWords() {
     #expect(build(["\u{FFFC}", " | "], rendered: nil).isEmpty)
 }

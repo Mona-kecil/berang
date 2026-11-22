@@ -20,3 +20,5 @@ wikibooks-cookbook-pancake	webkit	https://en.wikibooks.org/wiki/Cookbook:Pancake
 chrome-wikipedia-otter	chrome	https://en.wikipedia.org/wiki/Otter	CC BY-SA 4.0
 textedit-plain	textedit	fixtures/plain.txt	GPL-3.0 (this repository)
 textedit-rich	textedit	fixtures/rich.rtf	GPL-3.0 (this repository)
+skips	webkit	fixtures/skips.html	GPL-3.0 (this repository)
+chrome-skips	chrome	fixtures/skips.html	GPL-3.0 (this repository)

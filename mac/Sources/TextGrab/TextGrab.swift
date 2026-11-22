@@ -137,6 +137,15 @@ private let skippedRoles: Set = [
     "AXComboBox", "AXMenu", "AXMenuBar", "AXToolbar", "AXImage", "AXTable", "AXScrollBar", "AXSlider", "AXTabGroup",
 ]
 
+/// Class names of ad slots.
+private let adClasses: Set = ["ad", "ads", "advert", "advertisement", "adsbygoogle", "ad-slot", "ad-container", "ad-wrapper", "ad-unit", "sponsored"]
+
+/// What browsers call a figure. The name is localized; WebKit's comes from WebCore's strings.
+private let figureNames: Set = {
+    let webCore = Bundle(path: "/System/Library/Frameworks/WebKit.framework/Frameworks/WebCore.framework")
+    return ["figure", webCore?.localizedString(forKey: "figure", value: nil, table: nil) ?? "figure"]
+}()
+
 /// Deeper than any real page; only a tree that loops back on itself gets here.
 private let maxDepth = 200
 
@@ -184,11 +193,16 @@ private struct Reader {
 }
 
 struct BlockBuilder {
-    var pieces: [(element: AXUIElement, text: String, offset: Int)] = []
+    /// A skipped piece is text the browser shows but the listener should not hear, such as a caption.
+    var pieces: [(element: AXUIElement, text: String, offset: Int, skipped: Bool)] = []
 
     /// Gathers the text under `node`. Lists and headings inside it are left in `nested` to read as their own blocks.
     fileprivate mutating func collect(_ node: Node, nested: inout [Node], depth: Int = 0) {
-        if node.isSkipped || depth > maxDepth { return }
+        if depth > maxDepth { return }
+        if node.isSkipped {
+            if node.role == kAXGroupRole || node.role == "AXTable", let text = node.rendered { skip(text, from: node.element) }
+            return
+        }
         if node.role == "AXStaticText", let v = node.value { append(v, from: node.element, at: 0) }
         for child in node.children {
             if child.role == "AXList" || child.role == "AXHeading" { nested.append(child) } else { collect(child, nested: &nested, depth: depth + 1) }
@@ -196,13 +210,19 @@ struct BlockBuilder {
     }
 
     mutating func append(_ text: String, from element: AXUIElement, at offset: Int) {
-        pieces.append((element, text, offset))
+        pieces.append((element, text, offset, false))
+    }
+
+    /// Marks where skipped text sits in the rendered text, so a later piece that repeats it, like a
+    /// paragraph that starts with its figure's caption, is not matched there.
+    mutating func skip(_ text: String, from element: AXUIElement) {
+        pieces.append((element, text, 0, true))
     }
 
     /// `rendered` is the browser's own text for the element. Safari trims the text pieces, so joining
     /// them loses the spaces around links, and neither browser puts line breaks in the pieces.
     func build(_ kind: Block.Kind, rendered: String? = nil) -> [Block] {
-        let blocks = rendered.flatMap { align(kind, $0) } ?? align(kind, pieces.map(\.text).joined()) ?? []
+        let blocks = rendered.flatMap { align(kind, $0) } ?? align(kind, pieces.filter { !$0.skipped }.map(\.text).joined()) ?? []
         return blocks.filter { $0.text.contains { $0.isLetter || $0.isNumber } }
     }
 
@@ -210,12 +230,28 @@ struct BlockBuilder {
     /// its first piece to its last, which drops list markers and nested blocks. Nil when a piece is missing.
     private func align(_ kind: Block.Kind, _ source: String) -> [Block]? {
         let hay = Array(squash(source, keepingLines: true).utf16)
-        var cursor = 0, lines: [[Run]] = [], line = -1, newlines = 0
+        // `beforeSkip` is where the search stood before skipped text moved it on. The browser can put skipped
+        // text, like a floated caption, after the next piece, so that piece is searched for from there too.
+        var cursor = 0, lines: [[Run]] = [], line = -1, newlines = 0, beforeSkip: Int?
         for p in pieces {
             let raw = p.text.replacing("\u{FFFC}", with: "")
             let piece = squash(raw)
             if piece.isEmpty { continue }
-            guard let at = find(Array(piece.utf16), in: hay, from: cursor) else { return nil }
+            if p.skipped {
+                if let at = find(Array(piece.utf16), in: hay, from: cursor) {
+                    beforeSkip = beforeSkip ?? cursor
+                    newlines += hay[cursor..<at + piece.utf16.count].count(where: { $0 == newline })
+                    cursor = at + piece.utf16.count
+                }
+                continue
+            }
+            let needle = Array(piece.utf16)
+            if let start = beforeSkip, find(needle, in: hay, from: cursor) == nil {
+                newlines -= hay[start..<cursor].count(where: { $0 == newline })
+                cursor = start
+            }
+            beforeSkip = nil
+            guard let at = find(needle, in: hay, from: cursor) else { return nil }
             let lead = raw.utf16.count - raw.drop(while: \.isWhitespace).utf16.count
             let run = Run(element: p.element, range: at..<at + piece.utf16.count, offset: p.offset + lead)
             newlines += hay[cursor..<at].count(where: { $0 == newline })
@@ -278,14 +314,11 @@ private final class Node {
 
     init(_ element: AXUIElement) {
         self.element = element
-        let attrs = [kAXRoleAttribute, kAXSubroleAttribute, kAXValueAttribute, kAXChildrenAttribute] as CFArray
-        var out: CFArray?
-        AXUIElementCopyMultipleAttributeValues(element, attrs, [], &out)
-        let v = (out as? [AnyObject]) ?? []
-        role = v.count > 0 ? v[0] as? String : nil
-        subrole = v.count > 1 ? v[1] as? String : nil
-        value = v.count > 2 ? v[2] as? String : nil
-        childElements = v.count > 3 ? (v[3] as? [AXUIElement]) ?? [] : []
+        let v = element.get([kAXRoleAttribute, kAXSubroleAttribute, kAXValueAttribute, kAXChildrenAttribute])
+        role = v[0] as? String
+        subrole = v[1] as? String
+        value = v[2] as? String
+        childElements = v[3] as? [AXUIElement] ?? []
         saved = nil
     }
 
@@ -300,7 +333,25 @@ private final class Node {
     }
 
     private(set) lazy var children: [Node] = saved.map { ($0.children ?? []).map(Node.init(saved:)) } ?? childElements.map(Node.init)
-    var isSkipped: Bool { skippedRoles.contains(role ?? "") || skippedSubroles.contains(subrole ?? "") }
+    var isSkipped: Bool {
+        skippedRoles.contains(role ?? "") || skippedSubroles.contains(subrole ?? "") || isCodeBlock || isFigure || isAd
+    }
+    /// WebKit marks a `<pre>` as preformatted; Chrome shows it as a group holding only code.
+    private var isCodeBlock: Bool {
+        subrole == "AXPreformattedStyleGroup"
+            || role == "AXGroup" && !children.isEmpty && children.allSatisfy { $0.subrole == "AXCodeStyleGroup" }
+    }
+    private var isFigure: Bool { figureNames.contains(group?.roleDescription ?? "") }
+    private var isAd: Bool { group?.classes.contains { adClasses.contains($0.lowercased()) } ?? false }
+
+    /// A group's role description and class names, which mark figures and ad slots. Only groups that hold
+    /// other elements rather than text are asked: asking every element slows a whole-page read by a fifth.
+    fileprivate private(set) lazy var group: (roleDescription: String, classes: [String])? = {
+        guard role == kAXGroupRole, !children.contains(where: { $0.role == kAXStaticTextRole }) else { return nil }
+        if let saved { return (saved.roleDescription ?? "group", saved.classes ?? []) }
+        let v = element.get([kAXRoleDescriptionAttribute, "AXDOMClassList"])
+        return (v[0] as? String ?? "", v[1] as? [String] ?? [])
+    }()
     /// The browser's rendered text, which only blocks in a web area ask for.
     var rendered: String? { saved == nil ? renderedText(element) : saved?.rendered }
     /// A table without column headers, used to lay out a page rather than to hold data.
@@ -333,20 +384,24 @@ public struct SavedNode: Codable, Sendable {
     var role: String?
     var subrole: String?
     var value: String?
+    var roleDescription: String?
+    var classes: [String]?
     var rendered: String?
     var headers: Int?
     var focused: Bool?
     var children: [SavedNode]?
 
     enum CodingKeys: String, CodingKey {
-        case role = "r", subrole = "s", value = "v", rendered = "t", headers = "h", focused = "f", children = "c"
+        case role = "r", subrole = "s", value = "v", roleDescription = "d", classes = "k", rendered = "t", headers = "h", focused = "f", children = "c"
     }
 
     fileprivate init(_ node: Node, focused: AXUIElement?, depth: Int) {
         role = node.role
         subrole = node.subrole
         value = node.value
-        rendered = node.startsBlock ? node.rendered : nil
+        roleDescription = node.group.flatMap { $0.roleDescription == "group" ? nil : $0.roleDescription }
+        classes = node.group.flatMap { $0.classes.isEmpty ? nil : $0.classes }
+        rendered = node.startsBlock || node.isSkipped && (node.role == kAXGroupRole || node.role == "AXTable") ? node.rendered : nil
         headers = node.role == "AXTable" ? node.columnHeaders : nil
         self.focused = focused.map { CFEqual($0, node.element) } == true ? true : nil
         children = depth > 0 && !node.children.isEmpty ? node.children.map { SavedNode($0, focused: focused, depth: depth - 1) } : nil
@@ -362,6 +417,14 @@ extension AXUIElement {
     func get(_ attribute: String, _ parameter: AnyObject) -> AnyObject? {
         var v: AnyObject?
         return AXUIElementCopyParameterizedAttributeValue(self, attribute as CFString, parameter, &v) == .success ? v : nil
+    }
+
+    /// Several attributes in one call. A missing one comes back as an error value, which no cast matches.
+    func get(_ attributes: [String]) -> [AnyObject?] {
+        var out: CFArray?
+        AXUIElementCopyMultipleAttributeValues(self, attributes as CFArray, [], &out)
+        let v = (out as? [AnyObject]) ?? []
+        return attributes.indices.map { $0 < v.count ? v[$0] : nil }
     }
 
     func string(_ attribute: String) -> String? { get(attribute) as? String }

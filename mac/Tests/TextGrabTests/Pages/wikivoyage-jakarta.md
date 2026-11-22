@@ -1,8 +1,6 @@
 Asia > Southeast Asia > Indonesia > Java > Western Java > Greater Jakarta > Jakarta
 
-Jakarta
-
-is
+Jakarta is
 
 Indonesia's capital and largest city, with about 10 million inhabitants, and a total 41.9 million in Greater Jakarta on the Java island, making it the largest city in Southeast Asia and, by some measures, the largest city in the world. Dubbed The Big Durian, an equivalent to New York's Big Apple, its concrete jungle, traffic frenzy, and hot polluted air may tempt you to skip the city as fast as possible, but what awaits inside will change your perspective! One of the most bustling and cosmopolitan cities in Asia, the J-Town has cheerful nightlife, vibrant shopping malls, a variety of foods, refreshing greenery, cultural diversity and a rich history, that caters to all levels of budget and how much fun you want to have.
 
@@ -52,15 +50,11 @@ If you don't want to waste time, ask for the description or name of nearby landm
 
 edit
 
-Jakarta Skyline
-
 Jakarta's nickname among expats is the Big Durian, and like the fruit itself, it's a shock at first sight (and smell): a sweltering, steaming, heaving mass of some 30 million people packed into a vast urban sprawl. The metropolitan area is a magnet for Indonesians, both as a business and a government centre, and the most developed city in the country. But all of this comes at a cost: the city has been struggling very hard to keep up with the urban growth. Major roads are packed up during rush hours and weekends, sometimes all day during rainy season due to motorcyclists sheltering under the fly-over or the tunnel when it's raining heavily, thus causing additional congestion, while the growth of the public transportation system has been unable to keep up.
 
 All that said, while initially a bit overwhelming, if you can withstand the pollution and can afford to indulge in Jakarta's charms, you can discover what is also one of Asia's most exciting, most lively global cities. There is plenty to do in Jakarta, from green parks and historical centres, to cosmopolitan shopping, diverse gourmet choices, and some of the hippest nightlife in Southeast Asia!
 
 edit
-
-The colonial building that is now the Jakarta History Museum, in West Jakarta.
 
 The port of 1 Sunda Kelapa dates to the 12th century, when it served the Sundanese kingdom of Pajajaran near present-day Bogor. The first Europeans to arrive were the Portuguese, who were given permission by the Hindu Kingdom of Pakuan Pajajaran to erect a godown (warehouse) in 1522. Control was still firmly in local hands, and in 1527 the city was conquered by Prince Fatahillah, a Muslim prince from Cirebon, who changed the name to Jayakarta.
 
@@ -108,10 +102,6 @@ Previously, flying into Bandung (130 km away) was occasionally a reasonable alte
 
 edit
 
-Inter-city train
-
-High-speed train
-
 Jakarta is well-served by trains from all over Java. National operator Kereta Api runs multiple daily trains from other cities such as Bandung, Surabaya and Yogyakarta. A newly-built high-speed train called Whoosh serves Jakarta and Bandung, which runs every hour and takes 35-40 minutes. Commuter trains connects with outlying suburbs and cities in Greater Jakarta such as Bekasi, Depok, Tangerang as well as some more remote cities such as Bogor and Rangkasbitung.
 
 There are several major railway stations in Jakarta, with Gambir and Pasar Senen being the main stations for long-distance passenger service. Both are located in Central Jakarta and are well connected with public transport including the TransJakarta system. The historic Jakarta Kota terminus station in heart of old colonial Batavia is now mainly served by local and regional trains. High-speed trains terminate at Halim in East Jakarta from where it's possible to continue by Jabodebek LRT trains to the city centre.
@@ -158,15 +148,11 @@ edit
 
 edit
 
-KAI Commuter
-
 KAI Commuter (colloquially called KRL Commuterline) connects the city centre with the suburbs and satellite cities, namely Tangerang, Bekasi, Depok, Bogor, South Tangerang, and Tanjung Priok in North Jakarta. It's worth trying as it is much faster than most motor vehicles on the road, but the late arrival of trains (usually by 10 to 15 minutes) might be bothersome. The trains can get very crowded, especially during rush hours. Trains do not stop at Gambir and Pasar Senen stations, the starting stations for long-distance trains in Jakarta; transfer at Jatinegara station in the east instead. Major stations are adjacent to TransJakarta stations, though you often have to walk or use a feeder bus service to transfer.
 
 Trains run between 04:30 and midnight. Trains operate every 15-30 minutes, depending on the line.
 
 edit
-
-Jakarta MRT
 
 Jakarta MRT connects Lebak Bulus in South Jakarta with Bundaran HI in Central Jakarta. It follows the main business street of MH Thamrin, continuing south along the mixed-use areas of South Jakarta before ending near the southern city limits in Lebak Bulus. It primarily links a number of business centres in the city, as well as being pedestrian-accessible to several malls. It's less convenient to access other parts of the city, and passes through few tourist attractions. A northern extension to Kota is under construction and may open around 2027.
 
@@ -176,15 +162,11 @@ Trains run between 05:00 and midnight. Trains operate every 5 minutes during rus
 
 edit
 
-Jabodebek LRT
-
 Jabodebek LRT connects Jatimulya in Bekasi, West Java and Harjamukti in Depok, West Java with Dukuh Atas (interchange with MRT and Commuter Line) in Central Jakarta. It follows the main business street of Sudirman-MH Thamrin, continuing south along the mixed-use areas of South Jakarta and Central Jakarta. It primarily links a number of business centres in the city, as well as being pedestrian-accessible to several malls. It's less convenient to access other parts of the city, and passes through few tourist attractions. The Whoosh high speed railway to Bandung is accessible via Halim station.
 
 Trains run between 06:00 and 22:00. Trains operate every 10 minutes during rush hour (06:00-09:00 and 16:00–20:00), and every 20 minutes during the rest of the day.
 
 edit
-
-Jakarta LRT
 
 Jakarta LRT connects Pegangsaan Dua in North Jakarta to Manggarai in South Jakarta. It runs the main street of Velodrome, along Kayu Putih (Pulomas Equestrian Park), through Kelapa Gading's Boulevard Raya main road.
 
@@ -193,8 +175,6 @@ Trains run between 05:30 and 23:00. Trains operate every 10 minutes.
 edit
 
 edit
-
-TransJakarta
 
 TransJakarta is a Bus Rapid Transit (BRT) network that runs on fully dedicated lanes. There are 14 mainlines in operation, in addition to a number of feeder routes that operate between them. Passengers use dedicated stations usually found in the middle of large thoroughfares connected to both sides by overhead bridges. The network is remarkably user-friendly by Jakarta standards, with comfortable amenities at stations and announcements inside the purpose-built vehicles. The buses can get very crowded, especially during rush hours.
 
@@ -226,8 +206,6 @@ The city government provides tour buses. Dubbed the City Tour Jakarta , the buse
 
 edit
 
-Mikrotrans
-
 Mikrotrans, mikrolets and angkots are vans that serve fixed stops around the city. You can use the Moovit website or app to trace available stops. Make sure the prefix JAK (e.g. JAK-01, JAK-02) is displayed on the front of the van so you don't go wrong taking an older van with cash payments.
 
 edit
@@ -250,8 +228,6 @@ Blue Bird, Gojek and Grab apps can be downloaded for free to help you order taxi
 
 edit
 
-Bajaj
-
 The Jakartan equivalent to Thailand's tuk-tuk is the bajaj (pronounced "bahdge-eye"), orange mutant scooters souped up in India into little three-wheeled vehicles that carry passengers in a small cabin at the back. Besides the usual orange bajaj, there is blue bajaj, which use gas as fuel.
 
 They're a popular way to get around town since they can weave through Jakarta's interminable traffic jams much like motorbikes can. Although slow, boneshaking (they have no suspension), hot and windy (locals joke about the "natural A/C"), and a great way to breathe in more exhaust fumes than you ever thought possible (maybe less if you ride the blue bajaj), riding around in these little motor-bugs can really grow on you. Blue gas-fueled bajaj are quieter than the orange 2-cycle bajaj.
@@ -264,8 +240,6 @@ There are Qute bajaj that have 4 wheels instead of 3. Qute are much quieter than
 
 edit
 
-Ojek
-
 If you're poking around narrow back streets, or in such a hurry that you're willing to lose a limb or more to get there, then Jakarta's motorcycle taxis (ojek) might be the ticket for you. Jakarta's ojek services consist of guys with bikes lounging around street corners, who usually shuttle short distances down alleys and roads but will also do longer trips for a price. Agree on the fare before you set off. Insist on a helmet and wear it properly—no need to make it more insanely dangerous than it already is. The ojek drivers will insist you're safe with them and that they'll drive carefully—some are telling the truth, some lying. Before you choose a driver, pay attention to their motorcycle's appearance and their helmet; sometimes it shows their character. Locals normally pay Rp5,000 for a short ride (one kilometre) and Rp7,000-10,000 for a longer (roughly more than a kilometre or a 15-minute walk). Foreigners are likely to be asked for more, but generally, ojek drivers will accept the proper fare if you insist on it, unless they see you really need their service.
 
 On-demand (online) ojek services such as Go-Jek and Grab are ubiquitous can be booked through their respective smartphone apps and offer generally cheaper fares which are stated in advance, although for Jakarta, Bogor, Depok, Tangerang and Bekasi area are more expensive than other area Rp 2,250 to Rp 2,650 per kilometer with minimum payment Rp 9,000 to Rp 10,500. Payments can be made by cash or stored value (akin to prepaid mobile phone service). You may chat or call the driver for help with finding each other, although some knowledge of Indonesian would be helpful. Go-Jek as a pioneer has more widespread availability; those who travel here alongside other Southeast Asian countries may find it useful to keep using Grab. The other more expensive on-demand ojek service is Lady Jek with female drivers. Unlike conventional ojeks, which typically only operate dawn to dusk, they are available at all times and relatively safe for both passengers and drivers as they are monitored by GPS. While it seems cheap, those who travel in groups of at least three may be better off taking a taxi for convenience and the unnoticeable difference in fares.
@@ -273,8 +247,6 @@ On-demand (online) ojek services such as Go-Jek and Grab are ubiquitous can be b
 The aforementioned brands also offer taxi service that are either private cars akin to Uber elsewhere in the world or with taxi companies so that you can hail them from the same app. Other services include food or groceries delivery and shipping between residents or from online businesses.
 
 edit
-
-Jalan Jendral Sudirman, one of Jakarta's business avenues and frequent spots for stop-and-go traffic
 
 Getting around Jakarta is, more often than not, problematic. The city layout is bewildering with horrendous traffic jams (macet "MAH-chet"), slowing the city to a crawl during rush hour. To make things worse, the traffic jams are worse during the rainy season despite no real flooding, mainly due to motorcyclists sheltering under tunnels. Various areas of the city have different levels of chaotic traffic. But while the better-organised traffic is mainly in the business districts (MH Thamrin, Jendral Sudirman, and H.R. Rasuna Said), they remain one of the most congested spots in Jakarta! It can even go beyond business hours because of the area's mixed-use as both office and commercial space, as well as the domino effect from other streets' stop-and-go traffic.
 
@@ -298,8 +270,6 @@ However, after a car accident involving GrabWheels, in which 2 persons were kill
 
 edit
 
-Car Free Day in HI Roundabout
-
 Cycling provisions are lacking in Jakarta, but the first signs of a cycling culture are emerging. Every Sunday from 06:00-11:00 during the Car Free Day (CFD) in Jalan Sudirman and Thamrin (and every month in other places in each city in Jakarta) are emptied of motorised vehicles, except TransJakarta. The atmosphere can be festive, as events are held in some places (especially in Hotel Indonesia Roundabout). As of late 2023, 314 km of new bicycle lanes have been opened, and are targeted to reach 535 km by 2026. The Pemuda Pramuka is the most used bicycle lane, mainly to commute between work and home. New rules mention that bicycle lanes can be used by bicycle, electric bicycle, otopet, electric scooter, hoverboard and unicycle. Whoever violates the rule will be penalised up to Rp500,000.
 
 Beyond that, there are dedicated mountain biking paths in Cihuni and along the Jalur Gas Pipa, both in Tangerang. Or you could head to Salak Mountain or other parts of the region beyond Bogor.
@@ -317,8 +287,6 @@ A few other neighbourhoods can be explored on foot:
 On Car-Free Day (CFD), every Sunday from 06:00 to 11:00 in the morning, the Sudirman-Thamrin thoroughfares are closed to motor vehicles, except for the Transjakarta buses. Locals crowd the streets to walk, jog, bike, enjoy performance arts and generally have some fun on the streets. While crowded, this is a good time to get in touch with the locals and see a different side of the city.
 
 edit
-
-Jakarta History Museum, Kota
 
 The heart of tourist attractions is to the north and centre of Jakarta. Visitors typically start exploring Jakarta from this part of the town, called the Kota Tua, where the old buildings of Jakarta are preserved within a dedicated walking area. Jakarta has 47 museums, which are spread across the city.
 
@@ -340,8 +308,6 @@ edit
 
 edit
 
-Traditional male & female ondel-ondel in Wayang Museum, Jakarta
-
 Despite being the melting pot of Indonesia, Jakarta's indigenous tribe called the Betawi still stays proud of its culture. They are actually a unique assimilation of various domestic and international races from the Chinese to the Portuguese, which makes it distinct from other parts of Indonesia. The Lenong theatre performance is accompanied by the Gambang Kromong orchestra that consists of the Sundanese Gendang, the Javanese Gamelan, and the Chinese Kongahyan (its own version of violin). The Tanjidor trumpets are an influence from the Dutch, while the Portuguese bequeathed the Keroncong orchestra. At the anniversary of the city's founding every 22 June, a distinctive piece of culture can be seen in hotels, the infamous pair of Ondel-ondel puppets. The complete experience of the culture can be found at Setu Babakan, the village of Betawi culture (and fishing at its lake).
 
 edit
@@ -355,8 +321,6 @@ With its many young music fans, Jakarta boasts some of the world's largest music
 For some traditional and classical stuff, there are performances at Gedung Kesenian Jakarta, by indie, jazz, dance, and classical music orchestras. Taman Ismail Marzuki hosts mainly theatrical shows, although English shows might be rare. Erasmus Huis Hall by the Dutch embassy also regularly hosts classical music shows and photography exhibitions.
 
 edit
-
-Es Kopi Susu Gula Aren (Ice coffee with milk and palm sugar), popular amongst Indonesian youth, is a refreshing treat during a hot day
 
 Coffee culture is prevalent in Jakarta and is often a pre- or post-work activity centered around the local term nongkrong (nohng-KROHNG), which means "hanging out" in Indonesian. As the number of coffee shops increases, so does the pool of aspiring baristas and coffee aficionados. This trend has established Jakarta as one of the key places in the world to experience a vibrant specialty coffee scene and local coffee drinks such as kopi susu gula aren, which is made with espresso, milk, and palm sugar, typically served cold with ice.
 
@@ -410,8 +374,6 @@ Every year, the Provincial Government of Jakarta holds an annual Festival Jakart
 
 edit
 
-Inside of Grand Indonesia Mall
-
 An escape from Jakarta's sweltering heat, hundreds of shopping malls serve as social hotspots and are where the city congregate on weekends to shop, buy groceries, and hang out. They range from grand top-end luxury malls to smaller trade centers and shopping complexes, with new buildings constantly under construction, so you can probably find a suitably stocked mall (or three) for what you're looking for close to you. Genuinely imported goods from official retailers are priced to international standards, but Jakarta also offers local and lesser-known designer alternatives. A vast selection of cafes and social spots are also attached to malls, so if you're planning to meet up with an Indonesian acquaintance, brunch or dinner at a mall is a popular affair.
 
 As a convention, most Jakarta malls will have a supermarket in the basement, alongside utilities such as ATMs, office goods, barber shops, pharmacies, personal health, and budget eating options. Shopping options are on the middle floors, followed by a selection of higher-end restaurants and potentially a movie theater at the top floors. Expect each location to have one or more lobbies at which you can be dropped off, and one of these lobbies will usually include a taxi stand. If calling in your own taxi (or rideshare) be sure to specify which lobby you're waiting at. Most malls open at 10:00, though breakfast dining spaces on the ground floor may open sooner, and lunch options may only fully open at 11:00.
@@ -441,8 +403,6 @@ Budget up to Rp25,000
 Mid-range Rp25.000-Rp100.000
 
 Splurge more than Rp100.000
-
-Interior of Cafe Batavia near Museum Fatahillah
 
 Jakarta has a vast range of food available at hundreds of eating complexes located all over the huge city. In addition to selections from all over the country, you can also find excellent Chinese, Japanese, Western, and many other international foods thanks to the cosmopolitan population.
 

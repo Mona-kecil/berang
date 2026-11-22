@@ -20,15 +20,9 @@ She developed a vision of the capability of computers to go beyond mere calculat
 
 Lord Byron expected his child to be a "glorious boy" and was disappointed when Lady Byron gave birth to a girl.[9] The child was named after Byron's half-sister, Augusta Leigh, and was called "Ada" by Byron himself.[10] On 16 January 1816, at Lord Byron's command, Lady Byron left for her parents' home at Kirkby Mallory, taking their five-week-old daughter with her.[9] Although English law at the time granted full custody of children to the father in cases of separation, Lord Byron made no attempt to claim his parental rights,[11] but did request that his sister keep him informed of Ada's welfare.[12]
 
-Ada Byron, aged four
-
 On 21 April, Lord Byron signed the deed of separation, although very reluctantly, and left England for good a few days later.[13] Aside from an acrimonious separation, Lady Byron continued throughout her life to make allegations about her husband's immoral behaviour.[14] This set of events made Lovelace infamous in Victorian society. Ada did not have a relationship with her father. He died in April 1824 when she was eight years old. Her mother was the only significant parental figure in her life.[15] Lovelace was not shown the family portrait of her father until her 20th birthday.[16]
 
-Ada Byron, aged seven, by Alfred d'Orsay, 1822, Somerville College, Oxford
-
 Lovelace did not have a close relationship with her mother. She was often left in the care of her maternal grandmother Judith, Hon. Lady Milbanke, who doted on her. However, because of societal attitudes of the time—which favoured the husband in any separation, with the welfare of any child acting as mitigation—Lady Byron had to present herself as a loving mother to the rest of society. This included writing anxious letters to Lady Milbanke about her daughter's welfare, with a cover note saying to retain the letters in case she had to use them to show maternal concern.[17] In one letter to Lady Milbanke, she referred to her daughter as "it": "I talk to it for your satisfaction, not my own, and shall be very glad when you have it under your own."[18] Lady Byron had her teenage daughter watched by close friends for any sign of moral deviation. Lovelace dubbed these observers the "Furies" and later complained they exaggerated and invented stories about her.[19]
-
-Ada Byron, aged seventeen, 1832
 
 Lovelace was often ill, beginning in early childhood. At the age of eight, she experienced headaches that obscured her vision.[10] In June 1829, she was paralyzed after a bout of measles. She was subjected to continuous bed rest for nearly a year, something which may have extended her period of disability. By 1831, she was able to walk with crutches. Despite the illnesses, she developed her mathematical and technological skills.
 
@@ -38,13 +32,7 @@ Ada Byron had an affair with a tutor in early 1833. She tried to elope with him 
 
 # Adult years
 
-Watercolor portrait of Ada Byron, by Alfred Edward Chalon, c. 1835.
-
-Watercolour portrait of Ada King, Countess of Lovelace, c. 1840, possibly by Alfred Edward Chalon
-
 Lovelace became close friends with her tutor Mary Somerville, who introduced her to Charles Babbage in 1833. She had a strong respect and affection for Somerville,[22] and they corresponded for many years. Other acquaintances included the scientists Andrew Crosse, Sir David Brewster, Charles Wheatstone, Michael Faraday and the author Charles Dickens. She was presented at Court at the age of seventeen "and became a popular belle of the season" in part because of her "brilliant mind".[23] By 1834 Ada was a regular at Court and started attending various events. She danced often and was able to charm many people, and was described by most people as being dainty, although John Hobhouse, Byron's friend, described her as "a large, coarse-skinned young woman but with something of my friend's features, particularly the mouth".[24] This description followed their meeting on 24 February 1834 in which Ada made it clear to Hobhouse that she did not like him, probably due to her mother's influence, which led her to dislike all of her father's friends. This first impression was not to last, and they later became friends.[25]
-
-William King, 1st Earl of Lovelace in uniform
 
 On 8 July 1835, she married William, 8th Baron King, becoming Lady King. They had three homes: Ockham Park, Surrey; a Scottish estate on Loch Torridon in Ross-shire; and a house in London. They spent their honeymoon at Ashley Combe near Porlock Weir, Somerset, which had been built as a hunting lodge in 1799 and was improved by King in preparation for their honeymoon. It later became their summer retreat and was further improved during this time. From 1845, the family's main house was Horsley Towers, built in the Tudorbethan fashion by the architect of the Houses of Parliament, Charles Barry,[26][27] and later greatly enlarged to Lovelace's own designs.
 
@@ -53,8 +41,6 @@ They had three children: Byron (born 1836); Anne Isabella (called Annabella, bor
 In 1841, Lovelace and Medora Leigh (the daughter of Lord Byron's half-sister Augusta Leigh) were told by Ada's mother that Ada's father was also Medora's father.[31] On 27 February 1841, Ada wrote to her mother: "I am not in the least astonished. In fact, you merely confirm what I have for years and years felt scarcely a doubt about, but should have considered it most improper in me to hint to you that I in any way suspected."[32] She did not blame the incestuous relationship on Byron, but instead blamed Augusta Leigh: "I fear she is more inherently wicked than he ever was."[33] In the 1840s, Ada flirted with scandals: firstly, from a relaxed approach to extra-marital relationships with men, leading to rumours of affairs;[34] and secondly, from her love of gambling. She apparently lost more than £3,000 on the horses during the later 1840s.[35] The gambling led to her forming a syndicate with male friends, and an ambitious attempt in 1851 to create a mathematical model for successful large bets. This went disastrously wrong, leaving her thousands of pounds in debt to the syndicate, forcing her to admit it all to her husband.[36] She had a shadowy relationship with Andrew Crosse's son John from 1844 onwards. John Crosse destroyed most of their correspondence after her death as part of a legal agreement. She bequeathed him the only heirlooms her father had personally left to her.[37] During her final illness, she would panic at the idea of the younger Crosse being kept from visiting her.[38]
 
 # Education
-
-Sonnet titled The Rainbow in Lovelace's own hand (Somerville College)
 
 From 1832, when she was seventeen, her mathematical abilities began to emerge,[23] and her interest in mathematics dominated the majority of her adult life.[39] Her mother's obsession with rooting out any of the insanity of which she accused Byron was one of the reasons that Ada was taught mathematics from an early age. She was privately educated in mathematics and science by William Frend, William King,[a] and Mary Somerville, the noted 19th-century researcher and scientific author. In the 1840s, the mathematician Augustus De Morgan extended her "much help in her mathematical studies" including study of advanced calculus topics including the "numbers of Bernoulli" (that formed her celebrated algorithm for Babbage's Analytical Engine).[40] In a letter to Lady Byron, De Morgan suggested that Ada's skill in mathematics might lead her to become "an original mathematical investigator, perhaps of first-rate eminence".[41]
 
@@ -66,15 +52,11 @@ Lovelace believed that intuition and imagination were critical to effectively ap
 
 # Death
 
-Painting of Lovelace seated at a piano, by Henry Phillips (1852). Although in great pain at the time, she agreed to sit for the painting as her father, Lord Byron, had been painted by Phillips' father, Thomas Phillips.
-
 Lovelace died at the age of 36 on 27 November 1852[44] from cervical cancer (which contemporary accounts called uterine cancer, since a distinction between the two was not made at that time).[45][46] The illness lasted several months, in which time Lady Byron took command over whom Ada saw, and excluded all of her friends and confidants. Under her mother's influence, Ada had a religious transformation and was coaxed into repenting of her previous conduct and making Lady Byron her executor.[47] She lost contact with her husband after confessing something to him on 30 August which caused him to abandon her bedside. It is not known what she told him.[48] She was buried, at her request, next to her father at the Church of St. Mary Magdalene in Hucknall, Nottinghamshire.[49]
 
 # Work
 
 Throughout her life, Lovelace was strongly interested in scientific developments and fads of the day, including phrenology[50] and mesmerism.[51] After her work with Babbage, Lovelace continued to work on other projects. In 1844, she commented to a friend Woronzow Greig about her desire to create a mathematical model for how the brain gives rise to thoughts and nerves to feelings ("a calculus of the nervous system").[52] She never achieved this, however. In part, her interest in the brain came from a long-running preoccupation, inherited from her mother, about her "potential" madness. As part of her research into this project, she visited the electrical engineer Andrew Crosse in 1844 to learn how to carry out electrical experiments.[53] In the same year, she wrote a review of a paper by Baron Karl von Reichenbach, Researches on Magnetism, but this was not published and does not appear to have progressed past the first draft.[54] In 1851, the year before her cancer struck, she wrote to her mother mentioning "certain productions" she was working on regarding the relation of maths and music.[55]
-
-Portrait of Ada Lovelace by the British painter Margaret Sarah Carpenter (1836)
 
 Lovelace first met Charles Babbage in June 1833, through their mutual friend Mary Somerville. Later that month, Babbage invited Lovelace to see the prototype for his difference engine.[56] She became fascinated with the machine and used her relationship with Somerville to visit Babbage as often as she could. Babbage was impressed by Lovelace's intellect and analytic skills. He called her "The Enchantress of Number".[57][b] In 1843, he wrote to her:
 
@@ -97,8 +79,6 @@ Lovelace and Babbage had a minor falling out when the papers were published, whe
 # First published computer program
 
 Main article: Note G
-
-Lovelace's diagram from "Note G", the first published computer algorithm
 
 The notes are important in the early history of computers, especially since Note G[66] described, in complete detail, a method for calculating a sequence of Bernoulli numbers using the Analytical Engine, which might have run correctly had it ever been built.[67] Though Babbage's personal notes from 1837 to 1840 contain the first programs for the engine,[68][69][70] the algorithm in Note G is often called the first published computer program. The engine was never completed and so the program was never tested.[71]
 
@@ -146,8 +126,6 @@ The [1834 article] chiefly treats it under its mechanical aspect, entering but s
 
 # Commemoration
 
-Blue plaque to Ada Lovelace in St James's Square, London
-
 The computer language Ada, created on behalf of the United States Department of Defense, was named after Lovelace.[96] The reference manual for the language was approved on 10 December 1980 and the Department of Defense Military Standard for the language, MIL-STD-1815, was given the number of the year of her birth.[97]
 
 In 1981, the Association for Women in Computing inaugurated its Ada Lovelace Award.[98][99] As of 1998, the British Computer Society (BCS) has awarded the Lovelace Medal,[100] and in 2008 initiated an annual competition for women students.[101] BCSWomen sponsors the Lovelace Colloquium, an annual conference for women undergraduates.[101] In 2013, the University of Deusto in Spain established the Ada Byron Award for women in technology, which was subsequently expanded to several Latin American countries.[102]
@@ -167,8 +145,6 @@ The computer centre in the village of Porlock, near where Lovelace lived, is nam
 Ada Lovelace House is a council-owned building in Kirkby-in-Ashfield, Nottinghamshire, near where Lovelace spent her infancy.[110][111]
 
 In 2012, a Google Doodle and blog post honoured her on her birthday.[112][113] In 2013, Ada Developers Academy was founded and named after her. Its mission is to diversify tech by providing women and gender-diverse people the skills, experience, and community support to become professional software developers to change the face of tech.[114] On 17 September 2013, the BBC Radio 4 biography programme Great Lives devoted an episode to Ada Lovelace; she was sponsored by TV presenter Konnie Huq.[115]
-
-Lovelace statue in Millbank, City of Westminster, London
 
 As of November 2015, all new British passports have included an illustration of Lovelace and Babbage.[116][117] In 2017, a Google Doodle honoured her with other women on International Women's Day.[118] On 2 February 2018, Satellogic, a high-resolution Earth observation imaging and analytics company, launched a ÑuSat type micro-satellite named in honour of Ada Lovelace.[119] In March 2018, The New York Times published a belated obituary for Ada Lovelace.[120]
 
@@ -195,8 +171,6 @@ Ada.Ada.Ada, a one-woman show about the life and work of Ada Lovelace (using an 
 Special exhibitions were displayed by the Science Museum in London, England[141] and the Weston Library (part of the Bodleian Library) in Oxford, England.[142]
 
 # In popular culture
-
-An illustration inspired by the A. E. Chalon portrait created for the Ada Initiative, which supported open technology and women
 
 # Novels, plays and poetry
 
@@ -277,12 +251,6 @@ In 2021, the code name of Nvidia's GPU architecture in its RTX 4000 series is Ad
 Ada Byron University Programming Contest at the Polytechnic University of Valencia.[178]
 
 # Other
-
-Green plaque in Ealing
-
-Blue plaque at Mallory Park
-
-Ada Lovelace Memorial
 
 A green plaque is to be found on Fordhook Avenue on the corner of 5 Station Parade, Uxbridge Road, Ealing.[179]
 

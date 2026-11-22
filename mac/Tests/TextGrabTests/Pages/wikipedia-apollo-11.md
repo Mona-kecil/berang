@@ -32,8 +32,6 @@ On September 12, 1962, Kennedy delivered another speech before a crowd of about 
 
 There is no strife, no prejudice, no national conflict in outer space as yet. Its hazards are hostile to us all. Its conquest deserves the best of all mankind, and its opportunity for peaceful cooperation may never come again. But why, some say, the Moon? Why choose this as our goal? And they may well ask, why climb the highest mountain? Why, 35 years ago, fly the Atlantic? Why does Rice play Texas? We choose to go to the Moon! We choose to go to the Moon ... We choose to go to the Moon in this decade and do the other things, not because they are easy, but because they are hard; because that goal will serve to organize and measure the best of our energies and skills, because that challenge is one that we are willing to accept, one we are unwilling to postpone, and one we intend to win, and the others, too.[25]
 
-President John F. Kennedy speaking at Rice University on September 12, 1962
-
 In spite of that, the proposed program faced widespread opposition and was dubbed a "moondoggle" by Norbert Wiener, a mathematician at the Massachusetts Institute of Technology.[26][27] The effort to land a man on the Moon already had a name: Project Apollo.[28] When Kennedy met with Nikita Khrushchev, the Premier of the Soviet Union in June 1961, he proposed making the Moon landing a joint project, but Khrushchev declined the offer.[29] Kennedy again proposed a joint expedition to the Moon in a speech to the United Nations General Assembly on September 20, 1963.[30] The idea of a joint Moon mission was ultimately abandoned after Kennedy's death.[31]
 
 An early and crucial decision was choosing lunar orbit rendezvous over both direct ascent and Earth orbit rendezvous. A space rendezvous is an orbital maneuver in which two spacecraft navigate through space and meet up. In July 1962, NASA head James Webb announced that lunar orbit rendezvous would be used[32][33] and that the Apollo spacecraft would have three major parts: a command module (CM) with a cabin for the three astronauts, and the only part that returned to Earth; a service module (SM), which supported the command module with propulsion, electrical power, oxygen, and water; and a lunar module (LM) that had two stages—a descent stage for landing on the Moon, and an ascent stage to place the astronauts back into lunar orbit.[34] This design meant the spacecraft could be launched by a single Saturn V rocket that was then under development.[35]
@@ -68,8 +66,6 @@ During Projects Mercury and Gemini, each mission had a prime and a backup crew. 
 
 # Capsule communicators
 
-CAPCOM Charles Duke (left), with backup crewmembers Lovell and Haise listening in during Apollo 11's descent
-
 The capsule communicator (CAPCOM) was an astronaut stationed at the Mission Control Center in Houston, Texas, and was typically the only person permitted to communicate directly with the flight crew.[60] This practice ensured that messages came from someone best able to understand the situation in the spacecraft and to relay guidance from flight controllers as clearly as possible. For Apollo 11, the CAPCOMs were backup and support crew members Anders, Evans, Haise, Lovell, and Mattingly, along with Charles Duke, Owen Garriott, Don L. Lind, Bruce McCandless II, and Harrison Schmitt.[59]
 
 # Flight directors
@@ -84,8 +80,6 @@ Other key personnel who played important roles in the Apollo 11 mission include 
 
 # Insignia
 
-The Apollo 11 insignia. The eagle is carrying an olive branch to represent a peaceful mission
-
 The Apollo 11 mission emblem was designed by Collins, who wanted a symbol for "peaceful lunar landing by the United States". At Lovell's suggestion, he chose the bald eagle, the national bird of the United States, as the symbol. Tom Wilson, a simulator instructor, suggested an olive branch in its beak to represent their peaceful mission. Collins added a lunar background with the Earth in the distance. The sunlight in the image was coming from the wrong direction; the shadow should have been in the lower part of the Earth instead of the left.[68]
 
 Aldrin, Armstrong and Collins decided the Eagle and the Moon would be in their natural colors, and decided on a blue and gold border. Armstrong was concerned that "eleven" would not be understood by non-English speakers, so they went with "Apollo 11",[68] and they decided not to put their names on the patch, so it would "be representative of everyone who had worked toward a lunar landing".[69]
@@ -94,15 +88,11 @@ An illustrator at the Manned Spacecraft Center (MSC) did the artwork, which was 
 
 # Call signs
 
-The original cockpit of the command module (CM) with three seats, photographed from above. It is located in the National Air and Space Museum. The very high resolution image was produced in 2007 by the Smithsonian Institution.
-
 After the crew of Apollo 10 named their spacecraft Charlie Brown and Snoopy, assistant manager for public affairs Julian Scheer wrote to George Low, the Manager of the Apollo Spacecraft Program Office at the MSC, to suggest the Apollo 11 crew be less flippant in naming their craft. The name Snowcone was used for the CM and Haystack was used for the LM in both internal and external communications during early mission planning.[73]
 
 The LM was named Eagle after the motif which was featured prominently on the mission insignia. At Scheer's suggestion, the CM was named Columbia after Columbiad, the giant cannon that launched a spacecraft (also from Florida) in Jules Verne's 1865 novel From the Earth to the Moon. It also referred to Columbia, a historical name of the United States.[74][75] In Collins' 1976 book, he said Columbia was in reference to Christopher Columbus.[76]
 
 # Mementos
-
-Apollo 11 space-flown silver Robbins medallion
 
 The astronauts had personal preference kits (PPKs), small bags containing personal items of significance they wanted to take with them on the mission.[77] Five 0.5-pound (0.23 kg) PPKs were carried on Apollo 11: three (one for each astronaut) were stowed on Columbia before launch, and two on Eagle.[78]
 
@@ -144,8 +134,6 @@ The media accused Armstrong of exercising his commander's prerogative to exit th
 
 # Pre-launch
 
-Saturn V SA-506, the rocket carrying the Apollo 11 spacecraft, moves out of the Vehicle Assembly Building towards Launch Complex 39.
-
 The ascent stage of LM-5 Eagle arrived at the Kennedy Space Center on January 8, 1969, followed by the descent stage four days later, and CSM-107 Columbia on January 23.[6] There were several differences between Eagle and Apollo 10's LM-4 Snoopy; Eagle had a VHF radio antenna to facilitate communication with the astronauts during their EVA on the lunar surface; a lighter ascent engine; more thermal protection on the landing gear; and a package of scientific experiments known as the Early Apollo Scientific Experiments Package (EASEP). The only change in the configuration of the command module was the removal of some insulation from the forward hatch.[97][98] The CSM was mated on January 29, and moved from the Operations and Checkout Building to the Vehicle Assembly Building on April 14.[6]
 
 The S-IVB third stage of Saturn V AS-506 had arrived on January 18, followed by the S-II second stage on February 6, S-IC first stage on February 20, and the Saturn V Instrument Unit on February 27. At 12:30 on May 20, the 5,443-tonne (5,357-long-ton; 6,000-short-ton) assembly departed the Vehicle Assembly Building atop the crawler-transporter, bound for Launch Pad 39A, part of Launch Complex 39, while Apollo 10 was still on its way to the Moon. A countdown test commenced on June 26, and concluded on July 2. The launch complex was floodlit on the night of July 15, when the crawler-transporter carried the mobile service structure back to its parking area.[6] In the early hours of the morning, the fuel tanks of the S-II and S-IVB stages were filled with liquid hydrogen.[99] Fueling was completed by three hours before launch.[100] Launch operations were partly automated, with 43 programs written in the ATOLL programming language.[101]
@@ -155,8 +143,6 @@ Slayton roused the crew shortly after 04:00, and they showered, shaved, and had 
 # Mission
 
 # Launch and flight to lunar orbit
-
-The Apollo 11 Saturn V space vehicle lifts off with astronauts Neil A. Armstrong, Michael Collins and Edwin E. Aldrin Jr. at 9:32 am. EDT July 16, 1969, from Kennedy Space Center's Launch Complex 39A.
 
 An estimated one million spectators watched the launch of Apollo 11 from the highways and beaches in the vicinity of the launch site. Dignitaries included the Chief of Staff of the United States Army, General William Westmoreland, four cabinet members, 19 state governors, 40 mayors, 60 ambassadors and 200 congressmen. Vice President Spiro Agnew viewed the launch with former president Lyndon B. Johnson and his wife Lady Bird Johnson.[99][104] Around 3,500 media representatives were present.[105] About two-thirds were from the United States; the rest came from 55 other countries. The launch was televised live in 33 countries, with an estimated 25 million viewers in the United States alone. Millions more around the world listened to radio broadcasts.[104][99] President Richard Nixon viewed the launch from his office in the White House with his NASA liaison officer, Apollo astronaut Frank Borman.[106] Lodging near Cape Canaveral was reported as being booked months ahead in advance for the launch by a Florida newspaper.[107]
 
@@ -168,15 +154,11 @@ On July 19 at 17:21:50 UTC, Apollo 11 passed behind the Moon and fired its servi
 
 # Lunar descent
 
-Columbia in lunar orbit, photographed from Eagle
-
 At 12:52:00 UTC on July 20, Aldrin and Armstrong entered Eagle, and began the final preparations for lunar descent.[8] At 17:44:00 Eagle separated from Columbia.[13] Collins, alone aboard Columbia, inspected Eagle as it pirouetted before him to ensure the craft was not damaged, and that the landing gear was correctly deployed.[113][114] Armstrong exclaimed: "The Eagle has wings!"[114]
 
 As the descent began, Armstrong and Aldrin found themselves passing landmarks on the surface two or three seconds early, and reported that they were "long"; they would land miles west of their target point. Eagle was traveling too fast. The problem could have been mascons—concen­tra­tions of high mass in a region or regions of the Moon's crust that contains a gravitational anomaly, potentially altering Eagle's trajectory. Flight Director Gene Kranz speculated that it could have resulted from extra air pressure in the docking tunnel, or a result of Eagle's pirouette maneuver.[115][116]
 
 Five minutes into the descent burn, and 6,000 feet (1,800 m) above the surface of the Moon, the LM guidance computer (LGC) distracted the crew with the first of several unexpected 1201 and 1202 program alarms. Inside Mission Control Center, computer engineer Jack Garman told Guidance Officer Steve Bales it was safe to continue the descent, and this was relayed to the crew. The program alarms indicated "executive overflows", meaning the guidance computer could not complete all its tasks in real-time and had to postpone some of them.[117][118] Margaret Hamilton, the Director of Apollo Flight Computer Programming at the MIT Charles Stark Draper Laboratory later recalled:
-
-Eagle in lunar orbit photographed from Columbia
 
 To blame the computer for the Apollo 11 problems is like blaming the person who spots a fire and calls the fire department. Actually, the computer was programmed to do more than recognize error conditions. A complete set of recovery programs was incorporated into the software. The software's action, in this case, was to eliminate lower priority tasks and re-establish the more important ones. The computer, rather than almost forcing an abort, prevented an abort. If the computer hadn't recognized this problem and taken recovery action, I doubt if Apollo 11 would have been the successful Moon landing it was.[119]
 
@@ -192,15 +174,11 @@ Armstrong found a clear patch of ground and maneuvered the spacecraft towards it
 
 A light informed Aldrin that at least one of the 67-inch (170 cm) probes hanging from Eagle's footpads had touched the surface a few moments before the landing and he said: "Contact light!" Armstrong was supposed to immediately shut the engine down, as the engineers suspected the pressure caused by the engine's own exhaust reflecting off the lunar surface could make it explode, but he forgot. Three seconds later, Eagle landed and Armstrong shut the engine down.[127] Aldrin immediately said "Okay, engine stop. ACA—out of detent." Armstrong acknowledged: "Out of detent. Auto." Aldrin continued: "Mode control—both auto. Descent engine command override off. Engine arm—off. 413 is in."[128]
 
-The landing site relative to West crater
-
 ACA was the Attitude Control Assembly—the LM's control stick. Output went to the LGC to command the reaction control system (RCS) jets to fire. "Out of Detent" meant the stick had moved away from its centered position; it was spring-centered like the turn indicator in a car. Address 413 of the Abort Guidance System (AGS) contained the variable that indicated the LM had landed.[10]
 
 Eagle landed at 20:17:40 UTC on Sunday July 20 with 216 pounds (98 kg) of usable fuel remaining. Information available to the crew and mission controllers during the landing showed the LM had enough fuel for another 25 seconds of powered flight before an abort without touchdown would have become unsafe,[10][129] but post-mission analysis showed that the real figure was probably closer to 50 seconds.[130] Apollo 11 landed with less fuel than most subsequent missions, and the astronauts encountered a premature low fuel warning. This was later found to be the result of the propellant sloshing more than expected, uncovering a fuel sensor. On subsequent missions, extra anti-slosh baffles were added to the tanks to prevent this.[10]
 
 Armstrong acknowledged Aldrin's completion of the post-landing checklist with "Engine arm is off", before responding to the CAPCOM, Charles Duke, with the words, "Houston, Tranquility Base here. The Eagle has landed." Duke expressed the relief at Mission Control: "Roger, Twan—Tranquility, we copy you on the ground. You got a bunch of guys about to turn blue. We're breathing again. Thanks a lot."[10][131]
-
-A 3-D view from the Lunar Reconnaissance Orbiter (LRO) of the Apollo 11 landing site
 
 Two and a half hours after landing, before preparations began for the EVA, Aldrin radioed to Earth:
 
@@ -234,8 +212,6 @@ About seven minutes after stepping onto the Moon's surface, Armstrong collected 
 
 Armstrong said moving in the lunar gravity, one-sixth of Earth's, was "even perhaps easier than the simulations ... It's absolutely no trouble to walk around."[140] Aldrin joined him on the surface and tested methods for moving around, including two-footed kangaroo hops. The PLSS backpack created a tendency to tip backward, but neither astronaut had serious problems maintaining balance. Loping became the preferred method of movement. The astronauts reported that they needed to plan their movements six or seven steps ahead. The fine soil was quite slippery. Aldrin remarked that moving from sunlight into Eagle's shadow produced no temperature change inside the suit, but the helmet was warmer in sunlight, so he felt cooler in shadow.[140] The MESA failed to provide a stable work platform and was in shadow, slowing work somewhat. As they worked, the moonwalkers kicked up gray dust, which soiled the outer part of their suits.[151]
 
-Aldrin salutes the deployed United States flag on the lunar surface.
-
 The astronauts planted the Lunar Flag Assembly containing a flag of the United States on the lunar surface, in clear view of the TV camera. Aldrin remembered, "Of all the jobs I had to do on the Moon the one I wanted to go the smoothest was the flag raising."[152] But the astronauts struggled with the telescoping rod and could only insert the pole about 2 inches (5 cm) into the hard lunar surface. Aldrin was afraid it might topple in front of TV viewers, but gave "a crisp West Point salute".[152]
 
 Before Aldrin could take a photo of Armstrong with the flag, President Richard Nixon spoke to them through a telephone-radio transmission, which Nixon called "the most historic phone call ever made from the White House."[153] Nixon originally had a long speech prepared to read during the phone call, but Frank Borman, who was at the White House as a NASA liaison during Apollo 11, convinced Nixon to keep his words brief.[154]
@@ -246,13 +222,9 @@ Armstrong: Thank you, Mr. President. It's a great honor and privilege for us to 
 
 Nixon: Thank you very much, and I look forward, all of us look forward, to seeing you on the Hornet on Thursday.[155][156]
 
-Aldrin's bootprint, part of an experiment to test the properties of the lunar regolith
-
 They deployed the EASEP, which included a Passive Seismic Experiment Package used to measure moonquakes and a retroreflector array used for the lunar laser ranging experiment.[157] Then Armstrong walked 196 feet (60 m) from the LM to take photographs at the rim of Little West Crater while Aldrin collected two core samples. He used the geologist's hammer to pound in the tubes—the only time the hammer was used on Apollo 11—but was unable to penetrate more than 6 inches (15 cm) deep. The astronauts then collected rock samples using scoops and tongs on extension handles.[158]
 
 Many of the surface activities took longer than expected, so they had to stop documenting sample collection halfway through the allotted 34 minutes. Aldrin shoveled 6 kilograms (13 lb) of soil into the box of rocks to pack them in tightly.[158] Two types of rocks were found in the geological samples: basalt and breccia.[159] Three new minerals were discovered in the rock samples collected by the astronauts: armalcolite, tranquillityite, and pyroxferroite. Armalcolite was named after Armstrong, Aldrin, and Collins. All have subsequently been found on Earth.[160]
-
-The plaque left on the ladder of Eagle
 
 While on the surface, Armstrong uncovered a plaque mounted on the LM ladder, bearing two drawings of Earth (of the Western and Eastern Hemispheres), an inscription, and signatures of the astronauts and President Nixon. The inscription read:
 
@@ -268,15 +240,11 @@ Mission Control used a coded phrase to warn Armstrong his metabolic rates were h
 
 Aldrin entered Eagle first. With some difficulty the astronauts lifted film and two sample boxes containing 21.55 kilograms (47.5 lb) of lunar surface material to the LM hatch using a flat cable pulley device called the Lunar Equipment Conveyor (LEC). This proved to be an inefficient tool, and later missions preferred to carry equipment and samples up to the LM by hand.[135] Armstrong reminded Aldrin of a bag of memorial items in his sleeve pocket, and Aldrin tossed the bag down. Armstrong then jumped onto the ladder's third rung, and climbed into the LM. After transferring to LM life support, the explorers lightened the ascent stage for the return to lunar orbit by tossing out their PLSS backpacks, lunar overshoes, an empty Hasselblad camera, and other equipment.[163][164] The hatch was closed again at 05:11:13. They then pressurized the LM and settled down to sleep.[165]
 
-Aldrin next to the Passive Seismic Experiment Package with the Lunar Module Eagle in the background
-
 Presidential speech writer William Safire had prepared an In Event of Moon Disaster announcement for Nixon to read in the event the Apollo 11 astronauts were stranded on the Moon.[166] The remarks were in a memo from Safire to Nixon's White House Chief of Staff H. R. Haldeman, in which Safire suggested a protocol the administration might follow in reaction to such a disaster.[167][168] According to the plan, Mission Control would "close down communications" with the LM, and a clergyman would "commend their souls to the deepest of the deep" in a public ritual likened to burial at sea. The last line of the prepared text contained an allusion to Rupert Brooke's World War I poem "The Soldier".[168] The script for the speech does not make reference to Collins; as he remained onboard Columbia in orbit around the Moon, it was expected that he would be able to return the module to Earth in the event of a mission failure.[169]
 
 While moving inside the cabin, Aldrin accidentally damaged the circuit breaker that would arm the main engine for liftoff from the Moon. There was a concern this would prevent firing the engine, stranding them on the Moon. The nonconductive tip of a Duro felt-tip pen[170] was sufficient to activate the switch.[165]
 
 After more than 21+1⁄2 hours on the lunar surface, in addition to the scientific instruments, the astronauts left behind: an Apollo 1 mission patch in memory of astronauts Roger Chaffee, Gus Grissom, and Edward White, who died when their command module caught fire during a test in January 1967; two memorial medals of Soviet cosmonauts Vladimir Komarov and Yuri Gagarin, who died in 1967 and 1968 respectively; a memorial bag containing a gold replica of an olive branch as a traditional symbol of peace; and a silicon message disk carrying the goodwill statements by presidents Eisenhower, Kennedy, Johnson, and Nixon along with messages from leaders of 73 countries around the world.[171] The disk also carries a listing of the leadership of the US Congress, a listing of members of the four committees of the House and Senate responsible for the NASA legislation, and the names of NASA's past and then-current top management.[172]
-
-A map of the Tranquility Base landing site and photos taken
 
 After about seven hours of rest, the crew was awakened by Houston to prepare for the return flight. At that time, unknown to them, some hundred kilometers away from them the Soviet probe Luna 15 was about to descend and impact. Despite having been known to be orbiting the Moon at the same time, through a ground-breaking precautious goodwill exchange of data, the mission control of Luna 15 unexpectedly hastened its robotic sample-return mission, initiating descent, in an attempt to return before Apollo 11.[173] Just two hours before Apollo 11's launch, Luna 15 crashed at 15:50 UTC, with British astronomers monitoring Luna 15 and recording the situation one commented: "I say, this has really been drama of the highest order",[174] bringing the Space Race to a culmination.[175]
 
@@ -294,8 +262,6 @@ When Columbia came back around to the near side of the Moon again, Collins was a
 
 # Return
 
-Eagle's ascent stage approaching Columbia
-
 Eagle rendezvoused with Columbia at 21:24 UTC on July 21, and the two docked at 21:35. Eagle's ascent stage was jettisoned into lunar orbit at 23:41.[9] Just before the Apollo 12 flight, it was noted that Eagle was still likely to be orbiting the Moon. Later NASA reports mentioned that Eagle's orbit had decayed, resulting in it impacting in an "uncertain location" on the lunar surface.[181] In 2021, however, some calculations show that the lander may still be in orbit.[182]
 
 On July 23, the last night before splashdown, the three astronauts made a television broadcast in which Collins commented: "All this is possible only through the blood, sweat, and tears of a number of people ... All you see is the three of us, but beneath the surface are thousands and thousands of others, and to all of those, I would like to say, 'Thank you very much'."[183] Aldrin added: "This has been far more than three men on a mission to the Moon; more, still, than the efforts of a government and industry team; more, even, than the efforts of one nation. We feel that this stands as a symbol of the insatiable curiosity of all mankind to explore the unknown ..."[183]
@@ -307,8 +273,6 @@ The responsibility for this flight lies first with history and with the giants o
 On the return to Earth, a bearing at the Guam tracking station failed, potentially preventing communication on the last segment of the Earth return. A regular repair was not possible in the available time but the station director, Charles Force, had his ten-year-old son Greg use his small hands to reach into the housing and pack it with grease. Greg was later thanked by Armstrong.[184]
 
 # Splashdown and quarantine
-
-Columbia floats on the ocean as Navy divers assist in retrieving the astronauts.
 
 The aircraft carrier USS Hornet, under the command of Captain Carl J. Seiberlich,[185] was selected as the primary recovery ship (PRS) for Apollo 11 on June 5, replacing her sister ship, the LPH USS Princeton, which had recovered Apollo 10 on May 26. Hornet was then at her home port of Long Beach, California.[186] On reaching Pearl Harbor on July 5, Hornet embarked the Sikorsky SH-3 Sea King helicopters of HS-4, a unit which specialized in recovery of Apollo spacecraft, specialized divers of UDT Detachment Apollo, a 35-man NASA recovery team, and about 120 media representatives. To make room, most of Hornet's air wing was left behind in Long Beach. Special recovery equipment was also loaded, including a boilerplate command module used for training.[187]
 
@@ -336,19 +300,13 @@ Hornet returned to Pearl Harbor on July 26, where it was welcomed by thousands o
 
 In accordance with the Extra-Terrestrial Exposure Law, a set of regulations promulgated by NASA on July 16 to codify its quarantine protocol,[209] the astronauts continued in quarantine. After three weeks in confinement (first in the Apollo spacecraft, then in their trailer on Hornet, and finally in the Lunar Receiving Laboratory), the astronauts were given a clean bill of health.[210] On August 10, 1969, the Interagency Committee on Back Contamination met in Atlanta and lifted the quarantine on the astronauts, on those who had joined them in quarantine (NASA physician William Carpentier and John Hirasaki),[211] and on Columbia itself. Loose equipment from the spacecraft remained in isolation until the lunar samples were released for study.[212]
 
-August 13, 1969, New York City
-
 # Celebrations
 
 Following their return to Earth, the Apollo 11 crew received widespread international acclaim. On August 13, 1969, astronauts Neil Armstrong, Buzz Aldrin, and Michael Collins were honored with ticker-tape parades in New York City and Chicago, with an estimated six million people lining the streets.[213] In New York the parade started at Bowling Green going down Broadway to City Hall where Mayor John Lindsay greeted them and ended at the United Nations headquarters.[214] Broadway was temporarily renamed for that day to "Apollo Way". In Chicago the parade went to the Loop[215] and culminated at the Chicago Civic Center where the astronauts and local officials spoke to the crowd. That evening, a state dinner was held in Los Angeles at the Century Plaza Hotel to commemorate the historic achievement. The event was attended by members of Congress, 44 state governors, Chief Justice of the United States Warren E. Burger and his predecessor Earl Warren, as well as ambassadors from 83 nations. President Richard Nixon and Vice President Spiro Agnew awarded each astronaut the Presidential Medal of Freedom, the highest civilian honor in the United States.[216]
 
-Apollo 11 Astronauts - New York City - August 13, 1969
-
 On September 16, the astronauts addressed a joint session of Congress, where they presented two American flags—one to the House of Representatives and one to the Senate—that had traveled to the lunar surface aboard Eagle.[217]
 
 One of the mission flags carried aboard the flight—the Flag of American Samoa—was later displayed at the Jean P. Haydon Museum in Pago Pago, the capital of American Samoa, recognizing the territory's support role as a recovery staging area.[218]
-
-Terrazzo tribute to Apollo 11 astronauts on the Hollywood Walk of Fame
 
 Numerous countries and organizations honored the Moon landing by issuing special commemorative items. These included postage stamps, coins, medals, plaques, and magazine features. TIME, National Geographic, LIFE, and dozens of international publications featured the astronauts on their covers. Many of these commemoratives are now held in public and private collections, and some were placed aboard later Apollo missions in symbolic tribute.[219]
 
@@ -365,8 +323,6 @@ In London the astronauts went to Buckingham Palace, where they were greeted by Q
 # Cultural significance
 
 Main article: Apollo 11 in popular culture
-
-A girl holding The Washington Post newspaper stating "'The Eagle Has Landed' – Two Men Walk on the Moon"
 
 Humans walking on the Moon and returning safely to Earth accomplished Kennedy's goal set eight years earlier. In Mission Control during the Apollo 11 landing, Kennedy's speech flashed on the screen, followed by the words "TASK ACCOMPLISHED, July 1969".[226] The success of Apollo 11 demonstrated the United States' technological superiority;[226] and with the success of Apollo 11, America had won the Space Race.[227][228]
 
@@ -398,15 +354,11 @@ After the Apollo 11 mission, officials from the Soviet Union said landing humans
 
 # Spacecraft
 
-Columbia on display in the Milestones of Flight exhibition hall at the National Air and Space Museum
-
 The command module Columbia went on a tour of the United States, visiting 49 state capitals, the District of Columbia, and Anchorage, Alaska.[239] In 1971, it was transferred to the Smithsonian Institution, and was displayed at the National Air and Space Museum (NASM) in Washington, DC.[240] It was in the central Milestones of Flight exhibition hall in front of the Jefferson Drive entrance, sharing the main hall with other pioneering flight vehicles such as the Wright Flyer, Spirit of St. Louis, Bell X-1, North American X-15 and Friendship 7.[241]
 
 Columbia was moved in 2017 to the NASM Mary Baker Engen Restoration Hangar at the Steven F. Udvar-Hazy Center in Chantilly, Virginia, to be readied for a four-city tour titled Destination Moon: The Apollo 11 Mission. This included Space Center Houston from October 14, 2017, to March 18, 2018, the Saint Louis Science Center from April 14 to September 3, 2018, the Senator John Heinz History Center in Pittsburgh from September 29, 2018, to February 18, 2019, and its last location at Museum of Flight in Seattle from March 16 to September 2, 2019.[240][242] Continued renovations at the Smithsonian allowed time for an additional stop for the capsule, and it was moved to the Cincinnati Museum Center. The ribbon cutting ceremony was on September 29, 2019.[243]
 
 For 40 years Armstrong's and Aldrin's space suits were displayed in the museum's Apollo to the Moon exhibit,[244] until it permanently closed on December 3, 2018, to be replaced by a new gallery which was scheduled to open in 2022. A special display of Armstrong's suit was unveiled for the 50th anniversary of Apollo 11 in July 2019.[245][246] The quarantine trailer, the flotation collar and the flotation bags are in the Smithsonian's Steven F. Udvar-Hazy Center annex near Washington Dulles International Airport in Chantilly, Virginia, where they are on display along with a test lunar module.[247][248][249]
-
-Armstrong's space suit on display at the National Air and Space Museum in its new exhibit
 
 The descent stage of the LM Eagle remains on the Moon. In 2009, the Lunar Reconnaissance Orbiter (LRO) imaged the various Apollo landing sites on the surface of the Moon, for the first time with sufficient resolution to see the descent stages of the lunar modules, scientific instruments, and foot trails made by the astronauts.[250]
 
@@ -415,8 +367,6 @@ The remains of the ascent stage are assumed to lie at an unknown location on the
 F-1 Engine Injector Plate on temporary display at the Cincinnati Museum Center in 2019
 
 In March 2012 a team of specialists financed by Amazon founder Jeff Bezos located the F-1 engines from the S-IC stage that launched Apollo 11 into space. They were found on the Atlantic seabed using advanced sonar scanning.[253] His team brought parts of two of the five engines to the surface. In July 2013, a conservator discovered a serial number under the rust on one of the engines raised from the Atlantic, which NASA confirmed was from Apollo 11.[254][255] The S-IVB third stage which performed Apollo 11's trans-lunar injection remains in a solar orbit near to that of Earth.[256]
-
-Pieces of fabric and wood from the first airplane, the 1903 Wright Flyer, traveled to the Moon in Apollo 11's Lunar Module Eagle and are displayed at the Wright Brothers National Memorial.
 
 # Moon rocks
 
@@ -442,8 +392,6 @@ Further information: Apollo 11 anniversaries
 
 # 40th anniversary
 
-Columbia at the Mary Baker Engen Restoration Hangar
-
 On July 15, 2009, Life.com released a photo gallery of previously unpublished photos of the astronauts taken by Life photographer Ralph Morse prior to the Apollo 11 launch.[267] From July 16 to 24, 2009, NASA streamed the original mission audio on its website in real time 40 years to the minute after the events occurred.[268] It is in the process of restoring the video footage and has released a preview of key moments.[269] In July 2010, air-to-ground voice recordings and film footage shot in Mission Control during the Apollo 11 powered descent and landing was re-synchronized and released for the first time.[270] The John F. Kennedy Presidential Library and Museum set up an Adobe Flash website that rebroadcasts the transmissions of Apollo 11 from launch to landing on the Moon.[271]
 
 On July 20, 2009, Armstrong, Aldrin, and Collins met with President Barack Obama at the White House.[272] "We expect that there is, as we speak, another generation of kids out there who are looking up at the sky and are going to be the next Armstrong, Collins, and Aldrin", Obama said. "We want to make sure that NASA is going to be there for them when they want to take their journey."[273] On August 7, 2009, an act of Congress awarded the three astronauts a Congressional Gold Medal, the highest civilian award in the United States. The bill was sponsored by Florida Senator Bill Nelson and Florida Representative Alan Grayson.[274][275]
@@ -461,8 +409,6 @@ In June 2015, Congressman Bill Posey introduced resolution H.R. 2726 to the 114t
 A documentary film, Apollo 11, with restored footage of the 1969 event, premiered in IMAX on March 1, 2019, and broadly in theaters on March 8.[279][280]
 
 The Smithsonian Institute's National Air and Space Museum and NASA sponsored the "Apollo 50 Festival" on the National Mall in Washington DC. The three-day (July 18 to 20, 2019) outdoor festival featured hands-on exhibits and activities, live performances, and speakers such as Adam Savage and NASA scientists.[281]
-
-A Saturn V rocket projected onto the Washington Monument during the Apollo 11 50th anniversary show
 
 As part of the festival, a projection of the 363-foot (111 m) tall Saturn V rocket was displayed on the east face of the 555-foot (169 m) tall Washington Monument from July 16 to the 20th from 9:30 pm until 11:30 pm (EDT). The program included a 17-minute show that combined full-motion video projected on the Washington Monument to recreate the assembly and launch of the Saturn V rocket.[282]
 

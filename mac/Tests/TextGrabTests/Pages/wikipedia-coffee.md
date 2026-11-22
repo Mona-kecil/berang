@@ -14,8 +14,6 @@ The two most commonly grown coffee bean types are C. arabica and C. robusta.[7] 
 
 # Etymology
 
-Green coffee describes the beans before roasting.
-
 The word coffee entered the English language in 1582 via the Dutch koffie, borrowed from the Ottoman Turkish kahve (قهوه), borrowed from the Arabic qahwah (قَهْوَة).[9] Medieval Arabic lexicons traditionally held that the etymology of qahwah meant 'wine', given its distinctly dark color, and was derived from the verb qahiya (قَهِيَ), 'to have no appetite'.[10] The word qahwah most likely meant 'the dark one', referring to the brew or the bean.[10]
 
 qahwah is not the name of the bean, which are known in Arabic as bunn and in Cushitic languages as būn. Semitic languages have the root qhh, 'dark color', which became a natural designation for the beverage. Its cognates include the Hebrew qehe(h) 'dulling' and the Aramaic qahey ('give acrid taste to').[10] Although etymologists have connected it with a word meaning 'wine', it is also thought to be from the Kaffa region of Ethiopia.[11]
@@ -31,8 +29,6 @@ Main article: History of coffee
 There are multiple anecdotal origin stories which lack evidence. Ralph S. Hattox records traditions in which the Islamic prophet Muhammad is said to have been introduced to a stimulating beverage by the Angel Gabriel, who recommended it for its restorative qualities.[13] In another commonly repeated legend, Kaldi, a 9th-century Ethiopian or Arab goatherd,[14][15][16] first observed the coffee plant after seeing his flock energized by chewing on the plant.[4] This legend does not appear before 1671, indicating the story is likely apocryphal, first being related by Antoine Faustus Nairon, a Maronite professor of Oriental languages and author of one of the first printed treatises devoted to coffee, De Saluberrima potione Cahue seu Cafe nuncupata Discurscus (Rome, 1671), which describes a camel or goat herder in the Kingdom of Ayaman, Arabia Felix.[17][18][19][4] The herder is unnamed in the earliest account and the name Kaldi appears to be a later invention from the twentieth century.[20] Another legend attributes the discovery of coffee to a Sheikh Omar. Starving after being exiled from Mokha, Omar found berries. After attempting to chew and roast them, Omar boiled them, which yielded a liquid that revitalized and sustained him.[1]
 
 # Historical transmission
-
-A 1652 handbill advertising coffee for sale in St. Michael's Alley, London
 
 The earliest possible references to the coffee bean and its qualities appear in al-Razi's 10th-century al-Hawi[a] and in Avicenna's 11th-century The Canon of Medicine[21][b] both which describe a plant component called bunchum as hot and dry[c]—with al-Razi reporting beneficial effects for the stomach and Avicenna also adding claims for the skin and body odor. According to later accounts, bunchum was made from a root rather than from coffee beans.[22][23] There is no confirmed evidence, either historical or archaeological, of coffee as a drink being consumed before the 15th century. The drink appears to be a relatively recent development. By the late 15th century, coffee drinking was well established among Sufi communities in Yemen.[22][24]
 
@@ -68,11 +64,7 @@ Frenchman Gabriel de Clieu took a coffee plant to the French territory of Martin
 
 # Mass production
 
-The port city Mocha in Yemen 1692.
-
 In the late 16th century, Yemen developed a booming coffee economy. Farmers grew coffee on mountain terraces above the Tihamah plain, and trade routes linked its ports to Jeddah and Cairo. By the 17th century, coffee had surpassed the global spice trade.[52] Up to the end of the 17th century, Yemen was the world's main producer for coffee, and Mocha was the world's largest shipping port for coffee.[6][53]
-
-A coffee can from the first half of the 20th century. From the Museo del Objeto del Objeto collection.
 
 Coffee was introduced to Brazil in 1727, but its cultivation did not gather momentum until independence in 1822.[54] After this time, massive tracts of rainforest were cleared for coffee plantations, first around Rio de Janeiro and later São Paulo.[55] Brazil went from having essentially no coffee exports in 1800 to being a significant regional producer in 1830, to being the largest producer in the world by 1852. Between 1910 and 1920, Brazil exported around 70% of the world's coffee; Colombia, Guatemala, and Venezuela exported 15%; and Old World production accounted for less than 5% of world exports.[56]
 
@@ -81,8 +73,6 @@ Many countries in Central America took up cultivation in the latter half of the 
 Rapid growth in coffee production in South America during the second half of the 19th century was matched by an increase in consumption in developed countries. Nowhere was this growth been as pronounced as in the United States, where a high rate of population growth was compounded by doubling of per capita consumption between 1860 and 1920. Though the United States was not the heaviest coffee-drinking nation at the time (Belgium, the Netherlands and Nordic countries all had comparable or higher levels of per capita consumption), due to its sheer size, the US was already the largest consumer of coffee in the world by 1860. By 1920, around half of all coffee produced worldwide was consumed in the US.[56]
 
 Coffee has become a vital cash crop for many developing countries. Over 100 million people in developing countries have become dependent on coffee as their primary source of income. It has become the primary export and economic backbone for African countries like Uganda, Burundi, Rwanda, and Ethiopia,[59] as well as many Central American countries.
-
-Coffee bean production, 2023
 
 # Biology
 
@@ -116,8 +106,6 @@ In 2020, the world production of green coffee beans was 175,647,000 60 kg bags, 
 
 Of the two main species grown, arabica coffee (from C. arabica) is generally more highly regarded than robusta coffee (from C. canephora). Robusta coffee tends to be bitter and has less flavor but a better body than arabica. For these reasons, about three-quarters of the coffee cultivated worldwide is C. arabica.[60] Robusta strains contain about 40–50% more caffeine than arabica.[75] Consequently, this species is used as an inexpensive substitute for arabica in many commercial coffee blends. Good quality robusta beans are used in traditional Italian espresso blends to provide a full-bodied taste and a better foam head (known as crema).
 
-Coffee leaf rust has forced the cultivation of resistant robusta coffee in many countries.[76]
-
 Robusta is less susceptible to disease than arabica and can be cultivated in lower altitudes and warmer climates where arabica does not thrive.[77] The robusta strain was first collected in 1890 from the Lomani River, a tributary of the Congo River, and was conveyed from the Congo Free State (now the Democratic Republic of the Congo) to Brussels to Java around 1900. From Java, further breeding resulted in the establishment of robusta plantations in many countries.[76] In particular, the spread of the devastating coffee leaf rust, caused by the fungal pathogen Hemileia vastatrix, hastened the uptake of the resistant robusta. The pathogen results in light, rust-colored spots on the undersides of coffee plant leaves.[78] It grows exclusively on the leaves of coffee plants.[79] Coffee leaf rust is found in virtually all countries that produce coffee.[80]
 
 Beans from different countries or regions can usually be distinguished by differences in flavor, aroma, body, and acidity.[81] These taste characteristics are dependent on the coffee's growing region, genetic subspecies (varietals), and processing.[82] Varietals are generally known by the region in which they are grown, such as Colombian, Java, and Kona. Arabica coffee beans are cultivated mainly in Latin America, eastern Africa or Asia, while robusta beans are grown in central Africa, southeast Asia, and Brazil.[60]
@@ -126,13 +114,9 @@ Beans from different countries or regions can usually be distinguished by differ
 
 # Fungi
 
-A Robusta coffee tree infected by coffee wilt disease
-
 Coffee wilt disease or tracheomycosis is a common vascular wilt found in Eastern and Central Africa that can kill coffee trees it infects. It is induced by the fungal pathogen Gibberella xylarioides. It can affect several Coffea species and could potentially threaten production worldwide.[83] Mycena citricolor, American leaf spot, is a fungus that can affect the entire coffee plant. It grows on leaves, resulting in leaves with holes that often fall from the plant. It is a threat primarily in Latin America.[84]
 
 # Animals
-
-The coffee borer beetle is a major insect pest of the world's coffee industry.[85]
 
 Over 900 species of insect have been recorded as pests of coffee crops worldwide. Of these, over a third are beetles, and over a quarter are bugs. Some 20 species of nematodes, 9 species of mites, and several snails and slugs also attack the crop. Birds and rodents sometimes eat coffee berries, but their impact is minor compared to invertebrates.[86] In general, C. arabica is the more sensitive species to invertebrate predation overall. Each part of the coffee plant is assailed by different animals. Nematodes attack the roots, coffee borer beetles burrow into stems and woody material,[87] and the foliage is attacked by over 100 species of larvae of butterflies and moths.[88]
 
@@ -143,8 +127,6 @@ The 2-mm-long coffee borer beetle (Hypothenemus hampei) is the most damaging ins
 # Ecological effects
 
 See also: Sustainable coffee
-
-Shade-grown coffee in Guatemala
 
 Originally, coffee was grown in the shade of trees that provided a habitat for many animals and insects.[91] Remnant forest trees were used for this purpose, but many species have been planted as well. These include leguminous trees of the genera Acacia, Albizia, Cassia, Erythrina, Gliricidia, Inga, and Leucaena, as well as the nitrogen-fixing non-legume sheoaks of the genus Casuarina, and the silky oak Grevillea robusta.[92] This method is commonly called "shade-grown coffee". Starting in the 1970s, many farmers switched their production methods to sun cultivation, in which coffee is grown in rows under full sun with little or no forest canopy. This causes berries to ripen more rapidly and bushes to produce higher yields, but the method requires the clearing of trees and increased use of fertilizer and pesticides, which damage the environment and cause health problems.[93] Unshaded coffee plants grown with fertilizer yield the most coffee, although unfertilized shaded crops generally yield more than unfertilized unshaded crops: the response to fertilizer is much greater in full sun.[94] While traditional coffee production causes berries to ripen more slowly and produce lower yields, the quality of the coffee is allegedly superior.[95] According to The International Coffee Organization factors such as drought, unfavourable temperature and climate change greatly affect coffee quality.[96] In addition, the traditional shaded method provides living space for many wildlife species. Proponents of shade cultivation say environmental problems such as deforestation, pesticide pollution, habitat destruction, and soil and water degradation are the side effects of the practices employed in sun cultivation.[91][97] The American Birding Association, Smithsonian Migratory Bird Center,[98] National Arbor Day Foundation,[99] and the Rainforest Alliance have led a campaign for 'shade-grown' and organic coffees, which can be sustainably harvested.[100] Shaded coffee cultivation systems show greater biodiversity than full-sun systems, and those more distant from continuous forest compare rather poorly to undisturbed native forest in terms of habitat value for some bird species.[101][102]
 
@@ -160,8 +142,6 @@ Then they are sorted by ripeness and color, and most often the flesh of the berr
 
 Using drying tables produces the most uniform effect with less fermentation. In this method, the pulped and fermented coffee is spread thinly on raised beds, which allows the air to pass on all sides of the coffee, and then the coffee is mixed by hand. It is not done very often; most African coffee is dried in this manner, and in the early 20th century a few coffee farms around the world were starting to use this method.[111] Next, the coffee is sorted, and labeled as green coffee. Some companies use cylinders to pump in heated air to dry the coffee seeds, though this is generally in places where the humidity is very high.[111]
 
-Kopi luwak, coffee berries that have been preprocessed by passing through the Asian palm civet's digestive tract[112]
-
 An Asian coffee known as kopi luwak undergoes a peculiar process made from coffee berries eaten by the Asian palm civet, passing through its digestive tract, with the beans harvested from feces. Coffee brewed from this process[112] is among the most expensive in the world, with bean prices reaching $160 per pound or $30 per brewed cup.[113] Kopi luwak coffee is said to have a uniquely rich, slightly smoky aroma and flavor with hints of chocolate, resulting from the action of digestive enzymes breaking down bean proteins to facilitate partial fermentation.[112][113] In Thailand, black ivory coffee beans are fed to elephants whose digestive enzymes reduce the bitter taste of beans collected from dung.[114] These beans sell for up to $1,100 a kilogram ($500 per lb), achieving the world's most expensive coffee,[114] three times costlier than palm civet coffee beans.[113]
 
 # Processing
@@ -169,8 +149,6 @@ An Asian coffee known as kopi luwak undergoes a peculiar process made from coffe
 # Roasting
 
 Main article: Coffee roasting
-
-Roasted coffee beans
 
 The next step in the process is the roasting of the green coffee. Coffee is usually sold in a roasted state, and with rare exceptions, such as infusions from green coffee beans,[115] coffee is roasted before it is consumed. It can be sold roasted by the supplier, or it can be home roasted.[116] The roasting process influences the taste by changing the coffee bean physically and chemically. The bean decreases in weight as moisture is lost and increases in volume, causing it to become less dense. The density of the bean also influences the strength of the coffee and the requirements for packaging.
 
@@ -181,8 +159,6 @@ Sucrose is rapidly lost during the roasting process and may disappear entirely i
 # Grading roasted beans
 
 See also: Food grading
-
-Coffee "cuppers", or professional tasters, grade coffee.
 
 Depending on the color of the roasted beans as perceived by the human eye, they will be labeled as light, medium light, medium, medium dark, dark, or very dark. Typical terms used commercially, from the lightest to the darkest, are light, medium, sometimes medium-dark, full, espresso, and high (or dark).[120]A more accurate method of discerning the degree of roast involves measuring the reflected light from roasted seeds illuminated with a light source in the near-infrared spectrum. This elaborate light meter uses a process known as spectroscopy to return a number that consistently indicates the roasted coffee's relative degree of roast or flavor development. Coffee has, in many countries, been graded by size longer than it has been graded by quality. Grading is generally done with sieves, numbered to indicate the size of the perforations.[121]
 
@@ -208,10 +184,6 @@ In 1931, a method of packing coffee in a sealed vacuum in cans was introduced. T
 
 Main article: Coffee preparation
 
-A contemporary electric automatic drip-coffee maker
-
-Espresso is one of the most popular coffee-brewing methods. The term espresso, substituting s for most x letters in Latin-root words, with the term deriving from the past participle of the Italian verb esprimere, itself derived from the Latin exprimere, means 'to express', and refers to the process by which hot water is forced under pressure through ground coffee.[131][132]
-
 Coffee beans must be ground and brewed to create a beverage. The criteria for choosing a method include flavor and economy. Almost all methods of preparing coffee require that the beans be ground and then mixed with hot water long enough to allow the flavor to emerge but not so long as to draw out bitter compounds. The liquid can be consumed after the spent grounds are removed. Brewing considerations include the fineness of the grind, how the water is used to extract the flavor, the ratio of coffee grounds to water (the brew ratio), additional flavorings such as sugar, milk, and spices, and the technique to be used to separate spent grounds. Optimal coffee extraction occurs between 91 and 96 °C (196 and 205 °F).[133] Ideal holding temperatures range from 85 to 88 °C (185 to 190 °F) to as high as 93 °C (199 °F), and the ideal serving temperature is 68 to 79 °C (154 to 174 °F).[134]
 
 Coffee beans may be ground with a burr grinder, which uses revolving elements to shear the seed; a blade grinder cuts the seeds with blades moving at high speed; or a mortar and pestle crushes the seeds. For most brewing methods a burr grinder is deemed superior because the grind is more even, and the grind size can be adjusted.[135] The type of grind is often named after the brewing method for which it is generally used, Turkish grind being the finest, while coffee percolator or French press are the coarsest. The most common grinds are between these extremes: a medium grind is used in most home coffee-brewing machines.[136]
@@ -232,8 +204,6 @@ Cold brew coffee is made by steeping coarsely-ground beans in cold water for sev
 
 See also: List of coffee drinks
 
-Enjoying coffee in Ottoman Empire. Painting by unknown artist in the Pera Museum.
-
 Once brewed, coffee may be served in a variety of ways. Drip-brewed, percolated, or French-pressed/cafetière coffee may be served as white coffee with a dairy product such as milk or cream, or dairy substitute, or as black coffee with no such addition. It may be sweetened with sugar or artificial sweetener. When served cold, it is called iced coffee. Popular iced coffee options include frappés, iced lattes, or stronger brewed coffee served with ice.[142]
 
 Espresso-based coffee has a variety of possible presentations. In its most basic form, an espresso is served alone as a shot or short black, or with hot water added, when it is known as caffè americano. A long black is made by pouring a double espresso into an equal portion of water, retaining the crema, unlike caffè americano.[143] Milk is added in various forms to an espresso: steamed milk makes a caffè latte,[144] equal parts steamed milk and milk froth make a cappuccino,[143] and a dollop of hot foamed milk on top creates a caffè macchiato.[145] A flat white is prepared by adding steamed hot milk (microfoam) to two espresso shots;[146] it has less milk than a latte, but both are varieties of coffee to which the milk can be added in such a way as to create a decorative surface pattern. Such effects are known as latte art.[147]
@@ -250,8 +220,6 @@ Coffee can also be blended with ingredients claimed to improve health in a form 
 
 Main article: Instant coffee
 
-Instant coffee
-
 Many products are sold for the convenience of consumers who do not want to prepare their coffee or who do not have access to coffeemaking equipment. Instant coffee is dried into soluble powder or freeze-dried into granules that can be quickly dissolved in hot water.[154] A New Zealand invention and staple, instant coffee was originally invented in Invercargill in 1890 by food chemist David Strang.[155] It rapidly gained in popularity in many countries in the post-war period, with Nescafé being the most popular product.[156] Many consumers determined that the convenience of preparing a cup of instant coffee more than made up for a perceived inferior taste,[157] although, since the late 1970s, instant coffee has been produced differently in such a way that is similar to the taste of freshly brewed coffee.[158] Paralleling (and complementing) the rapid rise of instant coffee was the coffee vending machine invented in 1947 and widely distributed since the 1950s.[159]
 
 # Economics
@@ -263,8 +231,6 @@ Main article: Economics of coffee
 In 2023, world production of green coffee beans was 11 million tonnes, led by Brazil with 31% of the total and Vietnam as a secondary producer (table).
 
 # Commodity market
-
-Coffee prices 1973–2022
 
 Coffee retailing
 
@@ -279,8 +245,6 @@ Dating to the 1970s, coffee has been incorrectly described by many, including hi
 International Coffee Day, which is claimed to have originated in Japan in 1983 with an event organized by the All Japan Coffee Association, takes place on 29 September in several countries.[170] There are numerous trade associations and lobbying and other organizations representing the coffee industry.[171][172]
 
 # Consumption
-
-Coffee consumption, kilograms per capita, 2007
 
 Nordic countries are the highest coffee-consuming nations when measured per capita per year, with consumption in Finland as the world's highest.[173]
 
@@ -309,8 +273,6 @@ An April 2024, National Coffee Association survey indicated that coffee consumpt
 # Economic impacts
 
 Further information: List of countries by coffee production
-
-A map of coffee growing areas in Brazil
 
 In 1830, market volatility and thus increased returns, encouraged Brazilian entrepreneurs to shift their attention from gold to coffee, a crop hitherto reserved for local consumption. Concurrent with this shift was the commissioning of vital infrastructures, including approximately 7,000 km (4,300 mi) of railroads between 1860 and 1885. The creation of these railways enabled the importation of workers, to meet the enormous need for labor. This development primarily affected the State of Rio de Janeiro, as well as the southern states of Brazil, most notably São Paulo, due to its favorable climate, soils, and terrain.[175]
 
@@ -356,8 +318,6 @@ Coffee may have laxative effects, inducing defecation in some people within minu
 
 See also: Low caffeine coffee
 
-Skeletal formula of a caffeine molecule
-
 A psychoactive chemical in coffee – caffeine – is an adenosine receptor antagonist known for its stimulant effects.[188][196] Depending on the type of coffee and method of preparation, the caffeine content of a single serving can vary greatly.[197][198][199] The caffeine content of a cup of coffee varies depending mainly on the brewing method, and also on the coffee variety, such as 40 mg per 100 ml in regular coffee and 212 mg per 100 ml in espresso.[185][186] According to a 1979 analysis, coffee has the following caffeine content, depending on how it is prepared:[197]
 
 Caffeine remains stable up to 200 °C (392 °F) and completely decomposes around 285 °C (545 °F).[200] Given that roasting temperatures do not exceed 200 °C (392 °F) for long and rarely if ever reach 285 °C (545 °F), the caffeine content of a coffee is not likely changed much by the roasting process.[201]
@@ -368,15 +328,11 @@ Main article: Coffee culture
 
 See also: Coffee culture in Australia and Coffee culture in former Yugoslavia
 
-A coffeehouse in Cairo, 19th century
-
 Coffee is often consumed alongside (or instead of) breakfast by many at home or when eating out at diners or cafeterias. It is often served at the end of a formal meal, normally with a dessert, and at times with an after-dinner mint, especially when consumed at a restaurant or dinner party.[202]
 
 # Coffeehouses
 
 Main article: Coffeehouse
-
-Café Central in Vienna, Austria. A staple of the Viennese coffee house tradition, it has remained open since 1876.
 
 Widely known as coffeehouses or cafés, establishments serving prepared coffee or other hot beverages have existed for over 500 years. The first coffeehouse in Constantinople was opened in 1475 by traders arriving from Damascus and Aleppo.[203]
 
@@ -389,8 +345,6 @@ The coffee break in the United States and elsewhere is a short mid-morning rest 
 In 1952, the term became common through a Pan-American Coffee Bureau ad campaign which urged consumers, "Give yourself a Coffee-Break – and Get What Coffee Gives to You."[207] John B. Watson, a behavioral psychologist who worked with Maxwell House later in his career, helped to popularize coffee breaks within American culture.[208]
 
 # Prohibition and condemnation
-
-The Coffee Bearer, Cairo, an Orientalist painting by John Frederick Lewis (1857)
 
 Historically, several religious groups have prohibited or condemned the consumption of coffee. The permissibility of coffee was debated in the Islamic world during the early 16th century, variously being permitted or prohibited until it was ultimately accepted by the 1550s.[209] Contention existed among Ashkenazi Jews as to whether coffee was acceptable for Passover until it was certified kosher in 1923.[210] Some Christian groups, such as Mormons and Seventh-day Adventists, discourage the consumption of coffee.[211][212][213] Because of coffee's association with Muslims, Ethiopian Orthodox Christians avoided it until the end of the 19th century.[214] Some Rastafarians also generally avoid coffee.[215]
 

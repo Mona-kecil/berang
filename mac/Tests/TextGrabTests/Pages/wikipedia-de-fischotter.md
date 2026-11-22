@@ -1,7 +1,5 @@
 # Fischotter
 
-Nasser Fischotter
-
 Der Fischotter (Lutra lutra) ist ein an das Wasserleben angepasster Marder, der zu den besten Schwimmern unter den Landraubtieren zählt. Er kommt in fast ganz Europa vor und wird einschließlich Schwanz etwa 130 Zentimeter lang. Eine eindeutigere Bezeichnung für diese Art ist Eurasischer Fischotter, da es in der Gruppe der Otter noch weitere Arten gibt, die Fischotter heißen, beispielsweise den Indischen oder die Amerikanischen Fischotter.
 
 Der gefährdete und streng geschützte Fischotter lebt bereits seit rund 5 Millionen Jahren auf der Erde.[1] Der Wassermarder breitet sich seit den 1990er Jahren wieder in der Nordosthälfte Deutschlands aus. Dennoch gilt er in Deutschland noch als gefährdet (Rote Liste Säugetiere Deutschland 2019[2]). Da er saubere Gewässer mit natürlich bewachsenen Uferzonen benötigt, findet er in der modernen Kulturlandschaft nur noch selten einen entsprechenden Lebensraum. Die Deutsche Wildtier Stiftung wählte den Fischotter zum Tier des Jahres 2021.[3]
@@ -12,13 +10,9 @@ Bearbeiten
 
 Quelltext bearbeiten
 
-Schädel des Fischotters
-
 Der Fischotter hat eine Kopf-Rumpf-Länge von bis zu 90 Zentimetern, hinzu kommen 40 Zentimeter Schwanz. Der im Querschnitt rundliche und muskulöse Schwanz dient dem Fischotter als Steuer- und Stabilisierungsorgan.
 
 Fischotter haben eine Schulterhöhe von etwa 25 bis 30 Zentimetern. Ausgewachsene Fischotter können ein Körpergewicht bis zu 12 Kilogramm erreichen. Im Schnitt wiegen die Weibchen etwa 7,4 und Männchen 10,5 Kilogramm. Der Körper ist gestreckt und walzenförmig und die Beine sind kurz, der Kopf ist rundlich und stumpfschnauzig, und an der Schnauze befinden sich lange Tasthaare, die ein wichtiges Sinnesorgan in trübem Wasser darstellen. Die Zehen sind mit Schwimmhäuten verbunden. Das Fell ist hellbraun. Mit zunehmendem Alter färben sich Kehle und Vorderhals weißlich.
-
-Fischotter bei der Fellpflege
 
 Der Pelz des Fischotters bietet aufgrund der ungewöhnlichen Struktur seiner Haare eine besonders wirkungsvolle Isolation gegen Kälte und Nässe: Die Haare sind, wie bei einem Reißverschluss, durch mikroskopisch kleine, ineinander greifende Keile und Rillen miteinander verzahnt. Es entsteht ein außerordentlich dichtes Pelzgeflecht, welches isolierende Luftblasen festhält, gleichzeitig aber Wasser abweist. Auf diese Weise bleibt die Haut des Otters trocken und der Körper warm, obwohl dieser im Unterschied zu Delfinen, Walen, Eisbären oder Seelöwen über keine dicke isolierende Fettschicht verfügt. Insgesamt schützen 80 bis 100 Millionen Haare den Fischotter vor einem Wärmeverlust; das sind von 60.000 bis zu 80.000 Haare pro Quadratzentimeter.[4] Der Haarwechsel beim Fischotter vollzieht sich nur sehr langsam und etwa zehn Prozent seiner Wachzeit verbringt das Tier damit, sein Fell zu pflegen.
 
@@ -27,8 +21,6 @@ Der Pelz des Fischotters bietet aufgrund der ungewöhnlichen Struktur seiner Haa
 Bearbeiten
 
 Quelltext bearbeiten
-
-Verbreitungsgebiet des Eurasischen Fischotters
 
 Den Fischotter findet man in fast ganz Europa. Er fehlt lediglich auf Island und auf den Inseln des Mittelmeers. In Asien ist er nördlich bis zum Polarkreis und noch einige Kilometer darüber hinaus verbreitet. Er meidet hier allerdings die zentralasiatischen Steppen und Wüsten. Er kommt außerdem auf Japan und bis zu den Sundainseln und im westlichen Nordafrika (Marokko und Algerien) vor. Im Gebirge kommt er in Höhen bis 2500 Meter vor. Innerhalb des Verbreitungsgebietes ist er jedoch in vielen Regionen bedroht. In Mitteleuropa gab es bis zum Jahr 2000 noch Bestände in Tschechien, in Mecklenburg und Brandenburg sowie kleine Restvorkommen im Bayerischen Wald und in Nordostniedersachsen[5], außerdem kleine Populationen in Österreich. In Deutschland nimmt die Population seit den 1990er Jahren wieder zu, so dass 2019 wieder größere Teile von Schleswig-Holstein, Niedersachsen, Mecklenburg, Brandenburg, Sachsen-Anhalt, Ostthüringen und Sachsen sowie das östliche Drittel von Bayern und der nördliche Teil von Nordrhein-Westfalen besiedelt sind.[6] In Frankreich stand er kurz vor der Ausrottung, seit der Unterschutzstellung 1973 nehmen die Bestände jedoch wieder zu.[7] In der Schweiz galt er seit 1989 als ausgestorben – ab 2009 wurden wieder sporadisch einzelne Tiere nachgewiesen.[8][9]
 
@@ -39,8 +31,6 @@ Innerhalb dieses großen Verbreitungsgebietes werden bis zu 13 Unterarten beschr
 Bearbeiten
 
 Quelltext bearbeiten
-
-Fischotter an einem Baumstamm
 
 Er bevorzugt flache Flüsse mit zugewachsenen Ufern und Überschwemmungsebenen. Der Rückgang solcher Habitate und die Bejagung haben dazu geführt, dass der Fischotter stellenweise verschwand und an vielen Stellen extrem selten geworden ist. Er kommt aber mit allen Arten von Süßwasser-Lebensräumen zurecht, solange die Gewässer klar und fischreich sind und ihm ausreichend Versteckmöglichkeiten entlang der Ufer bieten. Zudem kommt er auch im Salzwasser an Küsten vor.
 
@@ -61,8 +51,6 @@ Am Ufer gräbt der Fischotter einen Bau, dessen Eingang etwa 50 Zentimeter unter
 Bearbeiten
 
 Quelltext bearbeiten
-
-Ein Fischotter mit Fisch auf einer Zeichnung von Walter Heubach
 
 Der Fischotter frisst das, was er am leichtesten erbeuten kann. Meist jagt er im Wasser und bei Nachts. Einen großen Teil seines Beutespektrums stellen Fische dar, wobei er überwiegend kleine Fischarten erbeutet und darunter langsame und geschwächte Tiere. Ihm kommt daher eine Rolle bei der Gesunderhaltung der Fischbestände zu. Auch andere Tiere werden vom Fischotter gejagt: Blässhühner, Enten, Möwen, Bisamratten, Schermäuse, Kaninchen, Schnecken, Frösche, Flusskrebse und Insekten, gelegentlich nimmt er auch Aas und verzehrt Muscheln. Kleinere Beutetiere werden im Wasser gefressen, größere erst an Land gebracht.
 
@@ -98,8 +86,6 @@ Bearbeiten
 
 Quelltext bearbeiten
 
-Skelett eines Eurasischen Otters
-
 Die Familie der Marder, zu denen auch die Fischotter gehören, begann sich vor etwa 38 Millionen Jahren in verschiedene Linien aufzuspalten. Aus einer dieser Linien entwickelten sich die kleinen und extrem wendigen Jäger, zu denen der Fischotter zählt. Fossilien der Gattung der Otter findet man das erste Mal im Mittelpleistozän, die damit etwa eine Million Jahre alt sind. Paläontologen sind allerdings davon überzeugt, dass die bisherigen Funde keine direkten Vorfahren der Fischotter darstellen.[13]
 
 Überreste, die eindeutig dem Eurasischen Fischotter zugeordnet werden, sind etwa 120.000 Jahre alt und stammen aus der Eem-Warmzeit. Weitere Fossilfunde unter anderem aus Österreich sind mit einem Alter zwischen 18.000 und 10.000 Jahren deutlich jünger. Sie zeigen, dass der Otter bereits in vorgeschichtlicher Zeit ein typisches Element der alpinen Fauna war.
@@ -109,8 +95,6 @@ Die Familie der Marder, zu denen auch die Fischotter gehören, begann sich vor e
 Bearbeiten
 
 Quelltext bearbeiten
-
-Fischotter in den Pyrenäen
 
 Von der IUCN wird der Fischotter insgesamt als „potenziell gefährdet“ (NT: near threatened) eingestuft, da die Population durch Verlust ihres Lebensraumes und die damit verbundene Verinselung des Lebensraumes beständig abnimmt, wie da sind die Ausbreitung von Siedlungs- und Agrarflächen oder die Nutzung geeigneter Gewässer durch menschliche Freizeitaktivitäten,[14] außerdem die Gefährdung durch den Straßenverkehr, unzureichende Wasserqualität und Überfischung.[15]
 
