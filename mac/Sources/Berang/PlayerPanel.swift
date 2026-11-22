@@ -27,6 +27,13 @@ final class PlayerPanel: NSPanel {
     }
 
     override var canBecomeKey: Bool { true }
+
+    /// Grows leftward when the content widens, so a message never pushes the panel off the right edge.
+    override func setFrame(_ rect: NSRect, display: Bool) {
+        var rect = rect
+        if frame.width > 0, rect.width != frame.width { rect.origin.x = frame.maxX - rect.width }
+        super.setFrame(rect, display: display)
+    }
 }
 
 struct PlayerView: View {
@@ -81,7 +88,8 @@ struct PlayerView: View {
 
     @ViewBuilder private func failure(_ message: String) -> some View {
         VStack(spacing: 6) {
-            Text(message).font(.caption).multilineTextAlignment(.center).frame(maxWidth: 240)
+            Text(message).font(.caption).multilineTextAlignment(.center)
+                .frame(width: 200).fixedSize(horizontal: false, vertical: true)
             if message == GrabError.notTrusted.description {
                 Button("Open Accessibility Settings") {
                     NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)

@@ -41,12 +41,16 @@ echo 'Dr. Patel raised $3.5M on 2026-11-22.' | python3 bench/clean/clean.py
 
 ## Mac app
 
-`mac/` holds a floating player that reads the window you were last in, using the Phonon 31m voice and highlighting the paragraph being read. Requires macOS 15 on Apple silicon. On the first play it downloads the voice (137 MB) from the Phonon release and checks its SHA-256.
+`mac/` holds Berang.app, a floating player that reads the window you were last in, using the Phonon 31m voice and highlighting the paragraph being read. Requires macOS 15 on Apple silicon, and Xcode to build.
 
 ```sh
-cd mac && swift build -c release
-.build/release/Berang
+mac/build-app.sh
+open mac/build/Berang.app
 ```
+
+The first time you press play, macOS asks to let Berang control your computer using accessibility features. Berang needs this to read text from other apps. Turn Berang on in System Settings > Privacy & Security > Accessibility, then press play again. On the first play, Berang downloads the voice (137 MB) from the Phonon release and checks its SHA-256.
+
+`build-app.sh` signs the app with your Developer ID or Apple Development certificate. Without one, it signs ad hoc, and macOS forgets the Accessibility permission on every rebuild.
 
 Right-click the player to quit.
 
@@ -60,7 +64,7 @@ cd mac && swift build -c release
 swift test
 ```
 
-Both read other apps' text, so the app that runs them, such as your terminal, needs Accessibility access in System Settings > Privacy & Security > Accessibility.
+It reads other apps' text, so the app that runs it, such as your terminal, needs Accessibility access in System Settings > Privacy & Security > Accessibility.
 
 ## License
 
