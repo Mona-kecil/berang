@@ -25,6 +25,8 @@ import TextGrab
     private(set) var resumedAt: Int?
     /// How much of the voice has downloaded, from 0 to 1, while it downloads.
     private(set) var download: Double?
+    /// The voice reading, one of `Voice.names`. Kept across launches.
+    private(set) var voice = UserDefaults.standard.string(forKey: "voice") ?? "default"
     /// Whether Berang has read anything yet, which ends setup's last step.
     private(set) var hasRead = UserDefaults.standard.bool(forKey: "hasRead") {
         didSet { UserDefaults.standard.set(hasRead, forKey: "hasRead") }
@@ -156,7 +158,7 @@ import TextGrab
                 if tts == nil {
                     try await installVoice()
                     state = .loading
-                    tts = try await Voice.load()
+                    tts = try await loadVoice()
                     guard g == generation else { return }
                     if let latest = pending {
                         pending = nil
@@ -228,6 +230,61 @@ import TextGrab
         }
     }
 
+    /// Chooses the voice to read with. While reading, the next sentence uses it; otherwise a sample plays in it.
+    func choose(_ name: String) {
+        voice = name
+        UserDefaults.standard.set(name, forKey: "voice")
+        switch state {
+        case .playing, .paused:
+            if let tts { Task { try? await tts.setVoice(name) } }
+        case .downloading, .loading:
+            break  // applied once the voice loads
+        case .idle, .failed:
+            sample()
+        }
+    }
+
+    /// Plays a sentence in the chosen voice. Any request replaces it.
+    private func sample() {
+        guard Voice.isInstalled else { return }
+        stop()
+        let g = generation
+        task = Task {
+            do {
+                if tts == nil {
+                    state = .loading
+                    tts = try await loadVoice()
+                    guard g == generation else { return }
+                    state = .idle
+                    if let latest = pending {
+                        pending = nil
+                        start(latest)
+                        return
+                    }
+                }
+                guard let tts else { return }
+                try await tts.setVoice(voice)
+                for chunk in prepare(sampleText) {
+                    for try await part in tts.stream(chunk.text) {
+                        try Task.checkCancellation()
+                        _ = try audio.enqueue(part)
+                    }
+                }
+            } catch {
+                guard g == generation, !(error is CancellationError) else { return }
+                state = .failed("\(error)")
+            }
+        }
+    }
+
+    /// Loads the voice model and conditions it on the chosen voice, or the model's default when that is gone.
+    private func loadVoice() async throws -> Phonon {
+        let tts = try await Voice.load()
+        if !tts.voices.contains(voice) { voice = tts.voices.contains("default") ? "default" : tts.voices.first ?? voice }
+        try await tts.setVoice(voice)
+        return tts
+    }
+
     private func installVoice() async throws {
         guard !Voice.isInstalled else { return }
         state = .downloading
@@ -290,6 +347,9 @@ import TextGrab
         page.blocks[b].scrollToVisible()
     }
 }
+
+/// What a voice says when chosen.
+private let sampleText = "Here is how I sound, reading the page in front of you."
 
 /// Five seconds of voice audio.
 private let lookahead = Int(Phonon.sampleRate) * 5

@@ -4,11 +4,11 @@ import SwiftUI
 /// Setup: the permissions Berang needs, the voice, and the two shortcuts. It opens at launch until Berang can
 /// read, and from the menu bar.
 final class SetupWindow: NSWindow {
-    init(player: Player) {
+    init(player: Player, showVoices: @escaping () -> Void) {
         super.init(contentRect: .zero, styleMask: [.titled, .closable], backing: .buffered, defer: false)
         title = "Set Up Berang"
         isReleasedWhenClosed = false
-        contentView = NSHostingView(rootView: SetupView(player: player) { [weak self] in self?.close() })
+        contentView = NSHostingView(rootView: SetupView(player: player, showVoices: showVoices) { [weak self] in self?.close() })
         setContentSize(contentView!.fittingSize)
         center()
     }
@@ -25,6 +25,7 @@ final class SetupWindow: NSWindow {
 /// Each step's status is read from the system every second, so it is right after a change in System Settings.
 struct SetupView: View {
     let player: Player
+    let showVoices: () -> Void
     let close: () -> Void
     @State private var trusted = AXIsProcessTrusted()
     @State private var screen = CGPreflightScreenCaptureAccess()
@@ -75,12 +76,12 @@ struct SetupView: View {
 
     private var voiceDetail: String {
         if !voice, case .failed(let message) = player.state { return message }
-        return "137 MB, downloaded once."
+        return voice ? "Reading with \(Voice.title(player.voice))." : "137 MB, downloaded once."
     }
 
     @ViewBuilder private var voiceControl: some View {
         if voice {
-            done("Downloaded")
+            Button("Choose Voice…", action: showVoices)
         } else if let fraction = player.download {
             VStack(alignment: .trailing, spacing: 4) {
                 ProgressView(value: fraction).frame(width: 120)
