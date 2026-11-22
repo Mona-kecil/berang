@@ -1,0 +1,23 @@
+<!doctype html><meta charset="utf-8"><title>Canvas text</title>
+<!-- canvas.png: Chrome --headless --force-device-scale-factor=2 --window-size=700,450 --screenshot=canvas.png canvas.html -->
+<body style="margin:0;background:#fff">
+<canvas id="c" width="1400" height="900" style="width:700px;height:450px"></canvas>
+<script>
+const g = document.getElementById("c").getContext("2d");
+g.scale(2, 2); g.fillStyle = "#111";
+const paragraphs = [
+  ["Meeting notes", "bold 22px Georgia"],
+  ["The team met to plan the next release. We agreed to ship the reader first and the voice picker after it.", "17px Georgia"],
+  ["Budget: about forty percent of last quarter goes to testing devices, and the rest to the voice work.", "17px Georgia"],
+];
+let y = 50;
+for (const [text, font] of paragraphs) {
+  g.font = font;
+  let line = "";
+  for (const word of text.split(" ")) {
+    if (g.measureText(line + word).width > 600) { g.fillText(line, 40, y); y += 26; line = ""; }
+    line += word + " ";
+  }
+  g.fillText(line, 40, y); y += 44;
+}
+</script>
