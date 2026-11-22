@@ -11,6 +11,7 @@ let package = Package(
         .target(name: "TextGrab"),
         .target(name: "Speakable"),
         .executableTarget(name: "berang-grab", dependencies: ["TextGrab"]),
+        .executableTarget(name: "page-viewer"),
         .executableTarget(name: "Berang", dependencies: ["TextGrab", "Speakable", .product(name: "ptts", package: "xn-ptts")]),
         .testTarget(name: "TextGrabTests", dependencies: ["TextGrab"]),
         .testTarget(name: "SpeakableTests", dependencies: ["Speakable"]),

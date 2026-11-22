@@ -39,21 +39,62 @@ public enum GrabError: Error, CustomStringConvertible {
 
 /// Reads the main text of the focused window of `app`, or of the first window whose title starts with `windowTitle`.
 public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws -> Page {
+    let (ax, window) = try window(of: app, titled: windowTitle)
+    // WebKit builds a page's accessibility tree on the first request, so the first read of a page
+    // can find only the window. A read that finds no page or text area and little text tries again.
+    for attempt in 0... {
+        let root = Node(window)
+        let (blocks, viewport) = read(root, focused: ax.element(kAXFocusedUIElementAttribute).map(Node.init))
+        if viewport !== root || attempt == 3 || blocks.reduce(0, { $0 + $1.text.utf16.count }) >= 200 {
+            return Page(app: app.localizedName ?? "", window: window.string(kAXTitleAttribute) ?? "", blocks: blocks, viewport: viewport.element)
+        }
+        Thread.sleep(forTimeInterval: 0.25)
+    }
+    fatalError("unreachable")
+}
+
+/// Copies the window that `grab` would read, for tests that run without the app. See `read(saved:)`.
+public func save(_ app: NSRunningApplication, windowTitle: String? = nil) throws -> SavedNode {
+    let (ax, window) = try window(of: app, titled: windowTitle)
+    return SavedNode(Node(window), focused: ax.element(kAXFocusedUIElementAttribute), depth: 80)
+}
+
+/// Reads a saved window the way `grab` reads a live one.
+public func read(saved window: SavedNode) -> [Block] {
+    let root = Node(saved: window)
+    var focused: Node?
+    root.visit(depth: 80) { n in
+        if n.saved?.focused == true { focused = n }
+        return focused == nil
+    }
+    return read(root, focused: focused).blocks
+}
+
+/// Blocks as Markdown: headings start with "# ", and a blank line separates blocks.
+public func markdown(_ blocks: [Block]) -> String {
+    blocks.map { $0.kind == .heading ? "# \($0.text)" : $0.text }.joined(separator: "\n\n") + "\n"
+}
+
+private func window(of app: NSRunningApplication, titled title: String?) throws -> (app: AXUIElement, window: AXUIElement) {
     guard AXIsProcessTrusted() else { throw GrabError.notTrusted }
     let ax = AXUIElementCreateApplication(app.processIdentifier)
     AXUIElementSetMessagingTimeout(ax, 1)
     // Electron apps build their accessibility tree only when asked.
     AXUIElementSetAttributeValue(ax, "AXManualAccessibility" as CFString, kCFBooleanTrue)
-
-    let window: AXUIElement? = if let windowTitle {
-        (ax.get(kAXWindowsAttribute) as? [AXUIElement])?.first { ($0.string(kAXTitleAttribute) ?? "").hasPrefix(windowTitle) }
+    // A locked screen or a broken app can report the application itself as its window.
+    let isWindow = { (w: AXUIElement) in w.string(kAXRoleAttribute) == kAXWindowRole }
+    let window: AXUIElement? = if let title {
+        (ax.get(kAXWindowsAttribute) as? [AXUIElement])?.first { isWindow($0) && ($0.string(kAXTitleAttribute) ?? "").hasPrefix(title) }
     } else {
-        ax.element(kAXFocusedWindowAttribute) ?? ax.element(kAXMainWindowAttribute)
+        [kAXFocusedWindowAttribute, kAXMainWindowAttribute].lazy.compactMap { ax.element($0) }.first(where: isWindow)
     }
     guard let window else { throw GrabError.noWindow }
+    return (ax, window)
+}
 
-    var reader = Reader(), viewport = window
-    if let web = Node(window).first(depth: 30, where: { $0.role == "AXWebArea" }) {
+private func read(_ window: Node, focused: Node?) -> (blocks: [Block], viewport: Node) {
+    var reader = Reader()
+    if let web = window.first(depth: 30, where: { $0.role == "AXWebArea" }) {
         // One article is the content (a post, a README). Several articles are a feed, read whole from main.
         var main: Node?, articles: [Node] = []
         web.visit(depth: 40) { n in
@@ -61,26 +102,25 @@ public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws
             if n.subrole == "AXDocumentArticle" { articles.append(n); return false }
             return !n.isSkipped
         }
-        viewport = web.element
         reader.web = true
         reader.layoutTables = main == nil && articles.isEmpty
         reader.walk(articles.count == 1 ? articles[0] : main ?? web)
-    } else if let area = textArea(in: window) {
-        viewport = area.element
-        reader.readTextArea(area)
-    } else {
-        reader.walk(Node(window))
+        return (reader.blocks, web)
     }
-    return Page(app: app.localizedName ?? "", window: window.string(kAXTitleAttribute) ?? "", blocks: reader.blocks, viewport: viewport)
+    if let area = textArea(in: window, focused: focused) {
+        reader.readTextArea(area)
+        return (reader.blocks, area)
+    }
+    reader.walk(window)
+    return (reader.blocks, window)
 }
 
 /// The focused text area, or else the one holding the most text.
-private func textArea(in window: AXUIElement) -> Node? {
+private func textArea(in window: Node, focused: Node?) -> Node? {
     let isArea = { (n: Node) in n.role == "AXTextArea" && !(n.value ?? "").isEmpty }
-    let app = AXUIElementCreateApplication(window.pid)
-    if let focused = app.element(kAXFocusedUIElementAttribute).map(Node.init), isArea(focused) { return focused }
+    if let focused, isArea(focused) { return focused }
     var best: Node?
-    Node(window).visit(depth: 30) { n in
+    window.visit(depth: 30) { n in
         if isArea(n), n.value!.utf16.count > (best?.value?.utf16.count ?? 0) { best = n }
         return n.role != "AXTextArea"
     }
@@ -97,6 +137,9 @@ private let skippedRoles: Set = [
     "AXComboBox", "AXMenu", "AXMenuBar", "AXToolbar", "AXImage", "AXTable", "AXScrollBar", "AXSlider", "AXTabGroup",
 ]
 
+/// Deeper than any real page; only a tree that loops back on itself gets here.
+private let maxDepth = 200
+
 /// Section headings that end the readable part of an article.
 private let backMatter: Set = [
     "references", "notes", "citations", "sources", "bibliography", "footnotes", "external links", "further reading", "see also",
@@ -111,20 +154,21 @@ private struct Reader {
     var done = false
 
     /// An element that directly holds text is one block; everything under it joins that block.
-    mutating func walk(_ node: Node) {
-        if done || node.isSkipped && !(layoutTables && node.isLayoutTable) { return }
+    /// The depth limit stops a tree that loops back on itself.
+    mutating func walk(_ node: Node, depth: Int = 0) {
+        if done || depth > maxDepth || node.isSkipped && !(layoutTables && node.isLayoutTable) { return }
         let children = node.children
         if node.role == "AXHeading" || children.contains(where: { $0.role == "AXStaticText" }) {
             var block = BlockBuilder(), nested: [Node] = []
             block.collect(node, nested: &nested)
             let kind: Block.Kind = node.role == "AXHeading" ? .heading : .text
-            for b in block.build(kind, rendered: web ? renderedText(node.element) : nil) {
+            for b in block.build(kind, rendered: web ? node.rendered : nil) {
                 if kind == .heading && backMatter.contains(b.text.lowercased()) { done = true; return }
                 blocks.append(b)
             }
-            for n in nested { walk(n) }
+            for n in nested { walk(n, depth: depth + 1) }
         } else {
-            for child in children { walk(child) }
+            for child in children { walk(child, depth: depth + 1) }
         }
     }
 
@@ -143,11 +187,11 @@ struct BlockBuilder {
     var pieces: [(element: AXUIElement, text: String, offset: Int)] = []
 
     /// Gathers the text under `node`. Lists and headings inside it are left in `nested` to read as their own blocks.
-    fileprivate mutating func collect(_ node: Node, nested: inout [Node]) {
-        if node.isSkipped { return }
+    fileprivate mutating func collect(_ node: Node, nested: inout [Node], depth: Int = 0) {
+        if node.isSkipped || depth > maxDepth { return }
         if node.role == "AXStaticText", let v = node.value { append(v, from: node.element, at: 0) }
         for child in node.children {
-            if child.role == "AXList" || child.role == "AXHeading" { nested.append(child) } else { collect(child, nested: &nested) }
+            if child.role == "AXList" || child.role == "AXHeading" { nested.append(child) } else { collect(child, nested: &nested, depth: depth + 1) }
         }
     }
 
@@ -166,7 +210,7 @@ struct BlockBuilder {
     /// its first piece to its last, which drops list markers and nested blocks. Nil when a piece is missing.
     private func align(_ kind: Block.Kind, _ source: String) -> [Block]? {
         let hay = Array(squash(source, keepingLines: true).utf16)
-        var cursor = 0, lines: [[Run]] = [], line = -1
+        var cursor = 0, lines: [[Run]] = [], line = -1, newlines = 0
         for p in pieces {
             let raw = p.text.replacing("\u{FFFC}", with: "")
             let piece = squash(raw)
@@ -174,8 +218,8 @@ struct BlockBuilder {
             guard let at = find(Array(piece.utf16), in: hay, from: cursor) else { return nil }
             let lead = raw.utf16.count - raw.drop(while: \.isWhitespace).utf16.count
             let run = Run(element: p.element, range: at..<at + piece.utf16.count, offset: p.offset + lead)
-            let n = hay[..<at].count(where: { $0 == newline })
-            if n == line { lines[lines.count - 1].append(run) } else { lines.append([run]); line = n }
+            newlines += hay[cursor..<at].count(where: { $0 == newline })
+            if newlines == line { lines[lines.count - 1].append(run) } else { lines.append([run]); line = newlines }
             cursor = run.range.upperBound
         }
         return lines.map { runs in
@@ -223,12 +267,13 @@ private func renderedText(_ element: AXUIElement) -> String? {
     return element.get("AXStringForTextMarkerRange", range) as? String
 }
 
-/// One element with the attributes the reader needs, fetched in a single call.
+/// One element with the attributes the reader needs, fetched in a single call, or read from a saved copy.
 private final class Node {
     let element: AXUIElement
     let role: String?
     let subrole: String?
     let value: String?
+    let saved: SavedNode?
     private let childElements: [AXUIElement]
 
     init(_ element: AXUIElement) {
@@ -241,14 +286,30 @@ private final class Node {
         subrole = v.count > 1 ? v[1] as? String : nil
         value = v.count > 2 ? v[2] as? String : nil
         childElements = v.count > 3 ? (v[3] as? [AXUIElement]) ?? [] : []
+        saved = nil
     }
 
-    private(set) lazy var children: [Node] = childElements.map(Node.init)
-    var isSkipped: Bool { skippedRoles.contains(role ?? "") || skippedSubroles.contains(subrole ?? "") }
-    /// A table without column headers, used to lay out a page rather than to hold data.
-    var isLayoutTable: Bool {
-        role == "AXTable" && ((element.get("AXColumnHeaderUIElements") as? [AXUIElement]) ?? []).isEmpty
+    /// A saved element has no live counterpart, so `element` is a placeholder.
+    init(saved: SavedNode) {
+        element = AXUIElementCreateSystemWide()
+        role = saved.role
+        subrole = saved.subrole
+        value = saved.value
+        childElements = []
+        self.saved = saved
     }
+
+    private(set) lazy var children: [Node] = saved.map { ($0.children ?? []).map(Node.init(saved:)) } ?? childElements.map(Node.init)
+    var isSkipped: Bool { skippedRoles.contains(role ?? "") || skippedSubroles.contains(subrole ?? "") }
+    /// The browser's rendered text, which only blocks in a web area ask for.
+    var rendered: String? { saved == nil ? renderedText(element) : saved?.rendered }
+    /// A table without column headers, used to lay out a page rather than to hold data.
+    var isLayoutTable: Bool { role == "AXTable" && columnHeaders == 0 }
+    fileprivate var columnHeaders: Int {
+        saved.map { $0.headers ?? 0 } ?? ((element.get("AXColumnHeaderUIElements") as? [AXUIElement]) ?? []).count
+    }
+    /// Whether the reader would make a block here and so ask for `rendered`.
+    fileprivate var startsBlock: Bool { role == "AXHeading" || children.contains { $0.role == "AXStaticText" } }
 
     /// Breadth-first search, so the shallowest match wins.
     func first(depth: Int, where match: (Node) -> Bool) -> Node? {
@@ -264,6 +325,31 @@ private final class Node {
     func visit(depth: Int, _ body: (Node) -> Bool) {
         guard depth >= 0, body(self) else { return }
         for child in children { child.visit(depth: depth - 1, body) }
+    }
+}
+
+/// A copy of an element and everything under it, with what the reader asks of each element.
+public struct SavedNode: Codable, Sendable {
+    var role: String?
+    var subrole: String?
+    var value: String?
+    var rendered: String?
+    var headers: Int?
+    var focused: Bool?
+    var children: [SavedNode]?
+
+    enum CodingKeys: String, CodingKey {
+        case role = "r", subrole = "s", value = "v", rendered = "t", headers = "h", focused = "f", children = "c"
+    }
+
+    fileprivate init(_ node: Node, focused: AXUIElement?, depth: Int) {
+        role = node.role
+        subrole = node.subrole
+        value = node.value
+        rendered = node.startsBlock ? node.rendered : nil
+        headers = node.role == "AXTable" ? node.columnHeaders : nil
+        self.focused = focused.map { CFEqual($0, node.element) } == true ? true : nil
+        children = depth > 0 && !node.children.isEmpty ? node.children.map { SavedNode($0, focused: focused, depth: depth - 1) } : nil
     }
 }
 
