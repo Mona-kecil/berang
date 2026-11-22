@@ -1,0 +1,199 @@
+{
+ "text": [
+  {
+   "in": "Dr. Patel raised $3.5M in March, roughly 40% more than last year.",
+   "out": "Doctor Patel raised three point five million dollars in March, roughly forty percent more than last year."
+  },
+  {
+   "in": "It costs $4.99 or €12.",
+   "out": "It costs four dollars and ninety-nine cents or twelve euros."
+  },
+  {
+   "in": "Revenue hit $1,250,000 last year.",
+   "out": "Revenue hit one million two hundred fifty thousand dollars last year."
+  },
+  {
+   "in": "Growth was ~12.5% this quarter.",
+   "out": "Growth was about twelve point five percent this quarter."
+  },
+  {
+   "in": "The meeting starts at 10:45 AM on 2026-11-22, e.g. right after standup.",
+   "out": "The meeting starts at ten forty-five A M on November twenty-second, twenty twenty-six, for example, right after standup."
+  },
+  {
+   "in": "Lunch at 12:05 pm, dinner at 7:00.",
+   "out": "Lunch at twelve oh five P M, dinner at seven o'clock."
+  },
+  {
+   "in": "She was born in 1987 and moved in 2004.",
+   "out": "She was born in nineteen eighty-seven and moved in two thousand four."
+  },
+  {
+   "in": "It happened on the 21st and the 3rd.",
+   "out": "It happened on the twenty-first and the third."
+  },
+  {
+   "in": "Download version 2.1.4 from https://example.com/docs before Friday.",
+   "out": "Download version two point one point four from link to example dot com before Friday."
+  },
+  {
+   "in": "See www.github.com/anomalyco/hex for details.",
+   "out": "See link to github dot com for details."
+  },
+  {
+   "in": "Docs live at docs.python.org/3/library.",
+   "out": "Docs live at link to docs dot python dot org."
+  },
+  {
+   "in": "Email me at jane.doe@example.com today.",
+   "out": "Email me at an email address today."
+  },
+  {
+   "in": "Run `npm install` first.",
+   "out": "Run npm install first."
+  },
+  {
+   "in": "Commit 3f9a2c1e8b7d fixed it.",
+   "out": "Commit fixed it."
+  },
+  {
+   "in": "Use v3.0.1 now.",
+   "out": "Use version three point zero point one now."
+  },
+  {
+   "in": "Call the API 3x, then wait 250 ms and retry.",
+   "out": "Call the API three times, then wait two hundred fifty milliseconds and retry."
+  },
+  {
+   "in": "A 1920x1080 screen weighs 1.2 kg.",
+   "out": "A one thousand nine hundred twenty by one thousand eighty screen weighs one point two kilograms."
+  },
+  {
+   "in": "It runs at 3.2 GHz and 72 °F.",
+   "out": "It runs at three point two gigahertz and seventy-two degrees Fahrenheit."
+  },
+  {
+   "in": "She lives at 221B Baker St., about 3.2 km from the station.",
+   "out": "She lives at two hundred twenty-one B Baker Street, about three point two kilometers from the station."
+  },
+  {
+   "in": "We flew to St. Louis on Main St. yesterday.",
+   "out": "We flew to Saint Louis on Main Street yesterday."
+  },
+  {
+   "in": "Mr. Smith vs. Mrs. Jones, etc.",
+   "out": "Mister Smith versus Missus Jones, et cetera"
+  },
+  {
+   "in": "The U.S. economy grew.",
+   "out": "The U S economy grew."
+  },
+  {
+   "in": "Ticket No. 5 and issue #42.",
+   "out": "Ticket number five and issue number forty-two."
+  },
+  {
+   "in": "Paris is the capital of France.[1] It is large.[citation needed]",
+   "out": "Paris is the capital of France. It is large."
+  },
+  {
+   "in": "Read the [setup guide](https://x.com/setup) and see ![logo](a.png).",
+   "out": "Read the setup guide and see image, logo."
+  },
+  {
+   "in": "This is **very** important 🎉.",
+   "out": "This is very important ."
+  },
+  {
+   "in": "The infor-\nmation was\nsplit across lines.",
+   "out": "The information was split across lines."
+  },
+  {
+   "in": "Order 48213377 shipped.",
+   "out": "Order four eight two one three three seven seven shipped."
+  },
+  {
+   "in": "Tom & Jerry → friends",
+   "out": "Tom and Jerry to friends"
+  },
+  {
+   "in": "It is 330 m tall.",
+   "out": "It is three hundred thirty meters tall."
+  },
+  {
+   "in": "SAN FRANCISCO (Nov. 21) — news.",
+   "out": "SAN FRANCISCO (November twenty-first) — news."
+  },
+  {
+   "in": "Due May 3, 2027.",
+   "out": "Due May third, twenty twenty-seven."
+  },
+  {
+   "in": "Built with ❤️ by us.",
+   "out": "Built with love by us."
+  },
+  {
+   "in": "Fixes #1902.",
+   "out": "Fixes number nineteen oh two."
+  }
+ ],
+ "chunks": [
+  {
+   "in": "Dr. Smith arrived. He sat down.",
+   "out": [
+    "Doctor Smith arrived.",
+    "He sat down."
+   ]
+  },
+  {
+   "in": "Most people read faster than they can listen, but listening has one advantage reading never will. Short.",
+   "out": [
+    "Most people read faster than they can listen,",
+    "but listening has one advantage reading never will.",
+    "Short."
+   ]
+  },
+  {
+   "in": "# Title\n\nFirst para here.\n\n- item one\n- item two",
+   "out": [
+    "Title",
+    "First para here.",
+    "item one",
+    "item two"
+   ]
+  },
+  {
+   "in": "The Eiffel Tower was completed on 1889-03-31 for the World's Fair, in Paris.",
+   "out": [
+    "The Eiffel Tower was completed on March thirty-first, eighteen eighty-nine for the World's Fair, in Paris."
+   ]
+  },
+  {
+   "in": "1. Run it\n2. Open the app",
+   "out": [
+    "Run it",
+    "Open the app"
+   ]
+  },
+  {
+   "in": "```\ncode here\n```\nAfter code.",
+   "out": [
+    "Code block.",
+    "After code."
+   ]
+  }
+ ],
+ "spans": {
+  "in": "Dr. Patel raised $3.5M. Visit https://example.com/docs now.",
+  "out": [
+   [
+    "Doctor Patel raised three point five million dollars.",
+    "Dr. Patel raised $3.5M."
+   ],
+   [
+    "Visit link to example dot com now.",
+    "Visit https://example.com/docs now."
+   ]
+  ]
+ }
+}

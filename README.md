@@ -32,7 +32,7 @@ To compare raw and cleaned text, run `python3 bench/clean/make_corpus.py`, then 
 
 ## Text cleanup
 
-Before text reaches the voice model, `bench/clean/clean.py` rewrites it into speakable form: money, dates, times, units, versions, and abbreviations become words, URLs become "link to example dot com", and footnotes, hashes, and markup are removed. Each spoken word keeps its position in the source text, so the reader can highlight the original `$3.5M` while saying "three point five million dollars". It uses only the Python standard library.
+Before text reaches the voice model, `bench/clean/clean.py` rewrites it into speakable form: money, dates, times, units, versions, and abbreviations become words, URLs become "link to example dot com", and footnotes, hashes, and markup are removed. Each spoken word keeps its position in the source text, so the reader can highlight the original `$3.5M` while saying "three point five million dollars". It uses only the Python standard library. The Mac app speaks through a Swift port in `mac/Sources/Speakable`, and both versions are tested against the cases in `bench/clean/cases.json`.
 
 ```sh
 python3 bench/clean/test_clean.py

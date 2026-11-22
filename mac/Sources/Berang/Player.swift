@@ -1,6 +1,7 @@
 import AppKit
 import Observation
 import PhononTTS
+import Speakable
 import TextGrab
 
 /// Reads the window the user was last in, one block at a time, highlighting each block as it plays.
@@ -97,8 +98,9 @@ import TextGrab
         while index < page.blocks.count {
             let block = page.blocks[index]
             highlight.show(block, in: page)
+            let spoken = prepare(block.text).map(\.text).joined(separator: " ")
             do {
-                try await audio.play(tts.stream(speakable(block.text)))
+                if !spoken.isEmpty { try await audio.play(tts.stream(spoken)) }
             } catch {
                 if !Task.isCancelled { state = .failed("\(error)") }
                 return
@@ -107,9 +109,4 @@ import TextGrab
         }
         stop()
     }
-}
-
-/// Drops footnote markers such as "[12]" or "[a]", which every voice reads out.
-private func speakable(_ text: String) -> String {
-    text.replacing(/\[(?:\d+|[a-z]|citation needed)\]/, with: "")
 }
