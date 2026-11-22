@@ -205,6 +205,19 @@ struct Reader {
     mutating func walk(_ node: Node, depth: Int = 0) {
         if done || depth > maxDepth || node.isSkipped && !(layoutTables && node.isLayoutTable) { return }
         let children = node.children
+        // Books shows each paragraph of a page as one text element of a web area that has no rendered text.
+        if node.role == "AXWebArea", children.contains(where: { $0.role == "AXStaticText" }), node.rendered == nil {
+            for child in children {
+                if child.role == "AXStaticText", let text = child.value {
+                    var block = BlockBuilder()
+                    block.append(text, from: child.element, at: 0)
+                    blocks += block.build(.text)
+                } else {
+                    walk(child, depth: depth + 1)
+                }
+            }
+            return
+        }
         if node.role == "AXHeading" || children.contains(where: { $0.role == "AXStaticText" }) {
             var block = BlockBuilder(), nested: [Node] = []
             block.collect(node, nested: &nested)
@@ -397,7 +410,7 @@ final class Node {
         return (v[0] as? String ?? "", v[1] as? [String] ?? [])
     }()
     /// The browser's rendered text, which only blocks in a web area ask for.
-    var rendered: String? { saved == nil ? renderedText(element) : saved?.rendered }
+    private(set) lazy var rendered: String? = saved == nil ? renderedText(element) : saved?.rendered
     /// A table without column headers, used to lay out a page rather than to hold data.
     var isLayoutTable: Bool { role == "AXTable" && columnHeaders == 0 }
     fileprivate var columnHeaders: Int {

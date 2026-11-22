@@ -52,7 +52,7 @@ The first time you press play, macOS asks to let Berang control your computer us
 
 `build-app.sh` signs the app with your Developer ID or Apple Development certificate. Without one, it signs ad hoc, and macOS forgets the Accessibility permission on every rebuild.
 
-Press ⌥⎋ (Option-Escape) in any app to start or pause reading. Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before and have not scrolled, it continues from the paragraph where you stopped; Start over goes back to the top. The waveform icon in the menu bar shows or hides the player and quits Berang.
+Press ⌥⎋ (Option-Escape) in any app to start or pause reading. Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before and have not scrolled, it continues from the paragraph where you stopped; Start over goes back to the top. Berang also reads PDFs in Preview and Safari, and the page in front of you in Apple Books, highlighting the paragraph rather than the word. The waveform icon in the menu bar shows or hides the player and quits Berang.
 
 ### Text grabber
 
@@ -66,7 +66,7 @@ swift test
 
 It reads other apps' text, so the app that runs it, such as your terminal, needs Accessibility access in System Settings > Privacy & Security > Accessibility.
 
-`swift test` also reads 23 saved pages in `mac/Tests/TextGrabTests/Pages`: openly licensed web pages saved from WebKit and Chrome, and two TextEdit documents. Each page keeps its accessibility tree, compressed, and the Markdown the grabber read from it, so a change to the grabber shows up as a diff in the `.md` files. `pages.tsv` lists each page's source and license. To record pages again, run `mac/Tests/TextGrabTests/Pages/record.sh [name ...]`. After a change to the grabber, `berang-grab --replay page.json.lzma` prints what it now reads from a saved page.
+`swift test` also reads 26 saved pages in `mac/Tests/TextGrabTests/Pages`: openly licensed web pages saved from WebKit and Chrome, two TextEdit documents, and three PDFs. Each page keeps its accessibility tree, compressed, and the Markdown the grabber read from it, so a change to the grabber shows up as a diff in the `.md` files. `pages.tsv` lists each page's source and license. To record pages again, run `mac/Tests/TextGrabTests/Pages/record.sh [name ...]`. After a change to the grabber, `berang-grab --replay page.json.lzma` prints what it now reads from a saved page.
 
 ## License
 

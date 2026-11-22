@@ -303,7 +303,7 @@ private func segments(_ src: NSString, urls: URLStyle) -> [Segment] {
     return out
 }
 
-private let sentenceEnd = try! NSRegularExpression(pattern: #"(?<=[.!?])["')\]]*\s+(?=["'(\[]?[A-Z0-9])|\n\n"#)
+private let sentenceEnd = try! NSRegularExpression(pattern: #"(?:(?<=[.!?])|(?<=[.!?]["')\]”’])|(?<=[.!?]["')\]”’]{2}))\s+(?=["'(\[“‘]?[A-Z0-9])|\n\n"#)
 private let clause = try! NSRegularExpression(pattern: #"[,;:—–](?=\s)"#)
 private let spaces = try! NSRegularExpression(pattern: #"\s{2,}"#)
 private let wordChar = try! NSRegularExpression(pattern: #"\w"#)

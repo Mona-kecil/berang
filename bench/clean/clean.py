@@ -279,7 +279,7 @@ def segments(src):
     return out
 
 
-SENTENCE_END = re.compile(r"(?<=[.!?])[\"')\]]*\s+(?=[\"'(\[]?[A-Z0-9])|\n\n")
+SENTENCE_END = re.compile(r"(?:(?<=[.!?])|(?<=[.!?][\"')\]”’])|(?<=[.!?][\"')\]”’]{2}))\s+(?=[\"'(\[“‘]?[A-Z0-9])|\n\n")
 CLAUSE = re.compile(r"[,;:—–](?=\s)")
 
 
