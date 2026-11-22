@@ -26,6 +26,8 @@ mkdir -p "$app/Contents/Resources"
 for bundle in .xcbuild/Build/Products/Release/*.bundle; do
   [ -e "$bundle" ] && cp -R "$bundle" "$app/Contents/Resources/"
 done
+# Each voice's recorded preview, made by `berang-say previews App/Previews <Pocket's model folder>`.
+cp -R App/Previews "$app/Contents/Resources/"
 
 identities=$(security find-identity -v -p codesigning)
 # The Berang certificate is self-signed, so macOS lists it as not trusted, which codesign accepts.

@@ -47,6 +47,18 @@ enum Engine: String, CaseIterable, Sendable {
         }
     }
 
+    /// The voices with a recorded preview in the app, which needs no download.
+    var previewVoices: [String] {
+        guard let folder = Bundle.main.resourceURL?.appending(path: "Previews/\(rawValue)"),
+              let files = try? FileManager.default.contentsOfDirectory(atPath: folder.path) else { return [] }
+        let names = files.filter { $0.hasSuffix(".m4a") }.map { String($0.dropLast(".m4a".count)) }.sorted()
+        return names.contains(defaultVoice) ? [defaultVoice] + names.filter { $0 != defaultVoice } : names
+    }
+
+    func preview(_ voice: String) -> URL? {
+        Bundle.main.resourceURL?.appending(path: "Previews/\(rawValue)/\(voice).m4a")
+    }
+
     /// The voice to read with when none was chosen.
     var defaultVoice: String {
         switch self {
