@@ -23,6 +23,9 @@ struct SavedPage: CustomTestStringConvertible, Sendable {
 func readsSavedPage(_ page: SavedPage) throws {
     let packed = try Data(contentsOf: SavedPage.folder.appending(path: "\(page.name).json.lzma"))
     let data = try (packed as NSData).decompressed(using: .lzma) as Data
+    let json = String(decoding: data, as: UTF8.self)
+    let home = NSHomeDirectory()
+    #expect(!json.contains(home) && !json.contains(home.replacing("/", with: "\\/")), "\(page.name) holds a home folder path. Rerun Pages/record.sh \(page.name).")
     let got = page.isPDF ? markdown(try JSONDecoder().decode(SavedPDF.self, from: data).read())
         : markdown(read(saved: try JSONDecoder().decode(SavedNode.self, from: data)))
     let want = try String(contentsOf: SavedPage.folder.appending(path: "\(page.name).md"), encoding: .utf8)
