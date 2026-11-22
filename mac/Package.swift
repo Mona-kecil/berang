@@ -13,7 +13,9 @@ let package = Package(
         .target(name: "Speakable"),
         .executableTarget(name: "berang-grab", dependencies: ["TextGrab"]),
         .executableTarget(name: "page-viewer"),
-        .executableTarget(name: "berang-say", dependencies: ["Speakable", .product(name: "ptts", package: "xn-ptts")]),
+        .executableTarget(name: "berang-say", dependencies: [
+            "Speakable", .product(name: "ptts", package: "xn-ptts"), .product(name: "MLXAudioTTS", package: "mlx-audio-swift"),
+        ]),
         .executableTarget(name: "Berang", dependencies: [
             "TextGrab", "Speakable", .product(name: "ptts", package: "xn-ptts"),
             .product(name: "MLXAudioTTS", package: "mlx-audio-swift"),

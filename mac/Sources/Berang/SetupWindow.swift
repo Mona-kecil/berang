@@ -77,7 +77,7 @@ struct SetupView: View {
     private var voiceDetail: String {
         if !voice, case .failed(let message) = player.state { return message }
         return voice ? "Reading with \(Engine.title(player.voice)), a \(player.engine.title) voice."
-            : "\(megabytes(player.engine.size)) MB, downloaded once."
+            : "Hear each voice, then download one."
     }
 
     @ViewBuilder private var voiceControl: some View {
@@ -86,14 +86,14 @@ struct SetupView: View {
         } else if let fraction = player.download {
             VStack(alignment: .trailing, spacing: 4) {
                 ProgressView(value: fraction).frame(width: 120)
-                Text("\(megabytes(Int64(fraction * Double(player.engine.size)))) of \(megabytes(player.engine.size)) MB")
+                let size = (player.downloading ?? player.engine).size
+                Text("\(megabytes(Int64(fraction * Double(size)))) of \(megabytes(size)) MB")
                     .font(.caption).monospacedDigit().foregroundStyle(.secondary)
             }
         } else if next == .voice {
-            Button(player.state.isFailed ? "Try Again" : "Download") { player.downloadVoice(player.engine) }
-                .buttonStyle(.borderedProminent)
+            Button("Choose Voice…", action: showVoices).buttonStyle(.borderedProminent)
         } else {
-            Button(player.state.isFailed ? "Try Again" : "Download") { player.downloadVoice(player.engine) }
+            Button("Choose Voice…", action: showVoices)
         }
     }
 
