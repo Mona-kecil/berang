@@ -154,7 +154,7 @@ private func joinFragments(_ lines: [PDFLine]) -> [PDFLine] {
 }
 
 /// A row of a table of numbers: at least three numbers, like "67.0%" or "3.3", and as many numbers as words.
-private func isTableRow(_ text: String) -> Bool {
+func isTableRow(_ text: String) -> Bool {
     let words = text.split(whereSeparator: \.isWhitespace)
     let numbers = words.count { word in
         let w = word.trimmingCharacters(in: CharacterSet(charactersIn: "()[],;"))

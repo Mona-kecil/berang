@@ -49,15 +49,15 @@ public enum GrabError: Error, CustomStringConvertible {
 /// Reads the main text of the focused window of `app`, or of the first window whose title starts with `windowTitle`.
 public func grab(_ app: NSRunningApplication, windowTitle: String? = nil) throws -> Page {
     let (ax, window) = try window(of: app, titled: windowTitle)
-    // WebKit builds a page's accessibility tree on the first request, so the first read of a page
-    // can find only the window. A read that finds no page or text area and little text tries again.
+    // WebKit and Chrome build a page's accessibility tree on the first request, so the first read of a page
+    // can find only the window, or a page with no text yet. Such a read tries again.
     for attempt in 0... {
         if attempt == 0, let page = readImageFile(in: window, app: app) { return page }
         let root = Node(window)
-        if attempt == 0, let document = root.document, document.role != "AXWebArea",
+        if attempt == 0, let document = root.document, document.role != "AXWebArea" || document.chromePDFPages != nil,
            let page = readPDFFile(document.element, in: window, app: app) { return page }
         let (blocks, viewport) = read(root, focused: ax.element(kAXFocusedUIElementAttribute).map(Node.init))
-        if viewport !== root || attempt == 3 || blocks.reduce(0, { $0 + $1.text.utf16.count }) >= 200 {
+        if (viewport !== root && !blocks.isEmpty) || attempt == 3 || blocks.reduce(0, { $0 + $1.text.utf16.count }) >= 200 {
             let clip = scrollArea(around: viewport.element) ?? window
             let start = startBlock(blocks, in: viewport.element, clip: clip)
             return Page(app: app.localizedName ?? "", window: window.string(kAXTitleAttribute) ?? "", blocks: blocks,
@@ -131,6 +131,10 @@ private func read(_ window: Node, focused: Node?) -> (blocks: [Block], viewport:
     let document = window.document
     if let document, document.role != "AXWebArea" {
         reader.readPages(document.children.filter { $0.role == "AXPage" })
+        return (reader.blocks, document)
+    }
+    if let document, let pages = document.chromePDFPages {
+        reader.readPages(pages, chrome: true)
         return (reader.blocks, document)
     }
     if let web = document {
@@ -420,6 +424,25 @@ final class Node {
     /// Whether the reader would make a block here and so ask for `rendered`.
     fileprivate var startsBlock: Bool { role == "AXHeading" || children.contains { $0.role == "AXStaticText" } }
 
+    /// The pages of the PDF that Chrome's PDF viewer shows in this web area: each is a region of paragraphs.
+    var chromePDFPages: [Node]? {
+        guard role == "AXWebArea", let viewer = first(depth: 6, where: {
+            $0.role == "AXWebArea" && $0.url?.hasPrefix("chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/") == true
+        }) else { return nil }
+        var pages: [Node] = []
+        viewer.visit(depth: 20) { n in
+            if n.subrole == "AXLandmarkRegion" { pages.append(n); return false }
+            return true
+        }
+        return pages
+    }
+
+    /// A web area's address.
+    var url: String? {
+        guard role == "AXWebArea" else { return nil }
+        return saved.map { $0.url } ?? (element.get("AXURL") as? URL)?.absoluteString
+    }
+
     /// The web area, or the element holding a PDF's pages, whichever is shallowest.
     var document: Node? {
         first(depth: 30) { $0.role == "AXWebArea" || pdfDocumentSubroles.contains($0.subrole ?? "") }
@@ -451,11 +474,12 @@ public struct SavedNode: Codable, Sendable {
     var classes: [String]?
     var rendered: String?
     var headers: Int?
+    var url: String?
     var focused: Bool?
     var children: [SavedNode]?
 
     enum CodingKeys: String, CodingKey {
-        case role = "r", subrole = "s", value = "v", roleDescription = "d", classes = "k", rendered = "t", headers = "h", focused = "f", children = "c"
+        case role = "r", subrole = "s", value = "v", roleDescription = "d", classes = "k", rendered = "t", headers = "h", url = "u", focused = "f", children = "c"
     }
 
     fileprivate init(_ node: Node, focused: AXUIElement?, depth: Int) {
@@ -466,6 +490,7 @@ public struct SavedNode: Codable, Sendable {
         classes = node.group.flatMap { $0.classes.isEmpty ? nil : $0.classes }
         rendered = node.startsBlock || node.isSkipped && (node.role == kAXGroupRole || node.role == "AXTable") ? node.rendered : nil
         headers = node.role == "AXTable" ? node.columnHeaders : nil
+        url = node.url
         self.focused = focused.map { CFEqual($0, node.element) } == true ? true : nil
         children = depth > 0 && !node.children.isEmpty ? node.children.map { SavedNode($0, focused: focused, depth: depth - 1) } : nil
     }
