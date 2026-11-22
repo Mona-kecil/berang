@@ -66,7 +66,7 @@ swift test
 
 It reads other apps' text, so the app that runs it, such as your terminal, needs Accessibility access in System Settings > Privacy & Security > Accessibility.
 
-`swift test` also reads 21 saved pages in `mac/Tests/TextGrabTests/Pages`: openly licensed web pages saved from WebKit and Chrome, and two TextEdit documents. Each page keeps its accessibility tree, compressed, and the Markdown the grabber read from it, so a change to the grabber shows up as a diff in the `.md` files. `pages.tsv` lists each page's source and license. To record pages again, run `mac/Tests/TextGrabTests/Pages/record.sh [name ...]`.
+`swift test` also reads 21 saved pages in `mac/Tests/TextGrabTests/Pages`: openly licensed web pages saved from WebKit and Chrome, and two TextEdit documents. Each page keeps its accessibility tree, compressed, and the Markdown the grabber read from it, so a change to the grabber shows up as a diff in the `.md` files. `pages.tsv` lists each page's source and license. To record pages again, run `mac/Tests/TextGrabTests/Pages/record.sh [name ...]`. After a change to the grabber, `berang-grab --replay page.json.lzma` prints what it now reads from a saved page.
 
 ## License
 

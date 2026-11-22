@@ -1,4 +1,108 @@
-,the free encyclopedia that anyone can edit.259,283 active editors · 7,267,801 articles in EnglishMairzy Doates (April 1, 1976 – May 25, 1998) was an American Thoroughbred racehorse and multiplegraded stakes winner, most remembered for her victory at the inaugural Japan Cup in 1981. Owned by art dealer Arno D. Schefler and trained by future U.S. Racing Hall of Fame inductee Horatio Luro, she competed successfully across the United States from 1978 to 1981, including winning the Yerba Buena Handicap twice. In her final race, she traveled to Tokyo for the first Japan Cup, an international invitational established by the Japan Racing Association to assess Japanese horses against international competition. Mairzy Doates won in course-record time, shocking Japan's racing industry and highlighting the disparity between Japanese and international horse-racing standards. Her victory is widely credited as a catalyst for the JRA's long-term efforts to improve Japanese breeding and racing, and made her the world's highest-earning mare of 1981. She retired to become abroodmare in Midway, Kentucky. (Full article...)Recently featured: "Talking to Yourself" · Tôn Thất Đính · Iron Gate (Antioch)Archive · By email · More featured articles · AboutHeart used in the "Ichaicha Mushi" music videoArchive · Start a new article · Nominate an articleGarbage bin with trash on topThis week's article for improvement isgarbage, waste material discarded by humans. The words garbage, refuse, rubbish, and trash are generally used interchangeably.You can improve this article by:You can be bold and start editing the article. Have questions or suggestions? Visit the article's talk page, or post at the Teahousefor general discussion.For new editors · Archive · What is this?Ongoing: Iran war · Russo-Ukrainian war · Yemen offensivesRecent deaths:Mikhail Poltoranin · Nicolas Tiangaye · László Sáry · Fiona · Nabeel Rajab · Miguel Ángel Félix GallardoMore current events · Nominate an articleNovember 22Serpent labret with articulated tongueRobert Clive (d. 1774) · Hans Zender (b. 1936) · Cecilia Suárez (b. 1971) · Song Hye-kyo (b. 1981)More anniversaries: November 21 · November 22 · November 23Archive · By email · List of days of the year · AboutNautilus is a 1927 black-and-white photograph by the American photographer Edward Weston, depicting a single nautilus shell standing on its end against a dark background. Inspired by paintings of seashells by artist Henrietta Shore, Weston used long exposures and careful composition to emphasize the shell's aesthetic form. The photograph marked a significant stage in Weston's development as amodernist photographer. He made 28 prints of the photograph, one of which was originally sold for $10. A print sold for $1,082,500 at aSotheby's auction in 2010.Photograph credit: Edward Weston; retouched by Yann ForgetRecently featured: Guaita · Jumping spider · Robinson projectionArchive · More featured picturesWikipedia is written by volunteer editors and hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other volunteer projects:CommonsFree media repositoryMediaWikiWiki software developmentMeta-WikiWikimedia project coordinationWikibooksFree textbooks and manualsWikidataFree knowledge baseWikifunctionsCatalog of computer functionsWikiquoteCollection of quotationsWikisourceFree-content libraryWikispeciesDirectory of speciesWikiversityFree learning toolsWikivoyageFree travel guideWiktionaryDictionary and thesaurusThis Wikipedia is written in English. Many other Wikipedias are available; some of the largest are listed below.العربية · Deutsch · Español · فارسی‎ · Français · Italiano · Nederlands · 日本語 · Polski · Português · Русский · Svenska · Українська · Tiếng Việt · 中文Bahasa Indonesia · Bahasa Melayu · Bân-lâm-gú · Български · Català · Čeština · Dansk · Eesti · Ελληνικά · Esperanto · Euskara · עברית · Հայերեն · 한국어 · Magyar · Norsk bokmål · Română · Simple English · Slovenčina · Srpski · Srpskohrvatski · Suomi · Türkçe · OʻzbekchaAsturianu · Azərbaycanca · বাংলা · Bosanski · کوردی · Frysk · Gaeilge · Galego · Hrvatski · ქართული · Kurdî · Latviešu · Lietuvių · മലയാളം · Македонски · မြန်မာဘာသာ · Norsk nynorsk · ਪੰਜਾਬੀ · Shqip · Slovenščina · ไทย · తెలుగు · اردو
+the free encyclopedia that anyone can edit.
+
+259,283 active editors 7,267,801 articles in English
+
+Mairzy Doates (April 1, 1976 – May 25, 1998) was an American Thoroughbred racehorse and multiple graded stakes winner, most remembered for her victory at the inaugural Japan Cup in 1981. Owned by art dealer Arno D. Schefler and trained by future U.S. Racing Hall of Fame inductee Horatio Luro, she competed successfully across the United States from 1978 to 1981, including winning the Yerba Buena Handicap twice. In her final race, she traveled to Tokyo for the first Japan Cup, an international invitational established by the Japan Racing Association to assess Japanese horses against international competition. Mairzy Doates won in course-record time, shocking Japan's racing industry and highlighting the disparity between Japanese and international horse-racing standards. Her victory is widely credited as a catalyst for the JRA's long-term efforts to improve Japanese breeding and racing, and made her the world's highest-earning mare of 1981. She retired to become a broodmare in Midway, Kentucky. (Full article...)
+
+Recently featured: "Talking to Yourself" Tôn Thất Đính Iron Gate (Antioch)
+
+Archive By email More featured articles About
+
+Heart used in the "Ichaicha Mushi" music video
+
+Archive Start a new article Nominate an article
+
+Garbage bin with trash on top
+
+This week's article for improvement is garbage, waste material discarded by humans. The words garbage, refuse, rubbish, and trash are generally used interchangeably.
+
+You can improve this article by:
+
+You can be bold and start editing the article. Have questions or suggestions? Visit the article's talk page, or post at the Teahouse for general discussion.
+
+For new editors Archive What is this?
+
+Ongoing: Iran war Russo-Ukrainian war timeline Yemen offensives
+
+Recent deaths: Mikhail Poltoranin Nicolas Tiangaye László Sáry Fiona Nabeel Rajab Miguel Ángel Félix Gallardo
+
+More current events Nominate an article
+
+November 22
+
+Serpent labret with articulated tongue
+
+Robert Clive (d. 1774)Hans Zender (b. 1936)Cecilia Suárez (b. 1971)Song Hye-kyo (b. 1981)
+
+More anniversaries: November 21 November 22 November 23
+
+Archive By email List of days of the year About
+
+Nautilus is a 1927 black-and-white photograph by the American photographer Edward Weston, depicting a single nautilus shell standing on its end against a dark background. Inspired by paintings of seashells by artist Henrietta Shore, Weston used long exposures and careful composition to emphasize the shell's aesthetic form. The photograph marked a significant stage in Weston's development as a modernist photographer. He made 28 prints of the photograph, one of which was originally sold for $10. A print sold for $1,082,500 at a Sotheby's auction in 2010.
+
+Photograph credit: Edward Weston; retouched by Yann Forget
+
+Recently featured: Guaita Jumping spider Robinson projection
+
+Archive More featured pictures
+
+Wikipedia is written by volunteer editors and hosted by the Wikimedia Foundation, a non-profit organization that also hosts a range of other volunteer projects:
+
+Commons
+
+Free media repository
+
+MediaWiki
+
+Wiki software development
+
+Meta-Wiki
+
+Wikimedia project coordination
+
+Wikibooks
+
+Free textbooks and manuals
+
+Wikidata
+
+Free knowledge base
+
+Wikifunctions
+
+Catalog of computer functions
+
+Wikiquote
+
+Collection of quotations
+
+Wikisource
+
+Free-content library
+
+Wikispecies
+
+Directory of species
+
+Wikiversity
+
+Free learning tools
+
+Wikivoyage
+
+Free travel guide
+
+Wiktionary
+
+Dictionary and thesaurus
+
+This Wikipedia is written in English. Many other Wikipedias are available; some of the largest are listed below.
+
+العربية Deutsch Español فارسی‎ Français Italiano Nederlands 日本語 Polski Português Русский Svenska Українська Tiếng Việt 中文
+
+Bahasa Indonesia Bahasa Melayu Bân-lâm-gú Български Català Čeština Dansk Eesti Ελληνικά Esperanto Euskara עברית Հայերեն 한국어 Magyar Norsk bokmål Română Simple English Slovenčina Srpski Srpskohrvatski Suomi Türkçe Oʻzbekcha
+
+Asturianu Azərbaycanca বাংলা Bosanski کوردی Frysk Gaeilge Galego Hrvatski ქართული Kurdî Latviešu Lietuvių മലയാളം Македонски မြန်မာဘာသာ Norsk nynorsk ਪੰਜਾਬੀ Shqip Slovenščina ไทย తెలుగు اردو
 
 # Welcome to Wikipedia
 
@@ -42,7 +146,7 @@ In Canadian football, the Edmonton Elks defeat the Montreal Alouettes to win the
 
 Nvidia CEO Jensen Huang resigns amidst allegations of being targeted by a Chinese spy and of having extramarital affairs.
 
-(timeline)
+timeline
 
 # On this day
 

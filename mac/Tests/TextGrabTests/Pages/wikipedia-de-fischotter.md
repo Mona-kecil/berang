@@ -198,71 +198,71 @@ Bearbeiten
 
 Quelltext bearbeiten
 
-↑ Fischotter: 10 Fakten über das Tier des Jahres 2021 WWF, aufgerufen am 9. Oktober 2021
+Fischotter: 10 Fakten über das Tier des Jahres 2021 WWF, aufgerufen am 9. Oktober 2021
 
 Rote Liste Säugetiere Deutschland 2019
 
-↑ Der Fischotter ist Tier des Jahres 2021 Deutsche Wildtier Stiftung, aufgerufen am 9. Oktober 2021
+Der Fischotter ist Tier des Jahres 2021 Deutsche Wildtier Stiftung, aufgerufen am 9. Oktober 2021
 
-↑ R. A. Kuhn, H. Ansorge, Godynicki, S. et al. Acta Theriol (2010) 55: 211.doi:10.4098/j.at.0001-7051.014.2009 („The hair density of adult Eurasian otters Lutra lutra (Linnaeus, 1758) and sea otters Enhydra lutris (Linnaeus, 1758) was analysed using skin samples taken from frozen carcasses. Lutra lutra exhibited a mean hair density of about 70000 hairs/cm2 (whole body, appendages excepted), the mean individual density ranging from about 60 000 to 80 000 hairs/cm2.“)
+R. A. Kuhn, H. Ansorge, Godynicki, S. et al. Acta Theriol (2010) 55: 211. doi:10.4098/j.at.0001-7051.014.2009 („The hair density of adult Eurasian otters Lutra lutra (Linnaeus, 1758) and sea otters Enhydra lutris (Linnaeus, 1758) was analysed using skin samples taken from frozen carcasses. Lutra lutra exhibited a mean hair density of about 70000 hairs/cm2 (whole body, appendages excepted), the mean individual density ranging from about 60 000 to 80 000 hairs/cm2.“)
 
 Otterzentrum Hankensbüttel
 
 BFN: Verbreitungskarte Fischotter in Deutschland 2019 - PDF - abgerufen am 25. Oktober 2022
 
-↑ François: The Return of Otter (Lutra lutra) in Haute-Savoie (France): Development of a New Method of Habitat Analysis, in: Revue d'Ecologie, Bd. 64(4): 2019, S. 359.
+François: The Return of Otter (Lutra lutra) in Haute-Savoie (France): Development of a New Method of Habitat Analysis, in: Revue d'Ecologie, Bd. 64(4): 2019, S. 359.
 
-↑ Erfolgreiches Comeback des Fischotters in der Schweiz?In:infofauna.ch.7. April 2025,abgerufen am 29. April 2026.
+Erfolgreiches Comeback des Fischotters in der Schweiz? In: infofauna.ch. 7. April 2025, abgerufen am 29. April 2026.
 
 ↑ aHochspringen nach:bcClaudia Aufdermauer:Der letzte Fischotter.In:Blog des Schweizerischen Nationalmuseums.17. Juni 2025,abgerufen am 22. Juni 2025.
 
-↑ Hans Kruuk:Otters: Ecology, Behaviour and Conservation. Oxford University Press, Oxford 2006, ISBN 978-0-19-856586-4, S. 186.
+Hans Kruuk: Otters: Ecology, Behaviour and Conservation. Oxford University Press, Oxford 2006, ISBN 978-0-19-856586-4, S. 186.
 
 Fischotter begegnet Fuchs am Leineufer - Dezember 2022
 
 Fischotter verteidigt sein Revier gegen Biber - am Leineufer - Juli 2023
 
-↑ Klaus Robin (1993): Das Aus für den Otter. Berichte der St.Gallischen Naturwissenschaftlichen Gesellschaft. 86. Band, S. 123–144.
+Klaus Robin (1993): Das Aus für den Otter. Berichte der St.Gallischen Naturwissenschaftlichen Gesellschaft. 86. Band, S. 123–144.
 
-↑ Fischotter-Verbreitung in Bayern, Deutschland und Europa. BUND-Naturschutz in Bayern. Abgerufen am 15. Juni 2023
+Fischotter-Verbreitung in Bayern, Deutschland und Europa. BUND-Naturschutz in Bayern. Abgerufen am 15. Juni 2023
 
-↑ Eurasian Otter. Lutra lutra (engl.) IUCN, aufgerufen am 9. Oktober 2021
+Eurasian Otter. Lutra lutra (engl.) IUCN, aufgerufen am 9. Oktober 2021
 
 BFN: Verbreitungskarte Fischotter in Deutschland 2019 - PDF - abgerufen am 25. Oktober 2022
 
 Fachinformationssystem des BfN zur FFH-Verträglichkeitsprüfung Stand: 10. Februar 2022
 
-↑ Fischottertötung per Verordnung orf.at, 3. Februar 2018, abgerufen am 3. Februar 2018.
+Fischottertötung per Verordnung orf.at, 3. Februar 2018, abgerufen am 3. Februar 2018.
 
-↑ W. W. F. Österreich:WWF kritisiert Pläne zur Jagd auf Fischotter in Kärnten.31. Januar 2018,abgerufen am 14. April 2019.
+W. W. F. Österreich: WWF kritisiert Pläne zur Jagd auf Fischotter in Kärnten. 31. Januar 2018, abgerufen am 14. April 2019.
 
-↑ W. W. F. Österreich:WWF gegen Fischotter-Tötungen: Kärntner Landesregierung ignoriert EU-Recht und hebelt Naturschutz aus.27. Februar 2020,abgerufen am 8. Oktober 2020.
+W. W. F. Österreich: WWF gegen Fischotter-Tötungen: Kärntner Landesregierung ignoriert EU-Recht und hebelt Naturschutz aus. 27. Februar 2020, abgerufen am 8. Oktober 2020.
 
-↑ Bundesamt für Umwelt vom 3. April 2005: Ein Fischotter zu Besuch im Seeland.Abgerufen am 11. November 2009.
+Bundesamt für Umwelt vom 3. April 2005: Ein Fischotter zu Besuch im Seeland. Abgerufen am 11. November 2009.
 
-↑ KORA Bericht Nr. 44f: Suivi des loutres de l'Aar.(PDF; 1,6 MB)ArchiviertvomOriginal(nicht mehr online verfügbar)am13. Juni 2010;abgerufen am 11. November 2009.
+KORA Bericht Nr. 44f: Suivi des loutres de l'Aar. (PDF; 1,6 MB) Archiviert vom Original (nicht mehr online verfügbar) am 13. Juni 2010; abgerufen am 11. November 2009.
 
-↑ KORA-News vom 16. November 2009: La loutre Fribourgeoise n’est sans doute pas une loutre d’Europe.ArchiviertvomOriginal(nicht mehr online verfügbar)am19. November 2009;abgerufen am 16. November 2009.
+KORA-News vom 16. November 2009: La loutre Fribourgeoise n’est sans doute pas une loutre d’Europe. Archiviert vom Original (nicht mehr online verfügbar) am 19. November 2009; abgerufen am 16. November 2009.
 
-↑ Berner Zeitung vom 17. November 2009: Rätsel um den Otter ist gelöst.ArchiviertvomOriginal(nicht mehr online verfügbar)am20. November 2009;abgerufen am 6. Mai 2010.
+Berner Zeitung vom 17. November 2009: Rätsel um den Otter ist gelöst. Archiviert vom Original (nicht mehr online verfügbar) am 20. November 2009; abgerufen am 6. Mai 2010.
 
-↑ Medienmitteilung und Bilder des Amts für Jagd und Fischerei Graubünden.ArchiviertvomOriginal(nicht mehr online verfügbar)am9. Mai 2010;abgerufen am 6. Mai 2010.
+Medienmitteilung und Bilder des Amts für Jagd und Fischerei Graubünden. Archiviert vom Original (nicht mehr online verfügbar) am 9. Mai 2010; abgerufen am 6. Mai 2010.
 
-↑ Auf Expansionskurs: Mehrere Kantone mit neuen Fischotternachweisen.In:info fauna.27. Februar 2026,abgerufen am 24. März 2026.
+Auf Expansionskurs: Mehrere Kantone mit neuen Fischotternachweisen. In: info fauna. 27. Februar 2026, abgerufen am 24. März 2026.
 
-↑ Amt für Jagd und Fischerei:Erster Fischotter-Nachwuchs im Churer Rheintal.In:Kanton Graubünden.19. Februar 2026,abgerufen am 24. März 2026.
+Amt für Jagd und Fischerei: Erster Fischotter-Nachwuchs im Churer Rheintal. In: Kanton Graubünden. 19. Februar 2026, abgerufen am 24. März 2026.
 
-↑ Robin Schwarzenbach:Der Fischotter kehrt nach Zürich zurück.In:Neue Zürcher Zeitung.24. März 2026,abgerufen am 24. März 2026.
+Robin Schwarzenbach: Der Fischotter kehrt nach Zürich zurück. In: Neue Zürcher Zeitung. 24. März 2026, abgerufen am 24. März 2026.
 
-↑ So jedenfalls die aktuellen Hinweisschilder entlang der Lagune (zuletzt besucht am 11. Januar 2020) und Berichte von Anwohnern über jedenfalls ein leider an der Seestraße überfahrenes Exemplar.
+So jedenfalls die aktuellen Hinweisschilder entlang der Lagune (zuletzt besucht am 11. Januar 2020) und Berichte von Anwohnern über jedenfalls ein leider an der Seestraße überfahrenes Exemplar.
 
-↑ Bendele, Robert: Répartition de la Loutre (lutra lutra L.) dans le département de l’ardèche – actualisation. Centre ornithologique Rhône-Alpes (CORA): 2001.
+Bendele, Robert: Répartition de la Loutre (lutra lutra L.) dans le département de l’ardèche – actualisation. Centre ornithologique Rhône-Alpes (CORA): 2001.
 
 Finanzieller Ausgleich von Schäden in Bayern
 
 Salzburger Landesregierung: Entschädigungsleistungen und Förderung von Präventionsmaßnahmen Wolf, Biber und Fischotter
 
-↑ Fischotter auf deutsche-briefmarken-zeitung.de, abgerufen am 7. Februar 2022.
+Fischotter auf deutsche-briefmarken-zeitung.de, abgerufen am 7. Februar 2022.
 
 Normdaten (Sachbegriff): GND: 4154479-1 (GND Explorer, lobid, OGND) | LCCN: sh85079031
 

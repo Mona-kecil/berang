@@ -96,7 +96,13 @@ C. arabica berries on the bush
 
 Further information: Coffee production and List of countries by coffee production
 
-A map of global coffee cultivation:r Coffea canephoram Coffea canephora and Coffea arabicaa Coffea arabica
+A map of global coffee cultivation:
+
+r Coffea canephora
+
+m Coffea canephora and Coffea arabica
+
+a
 
 The traditional method of planting coffee is to place 20 seeds in each hole at the beginning of the rainy season. This method loses about 50% of the seeds' potential, as about half fail to sprout. A more effective process of growing coffee, used in Brazil, is to raise seedlings in nurseries that are then planted outside after six to twelve months. Coffee is often intercropped with food crops, such as corn, beans, or rice during the first few years of cultivation as farmers become familiar with its requirements.[63] Coffee plants grow within a defined area between the tropics of Cancer and Capricorn, termed the bean belt or coffee belt.[69]
 

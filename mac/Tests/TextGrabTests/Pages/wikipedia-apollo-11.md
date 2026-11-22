@@ -166,7 +166,9 @@ During the mission, the cause was diagnosed as the rendezvous radar switch being
 
 # Landing
 
-Duration: 4 minutes and 30 seconds.Subtitles available.Armstrong pilots Eagle to its landing on the Moon, July 20, 1969.
+Duration: 4 minutes and 30 seconds.4:30Subtitles available.
+
+Armstrong pilots
 
 When Armstrong again looked outside, he saw that the computer's landing system was targeting a boulder-strewn area just north and east of a 300-foot-diameter (91 m) crater (later determined to be West crater), so he took semi-automatic control.[123][124] Armstrong considered landing short of the boulder field so they could collect geological samples from it, but could not since their horizontal velocity was too high. Throughout the descent, Aldrin called out navigation data to Armstrong, who was busy piloting Eagle.[125]
 

@@ -1,10 +1,23 @@
 // Prints the main text of a window as Markdown: headings as "# ", blocks separated by blank lines.
 // usage: berang-grab [--save page.json.lzma] [bundle-id-or-pid [window-title-prefix]]   (default: the frontmost app's focused window)
+//        berang-grab --replay page.json.lzma
 // --save writes the window's accessibility tree, compressed, and prints the text read back from that copy.
+// --replay prints the text read from a saved copy.
 import AppKit
 import TextGrab
 
 var args = Array(CommandLine.arguments.dropFirst())
+if args.first == "--replay", args.count > 1 {
+    do {
+        let packed = try Data(contentsOf: URL(filePath: args[1]))
+        let tree = try JSONDecoder().decode(SavedNode.self, from: (packed as NSData).decompressed(using: .lzma) as Data)
+        print(markdown(read(saved: tree)), terminator: "")
+        exit(0)
+    } catch {
+        FileHandle.standardError.write(Data("\(error)\n".utf8))
+        exit(1)
+    }
+}
 var saveTo: URL?
 if args.first == "--save", args.count > 1 {
     saveTo = URL(filePath: args[1])

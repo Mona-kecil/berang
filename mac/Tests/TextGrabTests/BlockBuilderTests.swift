@@ -23,6 +23,12 @@ private func build(_ pieces: [String], rendered: String?, kind: Block.Kind = .te
     #expect(build(["Hello ", "world"], rendered: "Something else").map(\.text) == ["Hello world"])
 }
 
+@Test func leavesOutAPieceTheBrowserDoesNotShow() {
+    let blocks = build(["First", "paragraph.", "Elapsed: 0 seconds", "Second", "paragraph."],
+                       rendered: "First paragraph.\nSecond paragraph.")
+    #expect(blocks.map(\.text) == ["First paragraph.", "Second paragraph."])
+}
+
 @Test func splitsAtLineBreaks() {
     let blocks = build(["July 2023", "If you collected lists.", "Partly my goal."],
                        rendered: "July 2023\n\nIf you collected lists.\n\nPartly my goal.")

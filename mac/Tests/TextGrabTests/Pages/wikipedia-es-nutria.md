@@ -104,17 +104,17 @@ Remingtonocetus
 
 editar
 
-↑ Wilson, Don E.; Reeder, DeeAnn M., eds. (2005).«Subfamily Lutrinae». Mammal Species of the World(en inglés) (3ª edición). Baltimore: Johns Hopkins University Press, 2 vols. (2142 pp.). ISBN 978-0-8018-8221-0.
+Wilson, Don E.; Reeder, DeeAnn M., eds. (2005). «Subfamily Lutrinae». Mammal Species of the World (en inglés) (3ª edición). Baltimore: Johns Hopkins University Press, 2 vols. (2142 pp.). ISBN 978-0-8018-8221-0.
 
-↑ «nutria (RAE)».
+«nutria (RAE)».
 
-↑ «Nutriapedia».
+«Nutriapedia».
 
-↑ Mammal Diversity Database (2025). «Mammal Diversity Database (Version 2.3) [Data set]».Zenodo. doi:10.5281/zenodo.17033774. Consultado el 5 de septiembre de 2025.
+Mammal Diversity Database (2025). «Mammal Diversity Database (Version 2.3) [Data set]». Zenodo. doi:10.5281/zenodo.17033774. Consultado el 5 de septiembre de 2025.
 
-↑ «Lontra annectens (Forsyth Major, 1897) Northern Neotropical River Otter». The Mammal Diversity Database. Consultado el 28 de noviembre de 2025.
+«Lontra annectens (Forsyth Major, 1897) Northern Neotropical River Otter». The Mammal Diversity Database. Consultado el 28 de noviembre de 2025.
 
-↑ Ferran, Vera de; Figueiró, Henrique Vieira; Trindade, Fernanda de Jesus; Smith, Oliver; Sinding, Mikkel-Holger S.; Trinca, Cristine S.; Lazzari, Gabriele Zenato; Veron, Géraldine et al. (22 de agosto de 2022). «Phylogenomics of the world’s otters». Current Biology(en inglés)32 (16): 3650-3658.e4. ISSN 0960-9822. PMID 35779528. doi:10.1016/j.cub.2022.06.036. Consultado el 30 de octubre de 2025.
+Ferran, Vera de; Figueiró, Henrique Vieira; Trindade, Fernanda de Jesus; Smith, Oliver; Sinding, Mikkel-Holger S.; Trinca, Cristine S.; Lazzari, Gabriele Zenato; Veron, Géraldine et al. (22 de agosto de 2022). «Phylogenomics of the world’s otters». Current Biology (en inglés) 32 (16): 3650-3658.e4. ISSN 0960-9822. PMID 35779528. doi:10.1016/j.cub.2022.06.036. Consultado el 30 de octubre de 2025.
 
 # Enlaces externos
 
