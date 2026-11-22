@@ -13,24 +13,30 @@ import AVFoundation
         engine.attach(pitch)
         engine.connect(node, to: pitch, format: format)
         engine.connect(pitch, to: engine.mainMixerNode, format: format)
+        pitch.bypass = true
     }
 
+    /// At normal speed the time-pitch unit is bypassed: it would only delay the voice, by up to about 0.1 s.
     var rate: Float {
         get { pitch.rate }
-        set { pitch.rate = newValue }
+        set {
+            pitch.rate = newValue
+            pitch.bypass = newValue == 1
+        }
     }
 
     /// Where the next queued sample goes on the queue's timeline, which counts voice samples from the last stop().
     private var end = 0
     /// The last sample rendered; the player reports none while paused.
     private var rendered = 0
-    /// Seconds from the player to the speaker. Asking the device costs about 2 ms, so it is asked when the engine starts,
+    /// Seconds from the mixer to the speaker. Asking the device costs about 2 ms, so it is asked when the engine starts,
     /// which it does again after the output device changes.
-    private var delay = 0.0
+    private var outputDelay = 0.0
 
     /// The sample being heard now, on the queue's timeline. Speed changes count voice samples, not output time.
     var position: Int {
-        render() - Int(delay * format.sampleRate * Double(rate))
+        let delay = outputDelay + (pitch.bypass ? 0 : pitch.latency)
+        return render() - Int(delay * format.sampleRate * Double(rate))
     }
 
     /// Samples queued but not yet played.
@@ -40,7 +46,7 @@ import AVFoundation
     func enqueue(_ samples: [Float]) throws -> Int {
         if !engine.isRunning {
             try engine.start()
-            delay = pitch.latency + engine.outputNode.presentationLatency
+            outputDelay = engine.outputNode.presentationLatency
         }
         if !isPaused { node.play() }
         // The timeline runs on while the queue is empty, so audio queued after a gap starts at the current sample.
