@@ -16,9 +16,14 @@ Prefer not to use Terminal? Download `Berang.zip` from the [latest release](http
 
 ## Get started
 
-1. Open a web page, and press ⌥⎋ (Option-Escape).
-2. macOS asks to let Berang use accessibility features, which it needs to read other apps. Turn Berang on in System Settings > Privacy & Security > Accessibility, and press ⌥⎋ again.
-3. The first time, Berang downloads its voice (137 MB), then starts reading.
+When Berang first opens, Set Up Berang walks you through what it needs:
+
+1. **Accessibility**, so Berang can read other apps. Click Allow, then turn Berang on in System Settings.
+2. **The voice**, 137 MB, downloaded once.
+3. **Screen Recording**, if you want to read parts of the screen. This is optional.
+4. **Try it**: press ⌥⎋ (Option-Escape) on any page.
+
+To finish a step later, choose Set Up Berang from the menu bar.
 
 ## Use Berang
 
