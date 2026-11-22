@@ -5,6 +5,9 @@ import Foundation
 public struct Chunk: Equatable, Sendable {
     public let text: String
     public let source: Range<Int>
+    /// The source span of each space-separated word of `text`, in order. Words a rule wrote, like the
+    /// "nineteen sixty-nine" said for "1969", each span the whole source the rule replaced.
+    public let words: [Range<Int>]
 }
 
 public enum URLStyle: Sendable {
@@ -327,6 +330,36 @@ private func chunks(_ segs: [Segment], firstMaxWords: Int = 12) -> [Chunk] {
     }
 
     let text = spoken as NSString
+    // Every run of non-space in the spoken text, which chunks keep as their words.
+    // Words come in order, so the span holding each starts the search for the next, as toSource would find it.
+    var words: [(spoken: Range<Int>, source: Range<Int>)] = [], wordStart: Int?, span = 0
+    func addWord(_ w: Range<Int>) {
+        while span < spans.count - 1, !spans[span].spoken.contains(w.lowerBound) { span += 1 }
+        let s = spans[span]
+        let start = s.verbatim ? s.source.lowerBound + w.lowerBound - s.spoken.lowerBound : s.source.lowerBound
+        let end = s.spoken.upperBound >= w.upperBound
+            ? (s.verbatim ? s.source.lowerBound + w.upperBound - s.spoken.lowerBound : s.source.upperBound)
+            : toSource(w.upperBound, isEnd: true)
+        words.append((w, start..<end))
+    }
+    for (i, unit) in spoken.utf16.enumerated() {
+        if isSpace(unit) {
+            if let w = wordStart { addWord(w..<i) }
+            wordStart = nil
+        } else if wordStart == nil {
+            wordStart = i
+        }
+    }
+    if let w = wordStart { addWord(w..<text.length) }
+    // Chunks come in order, so each takes the next words that start inside it.
+    var nextWord = 0
+    func sources(_ spoken: Range<Int>) -> [Range<Int>] {
+        while nextWord < words.count, words[nextWord].spoken.lowerBound < spoken.lowerBound { nextWord += 1 }
+        let first = nextWord
+        while nextWord < words.count, words[nextWord].spoken.lowerBound < spoken.upperBound { nextWord += 1 }
+        return words[first..<nextWord].map(\.source)
+    }
+
     var pieces: [Range<Int>] = [], start = 0
     for m in sentenceEnd.matches(in: spoken, range: NSRange(location: 0, length: text.length)) {
         pieces.append(start..<m.range.location)
@@ -345,14 +378,16 @@ private func chunks(_ segs: [Segment], firstMaxWords: Int = 12) -> [Chunk] {
             for c in clause.matches(in: s, range: NSRange(location: 0, length: s.utf16.count)) {
                 let cut = NSMaxRange(c.range), head = (s as NSString).substring(to: cut)
                 if cuttable.contains(a + c.range.location), (4...firstMaxWords).contains(wordCount(head)) {
-                    out.append(Chunk(text: head, source: toSource(a, isEnd: false)..<toSource(a + cut, isEnd: true)))
+                    out.append(Chunk(text: head, source: toSource(a, isEnd: false)..<toSource(a + cut, isEnd: true),
+                                     words: sources(a..<a + cut)))
                     s = (s as NSString).substring(from: cut).trimmingCharacters(in: .whitespacesAndNewlines)
                     a += cut + 1
                     break
                 }
             }
         }
-        out.append(Chunk(text: s, source: toSource(a, isEnd: false)..<toSource(piece.upperBound, isEnd: true)))
+        out.append(Chunk(text: s, source: toSource(a, isEnd: false)..<toSource(piece.upperBound, isEnd: true),
+                         words: sources(a..<piece.upperBound)))
     }
     return out
 }
