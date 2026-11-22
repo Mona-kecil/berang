@@ -1,1 +1,0 @@
-kitten08_mini.py

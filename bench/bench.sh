@@ -3,9 +3,7 @@
 set -e
 cd "$(dirname "$0")"
 uptime
-ALL=kitten08_mini,kitten2_mini,kitten2_nano,kokoro,kokoro_int8,moss_nano,phonon,piper_high,piper_med,pocket,pocket_18m,say
-NOSAY=kitten08_mini,kitten2_mini,kitten2_nano,kokoro,kokoro_int8,moss_nano,phonon,piper_high,piper_med,pocket,pocket_18m
-python3 run.py --models $ALL --threads 2 --reps 3
-python3 run.py --models $NOSAY --threads 1,4 --reps 1 --passages short,para
+python3 run.py --threads 2 --reps 3
+python3 run.py --threads 1,4 --reps 1 --passages short,para
 uptime
 HF_HOME=$PWD/models/asr/hf envs/asr/bin/python score.py results/*/t2/r0 2>&1 | grep '^results'

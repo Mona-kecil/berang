@@ -55,7 +55,7 @@ def align(ref, hyp, total):
 import soundfile as sf
 
 out = {}
-CLONES = {k: v for k, v in {"pocket_you": f"{HERE}/../clone/pocket", "pocket_18m_you": f"{HERE}/../clone/pocket_18m"}.items()
+CLONES = {k: v for k, v in {"pocket_you": f"{HERE}/../clone/pocket"}.items()
           if os.path.exists(f"{v}/para.wav")}
 for model, d in [(d.split("/results/")[1].split("/")[0], d) for d in sorted(glob.glob(f"{HERE}/../results/*/t2/r0"))] + list(CLONES.items()):
     for pid, ref in texts.items():
