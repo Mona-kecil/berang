@@ -27,3 +27,4 @@ pdf-llama	pdf	https://arxiv.org/pdf/2302.13971v1	CC BY 4.0
 preview-pdf	preview	fixtures/otters.pdf	CC BY-SA 4.0
 chrome-pdf	chrome	fixtures/otters.pdf	CC BY-SA 4.0
 chrome-pdf-llama	chrome	https://arxiv.org/pdf/2302.13971v1	CC BY 4.0
+vscode-editor	vscode	fixtures/plain.txt	GPL-3.0 (this repository)
