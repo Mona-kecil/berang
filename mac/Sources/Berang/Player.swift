@@ -25,8 +25,11 @@ import TextGrab
     private(set) var resumedAt: Int?
     /// How much of the voice has downloaded, from 0 to 1, while it downloads.
     private(set) var download: Double?
-    /// The voice reading, one of `Voice.names`. Kept across launches.
-    private(set) var voice = UserDefaults.standard.string(forKey: "voice") ?? "default"
+    /// The engine and voice reading, one of the engine's `voices`. Kept across launches.
+    private(set) var engine = Engine(rawValue: UserDefaults.standard.string(forKey: "engine") ?? "") ?? .phonon
+    private(set) var voice = UserDefaults.standard.string(forKey: "voice") ?? Engine.phonon.defaultVoice
+    /// The engine downloading, while `download` counts.
+    private(set) var downloading: Engine?
     /// Whether Berang has read anything yet, which ends setup's last step.
     private(set) var hasRead = UserDefaults.standard.bool(forKey: "hasRead") {
         didSet { UserDefaults.standard.set(hasRead, forKey: "hasRead") }
@@ -34,7 +37,10 @@ import TextGrab
 
     @ObservationIgnored private let audio = AudioOut()
     @ObservationIgnored private let highlight = Highlight()
-    @ObservationIgnored private var tts: Phonon?
+    @ObservationIgnored private var tts: (any Speech)?
+    /// The engine `tts` runs, which differs from `engine` after a voice of another engine is chosen.
+    @ObservationIgnored private var ttsEngine: Engine?
+    private var needsLoad: Bool { tts == nil || ttsEngine != engine }
     @ObservationIgnored private var page: Page?
     /// The block being heard, or about to be.
     @ObservationIgnored private var index = 0
@@ -155,7 +161,7 @@ import TextGrab
             do {
                 try allow(requested)
                 var source = requested
-                if tts == nil {
+                if needsLoad {
                     try await installVoice()
                     state = .loading
                     tts = try await loadVoice()
@@ -212,12 +218,12 @@ import TextGrab
         }
     }
 
-    /// Downloads the voice ahead of the first play, as setup offers.
-    func downloadVoice() {
-        guard !Voice.isInstalled, state == .idle || state.isFailed else { return }
+    /// Downloads an engine ahead of reading, as setup and the Voices window offer.
+    func downloadVoice(_ engine: Engine) {
+        guard !engine.isInstalled, state == .idle || state.isFailed else { return }
         task = Task {
             do {
-                try await installVoice()
+                try await installVoice(engine)
                 state = .idle
                 if let latest = pending {
                     pending = nil
@@ -230,13 +236,17 @@ import TextGrab
         }
     }
 
-    /// Chooses the voice to read with. While reading, the next sentence uses it; otherwise a sample plays in it.
-    func choose(_ name: String) {
+    /// Chooses the voice to read with. While reading, the next sentence uses a voice of the same engine; a voice
+    /// of another engine, which must load first, stops the reading. Otherwise a sample plays in it.
+    func choose(_ engine: Engine, _ name: String) {
+        let switching = engine != self.engine
+        self.engine = engine
         voice = name
+        UserDefaults.standard.set(engine.rawValue, forKey: "engine")
         UserDefaults.standard.set(name, forKey: "voice")
         switch state {
         case .playing, .paused:
-            if let tts { Task { try? await tts.setVoice(name) } }
+            if switching { sample() } else if let tts { Task { try? await tts.setVoice(name) } }
         case .downloading, .loading:
             break  // applied once the voice loads
         case .idle, .failed:
@@ -246,12 +256,12 @@ import TextGrab
 
     /// Plays a sentence in the chosen voice. Any request replaces it.
     private func sample() {
-        guard Voice.isInstalled else { return }
+        guard engine.isInstalled else { return }
         stop()
         let g = generation
         task = Task {
             do {
-                if tts == nil {
+                if needsLoad {
                     state = .loading
                     tts = try await loadVoice()
                     guard g == generation else { return }
@@ -277,20 +287,27 @@ import TextGrab
         }
     }
 
-    /// Loads the voice model and conditions it on the chosen voice, or the model's default when that is gone.
-    private func loadVoice() async throws -> Phonon {
-        let tts = try await Voice.load()
-        if !tts.voices.contains(voice) { voice = tts.voices.contains("default") ? "default" : tts.voices.first ?? voice }
+    /// Loads the chosen engine, first letting go of another one, and conditions it on the chosen voice, or on the
+    /// engine's default when that voice is gone.
+    private func loadVoice() async throws -> any Speech {
+        tts = nil
+        ttsEngine = nil
+        let tts = try await engine.load()
+        let voices = engine.voices
+        if !voices.contains(voice) { voice = voices.contains(engine.defaultVoice) ? engine.defaultVoice : voices.first ?? voice }
         try await tts.setVoice(voice)
+        ttsEngine = engine
         return tts
     }
 
-    private func installVoice() async throws {
-        guard !Voice.isInstalled else { return }
+    private func installVoice(_ engine: Engine? = nil) async throws {
+        let engine = engine ?? self.engine
+        guard !engine.isInstalled else { return }
         state = .downloading
+        downloading = engine
         download = 0
-        defer { download = nil }
-        try await Voice.install { [weak self] in self?.download = $0 }
+        defer { download = nil; downloading = nil }
+        try await engine.install { [weak self] in self?.download = $0 }
     }
 
     /// Plays from `index` to the end of the page, for request `g`. A skip cancels this task and starts another.
@@ -316,7 +333,7 @@ import TextGrab
                         if samples.isEmpty { timeline.append(block: b, chunk: chunk, start: start) }
                         samples += part
                     }
-                    if !samples.isEmpty { timeline.timeLast(samples, sampleRate: Phonon.sampleRate) }
+                    if !samples.isEmpty { timeline.timeLast(samples, sampleRate: Engine.sampleRate) }
                 }
             }
             try Task.checkCancellation()
@@ -352,4 +369,4 @@ import TextGrab
 private let sampleText = "Here is how I sound, reading the page in front of you."
 
 /// Five seconds of voice audio.
-private let lookahead = Int(Phonon.sampleRate) * 5
+private let lookahead = Int(Engine.sampleRate) * 5

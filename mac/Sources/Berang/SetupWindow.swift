@@ -14,7 +14,7 @@ final class SetupWindow: NSWindow {
     }
 
     /// Whether Berang can't read yet: it lacks Accessibility access or the voice.
-    static var isNeeded: Bool { !AXIsProcessTrusted() || !Voice.isInstalled }
+    static var isNeeded: Bool { !AXIsProcessTrusted() || !Engine.allCases.contains(where: \.isInstalled) }
 
     func show() {
         NSApp.activate()
@@ -29,7 +29,7 @@ struct SetupView: View {
     let close: () -> Void
     @State private var trusted = AXIsProcessTrusted()
     @State private var screen = CGPreflightScreenCaptureAccess()
-    @State private var voice = Voice.isInstalled
+    @State private var voice = Engine.allCases.contains(where: \.isInstalled)
     /// macOS shows its permission prompt once; after that, the button opens System Settings instead.
     @State private var askedTrust = false
     @State private var askedScreen = false
@@ -63,7 +63,7 @@ struct SetupView: View {
             while !Task.isCancelled {
                 trusted = AXIsProcessTrusted()
                 screen = CGPreflightScreenCaptureAccess()
-                voice = Voice.isInstalled
+                voice = Engine.allCases.contains(where: \.isInstalled)
                 try? await Task.sleep(for: .seconds(1))
             }
         }
@@ -76,7 +76,8 @@ struct SetupView: View {
 
     private var voiceDetail: String {
         if !voice, case .failed(let message) = player.state { return message }
-        return voice ? "Reading with \(Voice.title(player.voice))." : "137 MB, downloaded once."
+        return voice ? "Reading with \(Engine.title(player.voice)), a \(player.engine.title) voice."
+            : "\(megabytes(player.engine.size)) MB, downloaded once."
     }
 
     @ViewBuilder private var voiceControl: some View {
@@ -85,13 +86,14 @@ struct SetupView: View {
         } else if let fraction = player.download {
             VStack(alignment: .trailing, spacing: 4) {
                 ProgressView(value: fraction).frame(width: 120)
-                Text("\(Int(fraction * Double(Voice.downloadSize) / 1_000_000)) of 137 MB")
+                Text("\(megabytes(Int64(fraction * Double(player.engine.size)))) of \(megabytes(player.engine.size)) MB")
                     .font(.caption).monospacedDigit().foregroundStyle(.secondary)
             }
         } else if next == .voice {
-            Button(player.state.isFailed ? "Try Again" : "Download", action: player.downloadVoice).buttonStyle(.borderedProminent)
+            Button(player.state.isFailed ? "Try Again" : "Download") { player.downloadVoice(player.engine) }
+                .buttonStyle(.borderedProminent)
         } else {
-            Button(player.state.isFailed ? "Try Again" : "Download", action: player.downloadVoice)
+            Button(player.state.isFailed ? "Try Again" : "Download") { player.downloadVoice(player.engine) }
         }
     }
 
@@ -133,3 +135,5 @@ struct SetupView: View {
         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?\(pane)")!)
     }
 }
+
+func megabytes(_ bytes: Int64) -> Int64 { bytes / 1_000_000 }

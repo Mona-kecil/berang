@@ -21,7 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: swift --version
-      - run: swift build -c release
+      # The app, with MLX, builds below through Xcode; this builds the text grabber alone.
+      - run: swift build -c release --product berang-grab
       - run: swift test
       - run: ./build-app.sh
 

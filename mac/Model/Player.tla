@@ -69,6 +69,13 @@ YouChooseVoice ==
         /\ current' = Len(tasks) + 1 /\ ui' = st[2] /\ shown' = "none"
     /\ UNCHANGED <<voice, loaded, reason, ignored, pending>>
 
+\* choose() with a voice of the other engine: it must load first, so a reading stops and the sample waits for it.
+YouChooseVoiceOfOtherEngine ==
+    /\ ui \in {"idle", "failed", "playing", "paused"} /\ voice = "installed"
+    /\ tasks' = Append(Cancelled(tasks), [src |-> "sample", stage |-> "load", cancelled |-> FALSE])
+    /\ current' = Len(tasks) + 1 /\ ui' = "loading" /\ shown' = "none" /\ loaded' = FALSE
+    /\ UNCHANGED <<voice, reason, ignored, pending>>
+
 YouDownloadInSetup ==
     /\ voice = "missing" /\ ui \in {"idle", "failed"}
     /\ tasks' = Append(Cancelled(tasks), [src |-> "setup", stage |-> "download", cancelled |-> FALSE])
@@ -143,7 +150,7 @@ SampleEnds == \E i \in Ids : SampleEndsOf(i)
 StaleWorkEnds == \E i \in Ids : StaleWorkEndsOf(i)
 
 Next ==
-    \/ YouPressPlay \/ YouOpenArea \/ YouOpenFile \/ YouPressStop \/ YouSkip \/ YouDownloadInSetup \/ YouChooseVoice
+    \/ YouPressPlay \/ YouOpenArea \/ YouOpenFile \/ YouPressStop \/ YouSkip \/ YouDownloadInSetup \/ YouChooseVoice \/ YouChooseVoiceOfOtherEngine
     \/ DownloadFinishes \/ DownloadFails \/ LoadFinishes \/ YouDragAnArea \/ YouPressEscape
     \/ TextRecognized \/ PageEnds \/ SampleEnds \/ StaleWorkEnds
 
