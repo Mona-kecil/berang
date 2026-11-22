@@ -28,7 +28,7 @@ bench/bench.sh            # about 10 minutes; writes bench/results/
 python3 bench/report.py   # print the table
 ```
 
-To compare raw and cleaned text, run `python3 bench/clean/make_corpus.py`, then `bench/clean_bench.sh`. To build a listening page with word highlighting, run `python3 bench/listen/build.py`; it writes `bench/listen/index.html`.
+Before each release, run `bench/release/check.sh`; it measures time to first word, word errors on hard text, highlight drift, and memory, and `bench/release/README.md` keeps the results. To compare raw and cleaned text, run `python3 bench/clean/make_corpus.py`, then `bench/clean_bench.sh`. To build a listening page with word highlighting, run `python3 bench/listen/build.py`; it writes `bench/listen/index.html`.
 
 ## Text cleanup
 
