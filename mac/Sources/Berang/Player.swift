@@ -88,12 +88,24 @@ import TextGrab
         highlight.hide()
     }
 
-    private func start() {
+    /// Reads the text in an area of the screen the user drags over, stopping what is playing.
+    func readScreenArea() {
+        guard state != .downloading, state != .loading else { return }
+        stop()
+        start(screenArea: true)
+    }
+
+    /// Reads the target app's window, or with `screenArea`, an area of the screen the user picks.
+    private func start(screenArea: Bool = false) {
         task = Task {
             do {
-                // Shows the system's Accessibility prompt the first time, before the voice download.
-                guard AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
-                else { throw GrabError.notTrusted }
+                // Shows the system's permission prompt the first time, before the voice download.
+                if screenArea {
+                    try checkScreenAccess()
+                } else {
+                    guard AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
+                    else { throw GrabError.notTrusted }
+                }
                 if tts == nil {
                     if !Voice.isInstalled {
                         state = .downloading
@@ -102,11 +114,19 @@ import TextGrab
                     state = .loading
                     tts = try await Voice.load()
                 }
-                guard let target else { throw PhononError(description: "Open a page to read, then press play.") }
-                let page = try grab(target)
-                guard !page.blocks.isEmpty else { throw PhononError(description: "\(page.app) shows no text to read.") }
+                let page: Page
+                if screenArea {
+                    state = .idle  // not loading while the user picks
+                    guard let area = try await pickScreenArea() else { return }
+                    page = area
+                } else {
+                    guard let target else { throw PhononError(description: "Open a page to read, then press play.") }
+                    page = try grab(target)
+                    guard !page.blocks.isEmpty else { throw PhononError(description: "\(page.app) shows no text to read.") }
+                }
                 self.page = page
-                pageKey = page.address ?? target.bundleIdentifier.map { "\($0) \(page.window)" }
+                // An area of the screen has no address to return to.
+                pageKey = screenArea ? nil : page.address ?? target.flatMap(\.bundleIdentifier).map { "\($0) \(page.window)" }
                 index = page.start
                 // An unscrolled page with nothing selected continues where the last reading stopped.
                 if page.startPoint == .screen, page.start == 0, let pageKey,

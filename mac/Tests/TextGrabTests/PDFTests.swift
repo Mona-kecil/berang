@@ -1,3 +1,4 @@
+import CoreGraphics
 import Testing
 @testable import TextGrab
 
@@ -18,4 +19,10 @@ func knowsTextFromPageNumbers(_ text: String) {
 
 @Test func joinsWordsHyphenatedAtLineEnds() {
     #expect(joinLines(["a high metab-", "olic rate and an otter-", "Human bond"]) == "a high metabolic rate and an otter- Human bond")
+}
+
+@Test func startsAParagraphAtEachListItem() {
+    let texts = ["Action items:", "- Write the notes.", "2. Test the player.", "(a) Measure memory.", "Budget follows."]
+    let lines = texts.enumerated().map { i, t in PDFLine(text: t, bounds: CGRect(x: 72, y: 700 - CGFloat(i) * 16, width: 300, height: 13)) }
+    #expect(pdfParagraphs([lines], heights: [792]).map(\.text) == ["Action items:", "- Write the notes.", "2. Test the player.", "(a) Measure memory. Budget follows."])
 }

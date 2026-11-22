@@ -37,3 +37,11 @@ func readImageFile(in window: AXUIElement, app: NSRunningApplication) -> Page? {
     return Page(app: app.localizedName ?? "", window: window.string(kAXTitleAttribute) ?? "", blocks: blocks,
                 viewport: window, clip: nil, start: 0, startPoint: .screen, address: address)
 }
+
+/// The text of a part of the screen the user chose, saved as an image at `url`. Nil when it is not an image.
+public func readScreenArea(_ url: URL) -> Page? {
+    readImage(url).map {
+        Page(app: "", window: "", blocks: $0, viewport: AXUIElementCreateSystemWide(), clip: nil, start: 0,
+             startPoint: .selection, address: nil)
+    }
+}
