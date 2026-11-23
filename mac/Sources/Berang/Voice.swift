@@ -36,7 +36,14 @@ enum PhononVoice {
         let folders = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)
         guard let bundle = folders.first(where: { FileManager.default.fileExists(atPath: $0.appending(path: "bundle.json").path) })
         else { throw PhononError(description: "The voice download has no model bundle.") }
-        try PhononModels.install(bundled: bundle)
+        // Copied file by file, the bundle would look installed before its last file is whole. Copied beside its
+        // place and then moved in, it is there whole or not at all (Model/Update.tla).
+        let target = PhononModels.defaultDirectory
+        let staging = target.deletingLastPathComponent().appending(path: "models.partial")
+        try? FileManager.default.removeItem(at: staging)
+        try PhononModels.install(bundled: bundle, to: staging)
+        try? FileManager.default.removeItem(at: target)
+        try FileManager.default.moveItem(at: staging, to: target)
     }
 
     static func load() async throws -> Phonon {
