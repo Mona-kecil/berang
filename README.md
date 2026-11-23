@@ -97,7 +97,15 @@ open mac/build/Berang.app
 
 ### Player model
 
-`mac/Model/Player.tla` is a TLA+ model of the player: what each request does, step by step, while the voice downloads, loads, waits for an area, or reads. TLC checks that Berang never reads two things at once, never shows playing when nothing plays, keeps the highlight and saved position on what you hear, and reads a request made while the voice gets ready. CI runs it; to run it yourself, see the command at the top of the file. Update it with any change to how `Player.swift` handles requests.
+`mac/Model/Player.tla` is a TLA+ model of the player: what each request does, step by step, while the voice downloads, loads, waits for an area, or reads. It has two engines, so it covers switching between them. TLC checks that Berang:
+
+- never reads two things at once;
+- never shows playing when nothing plays;
+- keeps the highlight and saved position on what you hear;
+- reads a request made while the voice gets ready, even if you choose a voice of another engine meanwhile;
+- reads with the engine of the voice you chose.
+
+With `Fixed = FALSE`, it checks choosing voices as it worked before. TLC then finds the path where Berang asked one engine for another engine's voice. CI runs it; to run it yourself, see the command at the top of the file. Update it with any change to how `Player.swift` handles requests.
 
 ### Update model
 
