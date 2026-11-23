@@ -2,7 +2,8 @@ import AppKit
 import SwiftUI
 import TextGrab
 
-/// A floating player that never takes focus, so the app being read stays frontmost.
+/// A floating player that never takes focus, so the app being read stays frontmost. It shows while Berang reads,
+/// gets a voice ready, or has something to say, and hides when it stops.
 final class PlayerPanel: NSPanel {
     init(player: Player) {
         super.init(contentRect: .zero, styleMask: [.nonactivatingPanel, .titled, .fullSizeContentView],
@@ -24,6 +25,15 @@ final class PlayerPanel: NSPanel {
         if let screen = NSScreen.main?.visibleFrame {
             setFrameOrigin(NSPoint(x: screen.maxX - frame.width - 24, y: screen.midY - frame.height / 2))
         }
+        follow(player)
+    }
+
+    private func follow(_ player: Player) {
+        let showing = player.state != .idle
+        if showing, !isVisible { orderFrontRegardless() } else if !showing, isVisible { orderOut(nil) }
+        withObservationTracking { _ = player.state } onChange: { [weak self] in
+            Task { @MainActor in self?.follow(player) }
+        }
     }
 
     override var canBecomeKey: Bool { true }
@@ -42,69 +52,82 @@ struct PlayerView: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            HStack(spacing: 14) {
-                Button { player.skip(-1) } label: { Image(systemName: "backward.fill") }
+            HStack(spacing: 10) {
+                Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 30, height: 30).accessibilityHidden(true)
+                Button { player.skip(-1) } label: { small("backward.fill") }
                     .disabled(!reading)
                     .accessibilityLabel("Previous paragraph")
-                Button(action: player.playPause) { mainIcon.frame(width: 36, height: 36) }
-                    .accessibilityLabel(player.state == .playing ? "Pause" : "Play")
-                Button { player.skip(1) } label: { Image(systemName: "forward.fill") }
+                Button(action: player.playPause) {
+                    mainIcon.frame(width: 40, height: 40)
+                        .background(Circle().fill(Otter.orange))
+                        .background(Circle().fill(Otter.orangeEdge).offset(y: 2.5))
+                }
+                .accessibilityLabel(player.state == .playing ? "Pause" : "Play")
+                Button { player.skip(1) } label: { small("forward.fill") }
                     .disabled(!reading)
                     .accessibilityLabel("Next paragraph")
                 Menu {
                     ForEach(speeds, id: \.self) { s in Button(label(s)) { player.speed = s } }
                 } label: {
-                    Text(label(player.speed)).monospacedDigit()
+                    Text(label(player.speed)).font(Otter.font(12.5, .heavy)).monospacedDigit().foregroundStyle(Otter.ink)
                 }
                 .menuStyle(.button)
                 .menuIndicator(.hidden)
                 .fixedSize()
                 .accessibilityLabel("Speed")
-                Button(action: player.stop) { Image(systemName: "xmark") }
-                    .disabled(!reading)
+                Button(action: player.stop) { small("xmark") }
                     .accessibilityLabel("Stop")
             }
-            .buttonStyle(.borderless)
-            .font(.system(size: 15, weight: .semibold))
+            .buttonStyle(.plain)
             if player.resumedAt != nil {
                 Button("Start over", systemImage: "arrow.counterclockwise", action: player.startOver)
-                    .buttonStyle(.borderless)
-                    .font(.caption)
+                    .buttonStyle(.plain)
+                    .font(Otter.font(11.5, .bold))
+                    .foregroundStyle(Otter.teal)
             }
             if case .failed(let message) = player.state {
                 failure(message)
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 22))
+        .background(RoundedRectangle(cornerRadius: 22, style: .continuous).fill(Otter.card)
+            .shadow(color: Otter.ink.opacity(0.22), radius: 12, y: 6))
+        .padding(14)
+        .fontDesign(.rounded)
+    }
+
+    private func small(_ symbol: String) -> some View {
+        Image(systemName: symbol).font(.system(size: 11, weight: .bold)).foregroundStyle(Otter.teal)
+            .frame(width: 28, height: 28)
+            .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Otter.mint))
     }
 
     private var reading: Bool { player.state == .playing || player.state == .paused }
 
     @ViewBuilder private var mainIcon: some View {
         switch player.state {
-        case .downloading: ProgressView(value: player.download ?? 0).progressViewStyle(.circular).controlSize(.small)
-        case .loading: ProgressView().controlSize(.small)
-        case .playing: Image(systemName: "pause.fill").font(.system(size: 22))
-        default: Image(systemName: "play.fill").font(.system(size: 22))
+        case .downloading: ProgressView(value: player.download ?? 0).progressViewStyle(.circular).controlSize(.small).tint(.white)
+        case .loading: ProgressView().controlSize(.small).tint(.white)
+        case .playing: Image(systemName: "pause.fill").font(.system(size: 16, weight: .bold)).foregroundStyle(.white)
+        default: Image(systemName: "play.fill").font(.system(size: 16, weight: .bold)).foregroundStyle(.white)
         }
     }
 
     @ViewBuilder private func failure(_ message: String) -> some View {
         VStack(spacing: 6) {
-            Text(message).font(.caption).multilineTextAlignment(.center)
+            Text(message).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.ink).multilineTextAlignment(.center)
                 .frame(width: 200).fixedSize(horizontal: false, vertical: true)
             if message == GrabError.notTrusted.description {
                 Button("Open Accessibility Settings") {
-                    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+                    openPrivacy("Privacy_Accessibility")
                 }
-                .font(.caption)
+                .font(Otter.font(11.5, .bold))
             } else if message.hasSuffix(ScreenAreaError.turnOn) {
                 Button("Open Screen Recording Settings") {
-                    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture")!)
+                    openPrivacy("Privacy_ScreenCapture")
                 }
-                .font(.caption)
+                .font(Otter.font(11.5, .bold))
             }
         }
     }

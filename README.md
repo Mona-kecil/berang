@@ -16,32 +16,44 @@ Prefer not to use Terminal? Download `Berang.zip` from the [latest release](http
 
 ## Get started
 
-When Berang first opens, Set Up Berang walks you through what it needs:
+When Berang first opens, its window walks you through what it needs:
 
-1. **Accessibility**, so Berang can read other apps. Click Allow, then turn Berang on in System Settings.
-2. **A voice.** Hear each one, then download its engine once: Phonon (137 MB, 38 voices), Kitten (82 MB, 10 voices), or Pocket (240 MB, 8 voices).
-3. **Screen Recording**, if you want to read parts of the screen. This is optional.
-4. **Try it**: press ⌥⎋ (Option-Escape) on any page.
+1. **Let me read other apps**: Accessibility, so Berang can read the text in other apps. Click Allow, then turn Berang on in System Settings.
+2. **Pick my voice.** Hear each one, then download its engine once: Phonon (137 MB, 38 voices), Kitten (82 MB, 10 voices), or Pocket (240 MB, 8 voices).
+3. **Read screen areas**: Screen Recording, if you want to read parts of the screen. This is optional.
 
-To finish a step later, choose Set Up Berang from the menu bar.
+Then press ⌥⎋ (Option-Escape) on any page.
 
 ## Use Berang
+
+Berang lives in the menu bar, as an otter peeking over the waterline. Its menu holds what must be quick; everything else is in its window, under Open Berang.
 
 | To | Do this |
 |---|---|
 | Start or pause reading | Press ⌥⎋ in any app |
 | Read part of the screen | Press ⌥⇧⎋ (Option-Shift-Escape) and drag over it |
-| Listen to a whole book or file | Choose Open File from the menu bar, or open the file with Berang in Finder |
-| Skip, change speed, or stop | Use the floating player |
-| Hear and choose a voice | Choose Voices from the menu bar, and select a voice to hear it. To hear it read your own words, type or paste them below the list and click Read |
-| Show or hide the player, or quit | Click the waveform icon in the menu bar |
-| Update Berang | Choose Check for Updates from the menu bar |
+| Listen to a whole book or file | Drop it on Berang's window, or open it with Berang in Finder |
+| Skip, change speed, or stop | Use the floating player, which shows while Berang reads |
+| Hear and choose a voice | In Berang's window, click your voice. Select any voice to hear it, or type your own words below the list and click Read |
+| Change a shortcut | In Berang's window, open Settings, click the shortcut, and press the new keys |
+| Quit | Choose Quit Berang from the menu bar |
 
 Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before, Berang continues where you stopped; Start over goes back to the top. Berang remembers the speed you choose.
 
+### Shortcuts
+
+Berang refuses a new shortcut, and says why, when:
+
+- macOS or another app uses it;
+- your other Berang shortcut uses it;
+- every app uses it for a command, like ⌘C for Copy;
+- it has no ⌘, ⌥ or ⌃.
+
+To see whether another app uses a key, Berang watches the keys you press while you record a shortcut, and only then. If another app later takes a key Berang uses, Berang can't tell; change the shortcut if it stops working.
+
 ### Updates
 
-Berang checks for a new version once a day. If it finds one while you work in another app, the menu bar icon shows a badge and the menu shows Update to, followed by the version. Choose it, then Install Update. Berang installs the update when you choose Install and Relaunch, or when you quit. Your voices, reading positions, and permissions stay.
+Berang checks for a new version once a day. If it finds one while you work in another app, the menu bar icon shows a dot and the menu shows Update to, followed by the version. Choose it, then Install Update. Berang installs the update when you choose Install and Relaunch, or when you quit. Your voices, reading positions, and permissions stay.
 
 Each update must be signed with Berang's update key and its certificate, or Berang refuses it.
 
@@ -63,7 +75,7 @@ In PDFs and Apple Books, Berang highlights the paragraph rather than the word. V
 
 Berang reads and speaks on your Mac. It connects to the internet only to download a voice engine, once: Phonon from the [Phonon release](https://github.com/gradium-ai/xn-ptts/releases/tag/v0.7.1), checked against a known fingerprint; Kitten, if you choose one of its voices, from [KittenML](https://huggingface.co/KittenML/kitten-tts-2-nano) with its word lists from [Hugging Face](https://huggingface.co/beshkenadze/kitten-tts-g2p); and Pocket, if you choose one of its voices, from [Hugging Face](https://huggingface.co/mlx-community/pocket-tts). Once a day, it also checks [GitHub](https://github.com/Mona-kecil/berang/releases) for a new version. The check sends nothing about you or your Mac. It asks for two permissions:
 
-- **Accessibility**, to read the text of other apps.
+- **Accessibility**, to read the text of other apps, and to see which keys you press while you record a shortcut.
 - **Screen Recording**, only if you use ⌥⇧⎋ or read an app that draws its own text. Berang recognizes the text on your Mac and keeps no images.
 
 ## Uninstall
@@ -106,6 +118,21 @@ open mac/build/Berang.app
 - reads with the engine of the voice you chose.
 
 With `Fixed = FALSE`, it checks choosing voices as it worked before. TLC then finds the path where Berang asked one engine for another engine's voice. CI runs it; to run it yourself, see the command at the top of the file. Update it with any change to how `Player.swift` handles requests.
+
+### Shortcut model
+
+`mac/Model/Shortcuts.tla` models changing the shortcuts while other apps register and drop key combinations. macOS lets several apps register one combination and sends its presses to the latest, so the model includes that. TLC checks that:
+
+- a failed change leaves a working shortcut working;
+- Settings never shows a shortcut as working while Berang holds nothing for it;
+- Berang never takes a combination that went to another app when you pressed it;
+- recording never starts a reading.
+
+With `SafeOrder = FALSE`, the change lets go of the old combination before registering the new one, and TLC finds a failed change losing the shortcut. With `Watch = FALSE`, Berang doesn't watch the keyboard while recording, and TLC finds it taking another app's combination.
+
+### Brand
+
+`mac/App/Brand` holds the app icon, the menu bar icon, and the otter's poses. The otter was drawn with an image model, gpt-image-2.6-sunburst, from a written brief: a flat otter in deep teal, otter brown, cream, and one orange, with its natural face. The app icon is that artwork shaped into the macOS icon outline. The menu bar icon is a single-colour drawing traced into a PDF with potrace.
 
 ### Update model
 

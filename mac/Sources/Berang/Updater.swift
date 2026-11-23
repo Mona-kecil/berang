@@ -5,12 +5,18 @@ import Sparkle
 /// now. An update installs only once you choose to, and only if both its EdDSA signature and its code signature
 /// match this build's (Model/Update.tla). A daily check that finds one doesn't open a window over your work: the
 /// menu bar icon gets a badge, and the menu offers the update.
-@MainActor final class Updater: NSObject, SPUStandardUserDriverDelegate {
-    private var controller: SPUStandardUpdaterController!
+@MainActor @Observable final class Updater: NSObject, SPUStandardUserDriverDelegate {
+    @ObservationIgnored private var controller: SPUStandardUpdaterController!
     /// The version a daily check found, until you look at it.
     private(set) var waiting: String?
     /// Called when `waiting` changes.
-    var changed: () -> Void = {}
+    @ObservationIgnored var changed: () -> Void = {}
+
+    /// Whether Sparkle checks once a day on its own.
+    var checksDaily: Bool {
+        get { controller.updater.automaticallyChecksForUpdates }
+        set { controller.updater.automaticallyChecksForUpdates = newValue }
+    }
 
     override init() {
         super.init()
