@@ -3,9 +3,14 @@ import SwiftUI
 import TextGrab
 
 /// A floating player that never takes focus, so the app being read stays frontmost. It shows while Berang reads,
-/// gets a voice ready, or has something to say, and hides when it stops.
+/// gets a voice ready, or has something to say, and hides when it stops. Scrolling over it changes the speed.
 final class PlayerPanel: NSPanel {
-    init(player: Player) {
+    private let player: Player
+    /// Scrolling not yet turned into a speed step.
+    private var scrolled: CGFloat = 0
+
+    init(player: Player, shortcuts: Shortcuts) {
+        self.player = player
         super.init(contentRect: .zero, styleMask: [.nonactivatingPanel, .borderless], backing: .buffered, defer: false)
         isMovableByWindowBackground = true
         isOpaque = false
@@ -16,7 +21,7 @@ final class PlayerPanel: NSPanel {
         hidesOnDeactivate = false
         becomesKeyOnlyIfNeeded = true
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        contentView = NSHostingView(rootView: PlayerView(player: player))
+        contentView = NSHostingView(rootView: PlayerView(player: player, shortcuts: shortcuts))
         setContentSize(contentView!.fittingSize)
         if let screen = NSScreen.main?.visibleFrame {
             setFrameOrigin(NSPoint(x: screen.maxX - frame.width - 24, y: screen.midY - frame.height / 2))
@@ -34,17 +39,34 @@ final class PlayerPanel: NSPanel {
 
     override var canBecomeKey: Bool { true }
 
-    /// Grows leftward when the content widens, so a message never pushes the panel off the right edge.
+    /// Grows leftward and down when the content grows, so a message never pushes the panel off the right edge and
+    /// the controls stay where they were.
     override func setFrame(_ rect: NSRect, display: Bool) {
         var rect = rect
         if frame.width > 0, rect.width != frame.width { rect.origin.x = frame.maxX - rect.width }
+        if frame.height > 0, rect.height != frame.height {
+            rect.origin.y = max(frame.maxY - rect.height, screen?.visibleFrame.minY ?? -.infinity)
+        }
         super.setFrame(rect, display: display)
+    }
+
+    /// One step of 0.1× per notch of a mouse wheel, or per 24 points of trackpad scrolling. Scrolling up is faster.
+    override func scrollWheel(with event: NSEvent) {
+        guard event.momentumPhase.isEmpty else { return }
+        scrolled += event.hasPreciseScrollingDeltas ? event.scrollingDeltaY / 24 : event.scrollingDeltaY
+        while abs(scrolled) >= 1 {
+            let up: CGFloat = scrolled > 0 ? 1 : -1
+            player.nudge(Float(up) / 10)
+            scrolled -= up
+        }
+        if event.phase == .ended || event.phase == .cancelled { scrolled = 0 }
     }
 }
 
 struct PlayerView: View {
     let player: Player
-    private let speeds: [Float] = [0.75, 1, 1.25, 1.5, 2, 2.5, 3]
+    let shortcuts: Shortcuts
+    @State private var showsSpeed = false
 
     var body: some View {
         VStack(spacing: 8) {
@@ -61,19 +83,18 @@ struct PlayerView: View {
                 Button { player.skip(1) } label: { small("forward.fill") }
                     .disabled(!reading)
                     .accessibilityLabel("Next paragraph")
-                Menu {
-                    ForEach(speeds, id: \.self) { s in Button(label(s)) { player.speed = s } }
-                } label: {
-                    Text(label(player.speed)).font(Otter.font(12.5, .heavy)).monospacedDigit().foregroundStyle(Otter.ink)
+                Button { showsSpeed.toggle() } label: {
+                    Text(speedLabel(player.speed)).font(Otter.font(12.5, .heavy)).monospacedDigit().foregroundStyle(Otter.ink)
+                        .frame(minWidth: 36, minHeight: 28)
+                        .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(showsSpeed ? Otter.mint : .clear))
                 }
-                .menuStyle(.button)
-                .menuIndicator(.hidden)
-                .fixedSize()
-                .accessibilityLabel("Speed")
+                .accessibilityLabel("Speed, \(speedLabel(player.speed))")
+                .accessibilityAddTraits(showsSpeed ? .isSelected : [])
                 Button(action: player.stop) { small("xmark") }
                     .accessibilityLabel("Stop")
             }
             .buttonStyle(PlainButtonStyle(radius: 10))
+            if showsSpeed { SpeedControls(player: player, shortcuts: shortcuts).padding(.top, 4) }
             if player.resumedAt != nil {
                 Button("Start over", systemImage: "arrow.counterclockwise", action: player.startOver)
                     .buttonStyle(PlainButtonStyle(radius: 6))
@@ -92,6 +113,7 @@ struct PlayerView: View {
         .fontDesign(.rounded)
         // The panel never takes focus from the app being read, so its controls show no focus ring.
         .focusEffectDisabled()
+        .onChange(of: player.state == .idle) { _, idle in if idle { showsSpeed = false } }
     }
 
     private func small(_ symbol: String) -> some View {
@@ -129,5 +151,63 @@ struct PlayerView: View {
         }
     }
 
-    private func label(_ s: Float) -> String { s.formatted(.number.precision(.fractionLength(0...2))) + "×" }
+}
+
+/// The speed, as "1×" or "2.3×".
+func speedLabel(_ s: Float) -> String { s.formatted(.number.precision(.fractionLength(0...1))) + "×" }
+
+/// Slower and faster by 0.1×, the speed and the words a minute it makes, a slider, and the usual speeds. Clicking the
+/// speed goes back to 1×.
+struct SpeedControls: View {
+    let player: Player
+    let shortcuts: Shortcuts
+    private let presets: [Float] = [1, 1.5, 2, 2.5, 3]
+
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack {
+                step("minus", by: -0.1, name: "Slower", .slower)
+                Spacer()
+                Button { player.speed = 1 } label: {
+                    VStack(spacing: 1) {
+                        Text(speedLabel(player.speed)).font(Otter.font(22, .heavy)).monospacedDigit().foregroundStyle(Otter.ink)
+                        // Kept in place before the voice's pace is known, so the controls don't shift.
+                        Text(player.pace.map { "≈ \(Int(($0 * Double(player.speed)).rounded())) words/min" } ?? " ")
+                            .font(Otter.font(11, .bold)).monospacedDigit().foregroundStyle(Otter.soft)
+                    }
+                    .padding(.horizontal, 8).padding(.vertical, 2)
+                }
+                .help("Back to 1×")
+                .accessibilityLabel("Speed \(speedLabel(player.speed)). Back to 1×")
+                Spacer()
+                step("plus", by: 0.1, name: "Faster", .faster)
+            }
+            Slider(value: Binding(get: { player.speed }, set: { player.speed = Player.step($0) }), in: Player.speeds)
+                .tint(Otter.teal)
+                .controlSize(.small)
+                .accessibilityLabel("Speed")
+            HStack(spacing: 5) {
+                ForEach(presets, id: \.self) { s in
+                    let on = player.speed == s
+                    Button { player.speed = s } label: {
+                        Text(speedLabel(s)).font(Otter.font(11.5, .heavy)).foregroundStyle(on ? .white : Otter.teal)
+                            .frame(maxWidth: .infinity, minHeight: 24)
+                            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(on ? Otter.teal : Otter.mint))
+                    }
+                }
+            }
+        }
+        .buttonStyle(PlainButtonStyle(radius: 8))
+        .frame(width: 214)
+    }
+
+    private func step(_ symbol: String, by delta: Float, name: String, _ action: ShortcutAction) -> some View {
+        Button { player.nudge(delta) } label: {
+            Image(systemName: symbol).font(.system(size: 13, weight: .heavy)).foregroundStyle(Otter.teal)
+                .frame(width: 32, height: 32)
+                .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Otter.mint))
+        }
+        .help("\(name)  \(shortcuts.combos[action]!.display)")
+        .accessibilityLabel(name)
+    }
 }

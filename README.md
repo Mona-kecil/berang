@@ -33,23 +33,26 @@ Berang lives in the menu bar, as an otter peeking over the waterline. Its menu h
 | Start or pause reading | Press ⌥⎋ in any app |
 | Read part of the screen | Press ⌥⇧⎋ (Option-Shift-Escape) and drag over it |
 | Listen to a whole book or file | Drop it on Berang's window, or open it with Berang in Finder |
-| Skip, change speed, or stop | Use the floating player, which shows while Berang reads |
+| Skip or stop | Use the floating player, which shows while Berang reads |
+| Change the speed | Click the speed in the player, or scroll over the player. While Berang reads, ⌥⇧. reads faster and ⌥⇧, slower, by 0.1× |
 | Hear and choose a voice | In Berang's window, click your voice. Select any voice to hear it, or type your own words below the list and click Read |
 | Change a shortcut | In Berang's window, open Settings, click the shortcut, and press the new keys |
 | Quit | Choose Quit Berang from the menu bar |
 
-Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before, Berang continues where you stopped; Start over goes back to the top. Berang remembers the speed you choose.
+Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before, Berang continues where you stopped; Start over goes back to the top. Berang remembers the speed you choose, from 0.5× to 3×. Under the speed, the player shows about how many words a minute you hear, measured from what the voice has read. Click the speed there to go back to 1×.
 
 ### Shortcuts
 
 Berang refuses a new shortcut, and says why, when:
 
 - macOS or another app uses it;
-- your other Berang shortcut uses it;
+- another Berang shortcut uses it;
 - every app uses it for a command, like ⌘C for Copy;
 - it has no ⌘, ⌥ or ⌃.
 
 To see whether another app uses a key, Berang watches the keys you press while you record a shortcut, and only then. If another app later takes a key Berang uses, Berang can't tell; change the shortcut if it stops working.
+
+Berang holds the faster and slower shortcuts only while it reads. The rest of the time, those keys reach the app you're in, where ⌥⇧. types ˘.
 
 ### Updates
 
@@ -125,10 +128,14 @@ With `Fixed = FALSE`, it checks choosing voices as it worked before. TLC then fi
 
 - a failed change leaves a working shortcut working;
 - Settings never shows a shortcut as working while Berang holds nothing for it;
+- Berang holds the faster and slower shortcuts only while it reads;
+- no two shortcuts share a combination;
 - Berang never takes a combination that went to another app when you pressed it;
-- recording never starts a reading.
+- recording never starts a reading or changes the speed.
 
-With `SafeOrder = FALSE`, the change lets go of the old combination before registering the new one, and TLC finds a failed change losing the shortcut. With `Watch = FALSE`, Berang doesn't watch the keyboard while recording, and TLC finds it taking another app's combination.
+With `SafeOrder = FALSE`, the change lets go of the old combination before registering the new one, and TLC finds a failed change losing the shortcut. With `Watch = FALSE`, Berang doesn't watch the keyboard while recording, and TLC finds it taking another app's combination. With `Release = FALSE`, a speed shortcut recorded while Berang doesn't read stays registered, and TLC finds Berang holding it with the player closed.
+
+The check runs with read the page, read an area, and one speed shortcut, as the two speed shortcuts behave alike; it covers 5.6 million states in about a minute. To also check both speed shortcuts together, set `Always = {"page"}` and `WhileReading = {"faster", "slower"}` in `Shortcuts.cfg`.
 
 ### Brand
 

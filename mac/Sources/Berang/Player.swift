@@ -14,14 +14,22 @@ import TextGrab
         var isFailed: Bool { if case .failed = self { true } else { false } }
     }
 
-    private(set) var state = State.idle
-    /// Kept across launches.
+    private(set) var state = State.idle {
+        didSet { if (oldValue == .idle) != (state == .idle) { showing?(state != .idle) } }
+    }
+    /// Told whether the player shows, as the state leaves or returns to idle.
+    @ObservationIgnored var showing: ((Bool) -> Void)?
+    static let speeds: ClosedRange<Float> = 0.5...3
+    /// Kept across launches. Set within `speeds`, in steps of 0.1, through `step`.
     var speed: Float = Player.savedSpeed {
         didSet {
             audio.rate = speed
             UserDefaults.standard.set(speed, forKey: "speed")
         }
     }
+    /// The voice's words per minute at 1×, from what it has read: words over seconds of voice, pauses included.
+    private(set) var pace: Double?
+    @ObservationIgnored private var paced = (voice: "", words: 0, seconds: 0.0)
     /// The block reading continued from, on a return to a page read before. Clears once two blocks have played.
     private(set) var resumedAt: Int?
     /// How much of the voice has downloaded, from 0 to 1, while it downloads.
@@ -82,8 +90,16 @@ import TextGrab
 
     private static var savedSpeed: Float {
         let saved = UserDefaults.standard.float(forKey: "speed")
-        return (0.5...4).contains(saved) ? saved : 1
+        return speeds.contains(saved) ? step(saved) : 1
     }
+
+    /// The nearest speed to `s` in steps of 0.1 within `speeds`.
+    static func step(_ s: Float) -> Float {
+        min(max((s * 10).rounded() / 10, speeds.lowerBound), speeds.upperBound)
+    }
+
+    /// Changes the speed by `delta`, as the speed shortcuts do.
+    func nudge(_ delta: Float) { speed = Self.step(speed + delta) }
 
     func playPause() {
         switch state {
@@ -387,7 +403,10 @@ import TextGrab
                         if samples.isEmpty { timeline.append(block: b, chunk: chunk, start: start) }
                         samples += part
                     }
-                    if !samples.isEmpty { timeline.timeLast(samples, sampleRate: Engine.sampleRate) }
+                    if !samples.isEmpty {
+                        timeline.timeLast(samples, sampleRate: Engine.sampleRate)
+                        measure(chunk.text, samples.count)
+                    }
                 }
             }
             try Task.checkCancellation()
@@ -401,6 +420,15 @@ import TextGrab
         // A page read to the end starts from the top next time.
         if let pageKey { positions[pageKey] = nil }
         stop()
+    }
+
+    private func measure(_ text: String, _ samples: Int) {
+        let voice = "\(engine.rawValue)/\(self.voice)"
+        if paced.voice != voice { paced = (voice, 0, 0) }
+        paced.words += text.split(whereSeparator: \.isWhitespace).count
+        paced.seconds += Double(samples) / Engine.sampleRate
+        // A few words say little about a voice's pace.
+        pace = paced.words >= 8 ? Double(paced.words) / paced.seconds * 60 : nil
     }
 
     private func tick() {

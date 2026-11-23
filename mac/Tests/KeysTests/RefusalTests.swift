@@ -25,6 +25,14 @@ private let unnamedSystem = KeyCombo(key: UInt32(kVK_ANSI_K), modifiers: UInt32(
     #expect(refusal(for: .readPage, others: [:], system: []) == nil)
 }
 
+@Test func theStandardShortcutsAreAllAllowedTogether() {
+    let standard: [String: KeyCombo] = ["page": .readPage, "area": .readArea, "faster": .faster, "slower": .slower]
+    for (name, combo) in standard {
+        #expect(refusal(for: combo, others: standard.filter { $0.key != name }, system: []) == nil)
+    }
+    #expect(KeyCombo.faster.display == "⌥ ⇧ .")
+}
+
 @Test func showsCombinationsAsMenusDo() {
     #expect(KeyCombo.readArea.display == "⌥ ⇧ ⎋")
     #expect(KeyCombo(key: UInt32(kVK_ANSI_R), modifiers: UInt32(cmdKey | controlKey)).display == "⌃ ⌘ R")
