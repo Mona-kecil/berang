@@ -15,6 +15,9 @@ public struct KeyCombo: Codable, Hashable, Sendable {
     public static let allModifiers = UInt32(cmdKey | optionKey | controlKey | shiftKey)
     public static let readPage = KeyCombo(key: UInt32(kVK_Escape), modifiers: UInt32(optionKey))
     public static let readArea = KeyCombo(key: UInt32(kVK_Escape), modifiers: UInt32(optionKey | shiftKey))
+    /// ⌥ ⇧ . and ⌥ ⇧ , as YouTube's ⇧ > and ⇧ <. Held only while reading, as ⌥ ⇧ . otherwise types "˘".
+    public static let faster = KeyCombo(key: UInt32(kVK_ANSI_Period), modifiers: UInt32(optionKey | shiftKey))
+    public static let slower = KeyCombo(key: UInt32(kVK_ANSI_Comma), modifiers: UInt32(optionKey | shiftKey))
 
     /// As macOS menus show it, such as "⌥ ⇧ ⎋".
     public var display: String {

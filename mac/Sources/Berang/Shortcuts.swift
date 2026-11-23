@@ -2,15 +2,17 @@ import AppKit
 import Carbon.HIToolbox
 import Keys
 
-/// Berang's two global shortcuts.
+/// Berang's global shortcuts.
 enum ShortcutAction: String, CaseIterable, Identifiable {
-    case page, area
+    case page, area, faster, slower
     var id: Self { self }
 
     var title: String {
         switch self {
         case .page: "Read this page"
         case .area: "Read a screen area"
+        case .faster: "Read faster"
+        case .slower: "Read slower"
         }
     }
 
@@ -18,8 +20,14 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
         switch self {
         case .page: .readPage
         case .area: .readArea
+        case .faster: .faster
+        case .slower: .slower
         }
     }
+
+    /// Whether Berang holds the shortcut only while the player shows, so the rest of the time its keys reach the
+    /// app in front.
+    var whileReading: Bool { self == .faster || self == .slower }
 }
 
 /// The shortcuts, saved and registered, and changing them, as Model/Shortcuts.tla checks:
@@ -27,7 +35,9 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
 ///   whether the change succeeds or fails.
 /// - Only a registered combination is saved, so the next launch registers the same ones.
 /// - A combination another app took while Berang was closed shows as not working, whatever refusal is also shown.
-/// - While recording, pressing a combination Berang holds records it instead of reading.
+/// - The speed shortcuts are held only while the player shows. One recorded while it doesn't is registered, to learn
+///   whether it can be, and let go at once.
+/// - While recording, pressing a combination Berang holds records it instead of reading or changing the speed.
 /// - macOS lets several apps register one combination and sends its presses to the latest, so registering would
 ///   take a combination from another app without failing. While recording, Berang watches the keyboard instead: a
 ///   press seen there that never reaches Berang went to macOS or another app, and is refused.
@@ -44,6 +54,15 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
     @ObservationIgnored private var tapSource: CFRunLoopSource?
     /// The last combination that reached Berang while recording.
     @ObservationIgnored private var received: (combo: KeyCombo, at: ContinuousClock.Instant)?
+    /// Whether the player shows, which holds the speed shortcuts.
+    var reading = false {
+        didSet {
+            guard reading != oldValue else { return }
+            for action in ShortcutAction.allCases where action.whileReading {
+                if reading { register(action) } else { hotkeys[action] = nil }
+            }
+        }
+    }
 
     init(actions: [ShortcutAction: () -> Void]) {
         self.actions = actions
@@ -54,14 +73,20 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
             combos[action] = saved ?? action.standard
         }
         self.combos = combos
-        for action in ShortcutAction.allCases {
-            let combo = combos[action]!
-            if let hotkey = Hotkey(combo, pressed: { [weak self] in self?.pressed(action) }) {
-                hotkeys[action] = hotkey
-                working.insert(action)
-            } else {
-                notes[action] = "Another app took \(combo.display). Pick another."
-            }
+        working = Set(ShortcutAction.allCases)
+        for action in ShortcutAction.allCases where !action.whileReading { register(action) }
+    }
+
+    /// Registers the saved combination, even over another app, as at launch or when reading starts.
+    private func register(_ action: ShortcutAction) {
+        let combo = combos[action]!
+        if let hotkey = Hotkey(combo, pressed: { [weak self] in self?.pressed(action) }) {
+            hotkeys[action] = hotkey
+            working.insert(action)
+        } else {
+            hotkeys[action] = nil
+            working.remove(action)
+            notes[action] = "Another app took \(combo.display). Pick another."
         }
     }
 
@@ -149,7 +174,9 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
             notes[action] = Refusal.anotherApp.message(combo)
             return
         }
-        hotkeys[action] = hotkey  // the old hot key, now replaced, lets go of its combination
+        // The old hot key, now replaced, lets go of its combination. A speed shortcut lets go of the new one too
+        // while the player doesn't show.
+        hotkeys[action] = action.whileReading && !reading ? nil : hotkey
         combos[action] = combo
         UserDefaults.standard.set(try? JSONEncoder().encode(combo), forKey: "shortcut.\(action.rawValue)")
         working.insert(action)

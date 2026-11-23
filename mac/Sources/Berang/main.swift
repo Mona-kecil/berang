@@ -2,8 +2,10 @@ import AppKit
 
 let app = NSApplication.shared
 let player = Player()
-let panel = PlayerPanel(player: player)
-let shortcuts = Shortcuts(actions: [.page: { player.playPause() }, .area: { player.readScreenArea() }])
+let shortcuts = Shortcuts(actions: [.page: { player.playPause() }, .area: { player.readScreenArea() },
+                                    .faster: { player.nudge(0.1) }, .slower: { player.nudge(-0.1) }])
+player.showing = { shortcuts.reading = $0 }
+let panel = PlayerPanel(player: player, shortcuts: shortcuts)
 /// Files opened with Berang, from Finder's Open With or `open -a Berang`, are read.
 final class Opener: NSObject, NSApplicationDelegate {
     func application(_ application: NSApplication, open urls: [URL]) {
