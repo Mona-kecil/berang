@@ -90,7 +90,30 @@ enum Engine: String, CaseIterable, Sendable {
     }
 }
 
+/// What is known of a voice before hearing it, from its source's notes: who speaks, the accent it is grouped under
+/// (or "Characters"), and how it sounds. Written by voice-profiles.py into the app's Previews/voices.json.
+struct VoiceProfile: Decodable {
+    enum Gender: String, Decodable { case female, male }
+    let gender: Gender?
+    let group: String?
+    let style: String?
+
+    /// Such as "Female · Playful".
+    var summary: String {
+        [gender.map { $0.rawValue.capitalized }, style].compactMap(\.self).joined(separator: " · ")
+    }
+
+    /// Every engine's profiles, by engine, then voice.
+    static let all: [String: [String: VoiceProfile]] = {
+        guard let url = Bundle.main.resourceURL?.appending(path: "Previews/voices.json"),
+              let data = try? Data(contentsOf: url) else { return [:] }
+        return (try? JSONDecoder().decode([String: [String: VoiceProfile]].self, from: data)) ?? [:]
+    }()
+}
+
 extension Engine {
+    func profile(_ voice: String) -> VoiceProfile? { VoiceProfile.all[rawValue]?[voice] }
+
     /// "Default" for a model's default voice; otherwise the voice's name, capitalized as a name.
     static func title(_ name: String) -> String {
         name == "default" ? "Default" : name.prefix(1).uppercased() + name.dropFirst()
