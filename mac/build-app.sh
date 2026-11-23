@@ -32,6 +32,9 @@ mkdir -p "$app/Contents/Frameworks"
 ditto .xcbuild/Build/Products/Release/Sparkle.framework "$sparkle"
 rm -rf "$sparkle/XPCServices" "$sparkle/Versions/B/XPCServices"
 install_name_tool -add_rpath @executable_path/../Frameworks "$app/Contents/MacOS/Berang"
+# The app icon, the menu bar icon, and the mascot's poses.
+cp -R App/Brand "$app/Contents/Resources/"
+cp App/Brand/AppIcon.icns "$app/Contents/Resources/"
 # Each voice's recorded preview, made by `berang-say previews App/Previews <Pocket's model folder>`.
 cp -R App/Previews "$app/Contents/Resources/"
 

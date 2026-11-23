@@ -14,6 +14,7 @@ let package = Package(
     targets: [
         .target(name: "TextGrab"),
         .target(name: "Speakable"),
+        .target(name: "Keys"),
         .target(name: "Kitten", dependencies: [
             .product(name: "MLX", package: "mlx-swift"), .product(name: "MLXNN", package: "mlx-swift"),
             .product(name: "MLXFast", package: "mlx-swift"), .product(name: "MLXAudioCore", package: "mlx-audio-swift"),
@@ -25,11 +26,12 @@ let package = Package(
             .product(name: "MLXAudioTTS", package: "mlx-audio-swift"), .product(name: "HuggingFace", package: "swift-huggingface"),
         ]),
         .executableTarget(name: "Berang", dependencies: [
-            "TextGrab", "Speakable", "Kitten", .product(name: "ptts", package: "xn-ptts"),
+            "TextGrab", "Speakable", "Kitten", "Keys", .product(name: "ptts", package: "xn-ptts"),
             .product(name: "MLXAudioTTS", package: "mlx-audio-swift"), .product(name: "HuggingFace", package: "swift-huggingface"),
             .product(name: "Sparkle", package: "Sparkle"),
         ]),
         .testTarget(name: "TextGrabTests", dependencies: ["TextGrab"], exclude: ["Pages"]),
         .testTarget(name: "SpeakableTests", dependencies: ["Speakable"]),
+        .testTarget(name: "KeysTests", dependencies: ["Keys"]),
     ]
 )
