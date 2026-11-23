@@ -1,12 +1,12 @@
 import AppKit
 import SwiftUI
 
-/// Every voice of every engine, to hear and choose. Selecting one plays it, so the arrow keys walk through them:
-/// a voice of a downloaded engine becomes the voice and speaks a sample; any other plays its recorded preview, and
-/// its engine's Download button then reads with it.
+/// Every voice of every engine, to hear and choose. Selecting one plays its recorded clip, so the arrow keys walk
+/// through them. A voice of a downloaded engine also becomes the voice, and Read reads your own text with it; the
+/// Download button of any other voice's engine switches to that voice once downloaded.
 final class VoicesWindow: NSWindow {
     init(player: Player) {
-        super.init(contentRect: NSRect(x: 0, y: 0, width: 380, height: 560), styleMask: [.titled, .closable, .resizable],
+        super.init(contentRect: NSRect(x: 0, y: 0, width: 380, height: 680), styleMask: [.titled, .closable, .resizable],
                    backing: .buffered, defer: false)
         title = "Voices"
         isReleasedWhenClosed = false
@@ -32,6 +32,8 @@ struct VoicesView: View {
     @State private var tab: Engine
     /// A voice of an engine not yet downloaded, last previewed.
     @State private var considered: (engine: Engine, name: String)?
+    /// Your own words to hear the chosen voice read.
+    @State private var words = "Dr. Rivera's flight leaves at 7:45 on March 3rd, from gate B12. Is it really $1,299 for two nights? She laughed and said, \"Book it anyway.\""
 
     var body: some View {
         VStack(spacing: 0) {
@@ -51,6 +53,16 @@ struct VoicesView: View {
                     }
                 }
             }
+            Divider()
+            VStack(alignment: .trailing, spacing: 8) {
+                TextEditor(text: $words)
+                    .font(.body)
+                    .frame(height: 72)
+                    .accessibilityLabel("Text to read")
+                Button("Read with \(Engine.title(player.voice))") { player.readText(words) }
+                    .disabled(!player.engine.isInstalled || words.allSatisfy(\.isWhitespace))
+            }
+            .padding(12)
             if installed.isEmpty {
                 Divider()
                 download(tab).padding(12)

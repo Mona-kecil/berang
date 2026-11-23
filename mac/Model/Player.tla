@@ -1,6 +1,7 @@
 ---- MODULE Player ----
 \* Berang's player, Sources/Berang/Player.swift. Each request (press play, read an area, open a file, skip)
-\* runs as a task that steps through stages. A request replaces the work before it, replaced work changes nothing,
+\* runs as a task that steps through stages. Reading text typed into the Voices window is a request like opening a
+\* file, so YouOpenFile covers it. A request replaces the work before it, replaced work changes nothing,
 \* and a request made while the voice downloads or loads waits for it.
 \*
 \* There are two engines. Choosing a voice plays its recorded clip at once, and loads its engine behind the clip if
