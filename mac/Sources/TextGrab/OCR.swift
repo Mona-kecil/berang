@@ -89,6 +89,16 @@ public func readFile(_ url: URL) -> [Block]? {
     return nil
 }
 
+/// Text typed or pasted to listen to, one paragraph per line. It keeps no reading position.
+public func textPage(_ text: String) -> Page {
+    let blocks = text.components(separatedBy: .newlines).compactMap { line in
+        let t = line.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        return t.isEmpty ? nil : Block(kind: .text, text: t, runs: [])
+    }
+    return Page(app: "", window: "", blocks: blocks, viewport: AXUIElementCreateSystemWide(), clip: nil, start: 0,
+                startPoint: .screen, address: nil)
+}
+
 /// A file read whole, to listen to without a window: reading positions are kept by its address.
 public func readFilePage(_ url: URL) -> Page? {
     let book = url.pathExtension.lowercased() == "epub" ? readEPUB(url) : readFile(url).map { ($0, 0) }

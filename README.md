@@ -33,7 +33,7 @@ To finish a step later, choose Set Up Berang from the menu bar.
 | Read part of the screen | Press ⌥⇧⎋ (Option-Shift-Escape) and drag over it |
 | Listen to a whole book or file | Choose Open File from the menu bar, or open the file with Berang in Finder |
 | Skip, change speed, or stop | Use the floating player |
-| Hear and choose a voice | Choose Voices from the menu bar, and select a voice to hear it |
+| Hear and choose a voice | Choose Voices from the menu bar, and select a voice to hear it. To hear it read your own words, type or paste them below the list and click Read |
 | Show or hide the player, or quit | Click the waveform icon in the menu bar |
 | Update Berang | Choose Check for Updates from the menu bar |
 

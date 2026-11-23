@@ -20,3 +20,9 @@ import Testing
     #expect(blocks.map(\.kind) == [.heading, .text, .text])
     #expect(blocks.last?.text == "Budget: about forty percent of last quarter goes to testing devices, and the rest to the voice work.")
 }
+
+@Test func typedTextReadsEachLineAsAParagraph() {
+    let page = textPage("Dr. Rivera's flight leaves at 7:45.\n\n  Gate   B12,  she said.\n")
+    #expect(page.blocks.map(\.text) == ["Dr. Rivera's flight leaves at 7:45.", "Gate B12, she said."])
+    #expect(page.address == nil)
+}

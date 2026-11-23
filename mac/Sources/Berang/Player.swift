@@ -142,7 +142,10 @@ import TextGrab
     /// Reads a PDF, EPUB, image, or text file, from where it was last left.
     func readFile(_ url: URL) { open(.file(url)) }
 
-    private enum Source { case window, screenArea, file(URL) }
+    /// Reads text typed or pasted into the Voices window, to hear a voice on your own words.
+    func readText(_ text: String) { open(.text(text)) }
+
+    private enum Source { case window, screenArea, file(URL), text(String) }
 
     /// Starts a request, replacing whatever was playing or waiting. While the voice downloads or loads, the
     /// request waits for it instead.
@@ -162,7 +165,7 @@ import TextGrab
             guard AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
             else { throw GrabError.notTrusted }
         case .screenArea: try checkScreenAccess()
-        case .file: break
+        case .file, .text: break
         }
     }
 
@@ -211,6 +214,10 @@ import TextGrab
                     else { throw PhononError(description: "Berang can't read \(url.lastPathComponent).") }
                     page = file
                     pageKey = file.address
+                case .text(let text):
+                    page = textPage(text)
+                    guard !page.blocks.isEmpty else { throw PhononError(description: "Type something to read.") }
+                    pageKey = nil
                 }
                 self.page = page
                 index = page.start
