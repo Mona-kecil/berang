@@ -42,6 +42,8 @@ Berang lives in the menu bar, as an otter peeking over the waterline. Its menu h
 
 Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before, Berang continues where you stopped; Start over goes back to the top. Berang remembers the speed you choose, from 0.5× to 3×. Under the speed, the player shows about how many words a minute you hear, measured from what the voice has read. Click the speed there to go back to 1×.
 
+While you read, the player shows one short tip at a time: reading from somewhere else, changing the speed, and moving the player. A tip goes away once you use what it shows or dismiss it, and after three readings anyway.
+
 ### Shortcuts
 
 Berang refuses a new shortcut, and says why, when:

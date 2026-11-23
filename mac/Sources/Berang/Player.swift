@@ -19,6 +19,8 @@ import TextGrab
     }
     /// Told whether the player shows, as the state leaves or returns to idle.
     @ObservationIgnored var showing: ((Bool) -> Void)?
+    /// Told as a reading begins, and whether it reads an app's page, where text can be selected.
+    @ObservationIgnored var began: ((_ app: Bool) -> Void)?
     static let speeds: ClosedRange<Float> = 0.5...3
     /// Kept across launches. Set within `speeds`, in steps of 0.1, through `step`.
     var speed: Float = Player.savedSpeed {
@@ -114,14 +116,15 @@ import TextGrab
     }
 
     /// The read shortcut. While reading, text newly selected in the page being read moves reading there; otherwise
-    /// it pauses or resumes, like the player's button (Model/Jump.tla).
-    func readOrPause() {
+    /// it pauses or resumes, like the player's button (Model/Jump.tla). Returns whether reading moved.
+    @discardableResult func readOrPause() -> Bool {
         if state == .playing || state == .paused, let page, let selection = selected(in: page), selection != seenSelection {
             seenSelection = selection
             move(to: selection.block)
-        } else {
-            playPause()
+            return true
         }
+        playPause()
+        return false
     }
 
     func skip(_ delta: Int) {
@@ -256,6 +259,7 @@ import TextGrab
                 }
                 self.page = page
                 seenSelection = selected(in: page)
+                began?({ if case .window = source { true } else { false } }())
                 index = page.start
                 top = if case .file = source { page.start } else { 0 }
                 // A file, or an unscrolled page with nothing selected, continues where the last reading stopped.

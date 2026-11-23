@@ -11,13 +11,15 @@ import TextGrab
 ///   while your spot's display is gone.
 final class PlayerPanel: NSPanel {
     private let player: Player
+    private let tips: Tips
     /// Scrolling not yet turned into a speed step.
     private var scrolled: CGFloat = 0
     /// Where the player was when you pressed on it, to tell a drag from a click.
     private var pressedAt: NSPoint?
 
-    init(player: Player, shortcuts: Shortcuts) {
+    init(player: Player, shortcuts: Shortcuts, tips: Tips) {
         self.player = player
+        self.tips = tips
         super.init(contentRect: .zero, styleMask: [.nonactivatingPanel, .borderless], backing: .buffered, defer: false)
         isMovableByWindowBackground = true
         isOpaque = false
@@ -28,7 +30,7 @@ final class PlayerPanel: NSPanel {
         hidesOnDeactivate = false
         becomesKeyOnlyIfNeeded = true
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        contentView = NSHostingView(rootView: PlayerView(player: player, shortcuts: shortcuts))
+        contentView = NSHostingView(rootView: PlayerView(player: player, shortcuts: shortcuts, tips: tips))
         setContentSize(contentView!.fittingSize)
         place()
         NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil,
@@ -43,7 +45,10 @@ final class PlayerPanel: NSPanel {
         if showing, !isVisible {
             place()
             orderFrontRegardless()
-        } else if !showing, isVisible { orderOut(nil) }
+        } else if !showing, isVisible {
+            orderOut(nil)
+            tips.readingStopped()
+        }
         withObservationTracking { _ = player.state } onChange: { [weak self] in
             Task { @MainActor in self?.follow(player) }
         }
@@ -67,6 +72,7 @@ final class PlayerPanel: NSPanel {
         case .leftMouseUp:
             if let pressedAt, pressedAt != frame.origin, let screen {
                 PlayerSpot.saved = PlayerSpot(frame, in: screen)
+                tips.learn(.move)
             }
             pressedAt = nil
         default: break
@@ -92,6 +98,7 @@ final class PlayerPanel: NSPanel {
         while abs(scrolled) >= 1 {
             let up: CGFloat = scrolled > 0 ? 1 : -1
             player.nudge(Float(up) / 10)
+            tips.learn(.speed)
             scrolled -= up
         }
         if event.phase == .ended || event.phase == .cancelled { scrolled = 0 }
@@ -101,6 +108,7 @@ final class PlayerPanel: NSPanel {
 struct PlayerView: View {
     let player: Player
     let shortcuts: Shortcuts
+    let tips: Tips
     @State private var showsSpeed = false
 
     var body: some View {
@@ -139,6 +147,7 @@ struct PlayerView: View {
             if case .failed(let message) = player.state {
                 failure(message)
             }
+            if let tip = tips.showing { tipRow(tip) }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -149,6 +158,20 @@ struct PlayerView: View {
         // The panel never takes focus from the app being read, so its controls show no focus ring.
         .focusEffectDisabled()
         .onChange(of: player.state == .idle) { _, idle in if idle { showsSpeed = false } }
+    }
+
+    private func tipRow(_ tip: Tip) -> some View {
+        HStack(alignment: .top, spacing: 6) {
+            Text(tip.text(shortcuts)).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft)
+                .frame(width: 196, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+            Button { tips.learn(tip) } label: {
+                Image(systemName: "xmark").font(.system(size: 8, weight: .heavy)).foregroundStyle(Otter.soft)
+                    .frame(width: 16, height: 16)
+            }
+            .buttonStyle(PlainButtonStyle(radius: 5))
+            .accessibilityLabel("Dismiss tip")
+        }
     }
 
     private func small(_ symbol: String) -> some View {

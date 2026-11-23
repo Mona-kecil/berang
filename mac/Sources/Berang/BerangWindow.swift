@@ -196,6 +196,8 @@ struct HomePage: View {
                 shortcutRow(.page, title: "The page you're on", detail: "In any app, press")
                 Divider().overlay(Otter.edge)
                 shortcutRow(.area, title: "Part of the screen", detail: "Press, then drag over it")
+                Divider().overlay(Otter.edge)
+                shortcutRow(.page, title: "Somewhere else on the page", detail: "While reading, select it, then press")
             }
             .card(padding: 12)
         }
