@@ -34,7 +34,7 @@ jobs:
               || { echo "No profile for $engine/$voice in App/Previews/voices.json"; exit 1; }
           done
       # Builds every target, the app included, then runs the tests. The release workflow builds the signed app
-      # on pull requests that change how it is built.
+      # alongside, on pull requests that change it.
       - run: swift test
 
   cleanup:
