@@ -31,6 +31,7 @@ Berang lives in the menu bar, as an otter peeking over the waterline. Its menu h
 | To | Do this |
 |---|---|
 | Start or pause reading | Press ⌥⎋ in any app |
+| Read from somewhere else on the page | While Berang reads, select text there and press ⌥⎋ |
 | Read part of the screen | Press ⌥⇧⎋ (Option-Shift-Escape) and drag over it |
 | Listen to a whole book or file | Drop it on Berang's window, or open it with Berang in Finder |
 | Skip or stop | Use the floating player, which shows while Berang reads. Drag it anywhere; it stays there |
@@ -136,6 +137,16 @@ With `Fixed = FALSE`, it checks choosing voices as it worked before. TLC then fi
 With `SafeOrder = FALSE`, the change lets go of the old combination before registering the new one, and TLC finds a failed change losing the shortcut. With `Watch = FALSE`, Berang doesn't watch the keyboard while recording, and TLC finds it taking another app's combination. With `Release = FALSE`, a speed shortcut recorded while Berang doesn't read stays registered, and TLC finds Berang holding it with the player closed.
 
 The check runs with read the page, read an area, and one speed shortcut, as the two speed shortcuts behave alike; it covers 5.6 million states in about a minute. To also check both speed shortcuts together, set `Always = {"page"}` and `WhileReading = {"faster", "slower"}` in `Shortcuts.cfg`.
+
+### Jump model
+
+`mac/Model/Jump.tla` models reading from a selection while Berang reads: you select text and press ⌥⎋, while you also switch windows, follow links, and use the player. TLC checks that:
+
+- reading moves only to text selected since reading started or last moved, so a press meant to pause pauses;
+- reading moves only within the page being read, never to a selection in another window, tab, or a page a link opened;
+- only the shortcut moves reading; a click or a selection alone never does.
+
+With `Remember = FALSE`, Berang forgets the selection it moved to, and TLC finds a press meant to pause moving reading back to it. With `AskReadPage = FALSE`, Berang asks the window in front, and TLC finds it moving reading to a selection made in another page.
 
 ### Placement model
 
