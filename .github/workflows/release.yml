@@ -1,7 +1,8 @@
 name: Release
 
-# A tag like v0.2.0 publishes a signed Berang.zip to that tag's GitHub Release. A pull request that changes how
-# releases are built builds the same zip and keeps it as a workflow artifact. On main, a change to how releases are
+# A tag like v0.2.0 publishes a signed Berang.zip to that tag's GitHub Release. A pull request that changes the app
+# or how it is released builds the same zip and keeps it as a workflow artifact, which checks what the tests don't:
+# the Metal shaders, the optimized build, the app's packaging, and its signature. On main, a change to how releases are
 # built or to the dependencies rebuilds the cache that tags and pull requests build from.
 on:
   push:
@@ -10,7 +11,7 @@ on:
     # GitHub skips path filters for tags, so every tag still releases.
     paths: [".github/workflows/release.yml", "mac/build-app.sh", "mac/Package.resolved"]
   pull_request:
-    paths: [".github/workflows/release.yml", "mac/build-app.sh", "install.sh"]
+    paths: [".github/workflows/release.yml", "mac/**", "install.sh"]
 
 permissions:
   contents: write
