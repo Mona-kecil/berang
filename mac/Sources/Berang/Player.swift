@@ -61,6 +61,8 @@ import TextGrab
     @ObservationIgnored private var generation = 0
     /// What to read once the voice finishes downloading or loading: the latest request made meanwhile.
     @ObservationIgnored private var pending: Source?
+    /// The request whose voice is loading, which a voice chosen meanwhile keeps waiting.
+    @ObservationIgnored private var active: Source?
     /// The app to read: the last one active other than this one and System Settings. The panel never
     /// takes focus, so this is the app the user is looking at, even after granting Accessibility access.
     @ObservationIgnored private var target = NSWorkspace.shared.frontmostApplication
@@ -171,10 +173,11 @@ import TextGrab
                 try allow(requested)
                 var source = requested
                 if needsLoad {
+                    active = requested
+                    defer { if g == generation { active = nil } }
                     try await installVoice()
                     state = .loading
-                    tts = try await loadVoice()
-                    guard g == generation else { return }
+                    guard try await loadVoice(g) else { return }
                     if let latest = pending {
                         pending = nil
                         source = latest
@@ -218,6 +221,9 @@ import TextGrab
                     index = saved
                     resumedAt = saved
                 }
+                // A voice chosen since the engine loaded, from its recorded clip, applies from the first sentence.
+                try await tts?.setVoice(voice)
+                guard g == generation else { return }
                 await read(g)
             } catch {
                 guard g == generation, !(error is CancellationError) else { return }
@@ -263,7 +269,7 @@ import TextGrab
     }
 
     /// Chooses the voice to read with. While reading, the next sentence uses a voice of the same engine; a voice
-    /// of another engine, which must load first, stops the reading. Otherwise a sample plays in it.
+    /// of another engine stops the reading. Otherwise the voice's recorded clip plays (Model/Player.tla).
     func choose(_ engine: Engine, _ name: String) {
         let switching = engine != self.engine
         self.engine = engine
@@ -272,25 +278,34 @@ import TextGrab
         UserDefaults.standard.set(name, forKey: "voice")
         switch state {
         case .playing, .paused:
-            if switching { sample() } else if let tts { Task { try? await tts.setVoice(name) } }
-        case .downloading, .loading:
-            break  // applied once the voice loads
-        case .idle, .failed:
-            sample()
+            if switching { audition() } else if let tts { Task { try? await tts.setVoice(name) } }
+        case .downloading:
+            preview(engine, name)  // beside the download, which then loads the chosen engine
+        case .loading, .idle, .failed:
+            audition()
         }
     }
 
-    /// Plays a sentence in the chosen voice. Any request replaces it.
-    private func sample() {
+    /// Plays the chosen voice's recorded clip at once and, if its engine isn't the loaded one, loads it behind the
+    /// clip. A request waiting on a load keeps waiting, for this one. A voice with no clip speaks a sample instead,
+    /// once its engine loads. Any other request replaces this.
+    private func audition() {
         guard engine.isInstalled else { return }
+        let waiting = state == .loading ? pending ?? active : nil
         stop()
+        pending = waiting
+        if let url = engine.preview(voice), let player = try? AVAudioPlayer(contentsOf: url) {
+            clip = player
+            player.play()
+        }
+        let speaks = clip == nil
+        guard needsLoad || speaks else { return }
         let g = generation
         task = Task {
             do {
                 if needsLoad {
                     state = .loading
-                    tts = try await loadVoice()
-                    guard g == generation else { return }
+                    guard try await loadVoice(g) else { return }
                     state = .idle
                     if let latest = pending {
                         pending = nil
@@ -298,9 +313,7 @@ import TextGrab
                         return
                     }
                 }
-                guard let tts else { return }
-                endPreview()
-                try await tts.setVoice(voice)
+                guard speaks, let tts else { return }
                 for chunk in prepare(voiceSampleText) {
                     for try await part in tts.stream(chunk.text) {
                         try Task.checkCancellation()
@@ -309,22 +322,28 @@ import TextGrab
                 }
             } catch {
                 guard g == generation, !(error is CancellationError) else { return }
+                pending = nil
                 state = .failed("\(error)")
             }
         }
     }
 
-    /// Loads the chosen engine, first letting go of another one, and conditions it on the chosen voice, or on the
-    /// engine's default when that voice is gone.
-    private func loadVoice() async throws -> any Speech {
+    /// Loads the chosen engine for request `g`, first letting go of the loaded one, and conditions it on the chosen
+    /// voice, or on the engine's default when that voice is gone. Returns false, keeping nothing, if a later request
+    /// replaced `g` meanwhile, such as a voice of another engine.
+    private func loadVoice(_ g: Int) async throws -> Bool {
+        let engine = self.engine
         tts = nil
         ttsEngine = nil
-        let tts = try await engine.load()
+        let speech = try await engine.load()
+        guard g == generation else { return false }
         let voices = engine.voices
         if !voices.contains(voice) { voice = voices.contains(engine.defaultVoice) ? engine.defaultVoice : voices.first ?? voice }
-        try await tts.setVoice(voice)
+        try await speech.setVoice(voice)
+        guard g == generation else { return false }
+        tts = speech
         ttsEngine = engine
-        return tts
+        return true
     }
 
     private func installVoice(_ engine: Engine? = nil) async throws {
