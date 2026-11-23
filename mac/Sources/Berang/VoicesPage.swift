@@ -150,7 +150,7 @@ struct VoicesPage: View {
                 .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(on ? Otter.edge : .clear).offset(y: 3)))
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PlainButtonStyle(radius: 12))
         .accessibilityLabel("\(voice.title), \(voice.profile?.summary ?? voice.engine.title)")
         .accessibilityAddTraits(on ? .isSelected : [])
     }
@@ -222,6 +222,7 @@ struct ChipStyle: ButtonStyle {
             .background(Capsule().fill(on ? Otter.teal : Otter.card)
                 .background(Capsule().fill(on ? Otter.teal.opacity(0.6) : Otter.edge).offset(y: 2)))
             .fixedSize()
+            .focusRing(12)
     }
 }
 
@@ -233,7 +234,7 @@ struct PageHeader: View {
         HStack(spacing: 6) {
             if let back {
                 Button(action: back) { Image(systemName: "chevron.left").font(.system(size: 15, weight: .heavy)) }
-                    .buttonStyle(.plain).foregroundStyle(Otter.ink).accessibilityLabel("Back")
+                    .buttonStyle(PlainButtonStyle(radius: 6)).foregroundStyle(Otter.ink).accessibilityLabel("Back")
                     .keyboardShortcut("[", modifiers: .command)
             }
             Text(title).font(Otter.font(21, .heavy)).foregroundStyle(Otter.ink)

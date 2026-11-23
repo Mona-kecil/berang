@@ -6,16 +6,12 @@ import TextGrab
 /// gets a voice ready, or has something to say, and hides when it stops.
 final class PlayerPanel: NSPanel {
     init(player: Player) {
-        super.init(contentRect: .zero, styleMask: [.nonactivatingPanel, .titled, .fullSizeContentView],
-                   backing: .buffered, defer: false)
-        titlebarAppearsTransparent = true
-        titleVisibility = .hidden
-        for button in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] {
-            standardWindowButton(button)?.isHidden = true
-        }
+        super.init(contentRect: .zero, styleMask: [.nonactivatingPanel, .borderless], backing: .buffered, defer: false)
         isMovableByWindowBackground = true
         isOpaque = false
         backgroundColor = .clear
+        // The pill draws its own soft shadow; a window shadow would trace the transparent margin around it.
+        hasShadow = false
         level = .floating
         hidesOnDeactivate = false
         becomesKeyOnlyIfNeeded = true
@@ -53,7 +49,6 @@ struct PlayerView: View {
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 10) {
-                Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 30, height: 30).accessibilityHidden(true)
                 Button { player.skip(-1) } label: { small("backward.fill") }
                     .disabled(!reading)
                     .accessibilityLabel("Previous paragraph")
@@ -78,10 +73,10 @@ struct PlayerView: View {
                 Button(action: player.stop) { small("xmark") }
                     .accessibilityLabel("Stop")
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PlainButtonStyle(radius: 10))
             if player.resumedAt != nil {
                 Button("Start over", systemImage: "arrow.counterclockwise", action: player.startOver)
-                    .buttonStyle(.plain)
+                    .buttonStyle(PlainButtonStyle(radius: 6))
                     .font(Otter.font(11.5, .bold))
                     .foregroundStyle(Otter.teal)
             }
@@ -95,6 +90,8 @@ struct PlayerView: View {
             .shadow(color: Otter.ink.opacity(0.22), radius: 12, y: 6))
         .padding(14)
         .fontDesign(.rounded)
+        // The panel never takes focus from the app being read, so its controls show no focus ring.
+        .focusEffectDisabled()
     }
 
     private func small(_ symbol: String) -> some View {

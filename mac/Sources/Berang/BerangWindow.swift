@@ -27,6 +27,7 @@ final class BerangWindow: NSWindow {
         model.page = page
         NSApp.activate()
         makeKeyAndOrderFront(nil)
+        makeFirstResponder(nil)  // nothing looks chosen until you press Tab
     }
 
     override func close() {
@@ -130,7 +131,7 @@ struct HomePage: View {
                     if shortcuts.needsAttention { Circle().fill(Otter.orange).frame(width: 9, height: 9).offset(x: 3, y: -3) }
                 }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PlainButtonStyle(radius: 10))
         .accessibilityLabel(shortcuts.needsAttention ? "Settings, a shortcut needs attention" : "Settings")
         .keyboardShortcut(",", modifiers: .command)
     }
@@ -219,7 +220,7 @@ struct HomePage: View {
             Text("Drop a PDF or EPUB here").font(Otter.font(13.5, .bold)).foregroundStyle(Otter.ink)
             HStack(spacing: 3) {
                 Text("or").foregroundStyle(Otter.soft)
-                Button("choose a file", action: chooseFile).buttonStyle(.plain).foregroundStyle(Otter.teal)
+                Button("choose a file", action: chooseFile).buttonStyle(PlainButtonStyle(radius: 4)).foregroundStyle(Otter.teal)
             }
             .font(Otter.font(12, .bold))
         }
@@ -256,7 +257,7 @@ struct HomePage: View {
                 .card(padding: 11)
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PlainButtonStyle(radius: 16))
             .accessibilityLabel("Voice: \(Engine.title(player.voice)). Change")
         }
     }
@@ -383,7 +384,7 @@ struct ShortcutRecorder: View {
                 KeyCap(text: recording ? "…" : shortcuts.combos[action]!.display,
                        tint: recording ? Otter.orange : working ? nil : Otter.alert)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PlainButtonStyle(radius: 10))
             .accessibilityLabel("\(action.title): \(shortcuts.combos[action]!.display). Change")
         }
         .padding(.vertical, 8)
