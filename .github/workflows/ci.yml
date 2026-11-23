@@ -21,6 +21,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: swift --version
+      - name: Check every voice preview has a profile
+        run: |
+          for clip in App/Previews/*/*.m4a; do
+            engine=$(basename "$(dirname "$clip")"); voice=$(basename "$clip" .m4a)
+            jq -e --arg e "$engine" --arg v "$voice" '.[$e][$v]' App/Previews/voices.json > /dev/null \
+              || { echo "No profile for $engine/$voice in App/Previews/voices.json"; exit 1; }
+          done
       # MLX compiles Metal shaders, which needs Xcode's Metal toolchain.
       - run: xcodebuild -downloadComponent MetalToolchain
       # The app, with MLX, builds below through Xcode; this builds the text grabber alone.

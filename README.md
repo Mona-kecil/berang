@@ -95,6 +95,8 @@ open mac/build/Berang.app
 
 `mac/App/Previews` holds a few seconds of each voice, so you can hear it before downloading its engine. `berang-say previews mac/App/Previews <Pocket's model folder> <Kitten's folder>` makes them again. The Phonon clips come from Phonon 31m by Gradium (Apache-2.0), the Kitten clips from Kitten TTS 2 nano by KittenML (Apache-2.0), and the Pocket clips from Pocket TTS by Kyutai (CC-BY-4.0).
 
+`mac/App/Previews/voices.json` gives each voice's gender, accent and style, which the Voices window groups and labels them by. `python3 voice-profiles.py <Phonon's voices.jsonl> <Kitten's config.json>`, run in `mac`, writes it from what each source publishes: [Phonon's voice list](https://huggingface.co/gradium/phonon-voices), Kitten's config, and for Pocket the speaker notes of the datasets its voices were recorded for ([VCTK](https://datashare.ed.ac.uk/handle/10283/3443), [EARS](https://github.com/facebookresearch/ears_dataset)). Four Pocket voices have no published accent.
+
 ### Kitten on MLX
 
 Kitten TTS 2 nano ships for ONNX Runtime and PyTorch. `mac/Sources/Kitten` runs it on MLX instead: it is mlx-audio-swift's port of Kitten 0.8 (MIT, see `mac/Sources/Kitten/LICENSE`), at nano's sizes, with the decoder's learned norm scales, uniform starting phases as in Kitten's PyTorch code, and one copy of the decoder's frames instead of one per frame. `berang-say kitten <folder> <reference>` compares it with kittenml's PyTorch output for the same tokens with noise off: on "The team met to plan the next release." the durations match to 0.00001 frames, the pitch to 0.2 Hz except at the last frames, and the spectrograms correlate at 0.993. It speaks 3.2 s of audio in 0.11 s.

@@ -6,7 +6,7 @@ import SwiftUI
 /// its engine's Download button then reads with it.
 final class VoicesWindow: NSWindow {
     init(player: Player) {
-        super.init(contentRect: NSRect(x: 0, y: 0, width: 320, height: 560), styleMask: [.titled, .closable, .resizable],
+        super.init(contentRect: NSRect(x: 0, y: 0, width: 380, height: 560), styleMask: [.titled, .closable, .resizable],
                    backing: .buffered, defer: false)
         title = "Voices"
         isReleasedWhenClosed = false
@@ -43,8 +43,12 @@ struct VoicesView: View {
             .padding(12)
             let installed = voices[tab] ?? []
             List(selection: Binding(get: { selected }, set: { select($0) })) {
-                ForEach(installed.isEmpty ? tab.previewVoices : installed, id: \.self) { name in
-                    Text(Engine.title(name)).tag("\(tab.rawValue)/\(name)")
+                ForEach(groups(installed.isEmpty ? tab.previewVoices : installed), id: \.title) { group in
+                    if let title = group.title {
+                        Section(title) { rows(group.names) }
+                    } else {
+                        Section { rows(group.names) }
+                    }
                 }
             }
             if installed.isEmpty {
@@ -62,6 +66,30 @@ struct VoicesView: View {
                     if let engine = considered?.engine, voices[engine]?.isEmpty == false { considered = nil }
                 }
             }
+        }
+    }
+
+    private static let order = ["American", "British", "Scottish", "Canadian", "Characters"]
+
+    /// The voices by accent, in their listed order: first those whose accent is unknown, under no heading.
+    private func groups(_ names: [String]) -> [(title: String?, names: [String])] {
+        let byGroup = Dictionary(grouping: names) { tab.profile($0)?.group }
+        let titles = byGroup.keys.sorted { a, b in
+            let i = a.map { Self.order.firstIndex(of: $0) ?? Self.order.count } ?? -1
+            let j = b.map { Self.order.firstIndex(of: $0) ?? Self.order.count } ?? -1
+            return i != j ? i < j : (a ?? "") < (b ?? "")
+        }
+        return titles.map { ($0, byGroup[$0] ?? []) }
+    }
+
+    private func rows(_ names: [String]) -> some View {
+        ForEach(names, id: \.self) { name in
+            HStack {
+                Text(Engine.title(name))
+                Spacer()
+                Text(tab.profile(name)?.summary ?? "").foregroundStyle(.secondary)
+            }
+            .tag("\(tab.rawValue)/\(name)")
         }
     }
 

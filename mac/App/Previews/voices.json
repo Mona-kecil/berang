@@ -1,0 +1,261 @@
+{
+ "phonon": {
+  "Zoey": {
+   "gender": "female",
+   "group": "American",
+   "style": "Playful"
+  },
+  "Juniper": {
+   "gender": "female",
+   "group": "American",
+   "style": "Cheerful"
+  },
+  "Everly": {
+   "gender": "female",
+   "group": "American",
+   "style": "Relaxed"
+  },
+  "Harper": {
+   "gender": "female",
+   "group": "American",
+   "style": "Confident"
+  },
+  "Hadley": {
+   "gender": "female",
+   "group": "American",
+   "style": "Kind"
+  },
+  "Delia": {
+   "gender": "female",
+   "group": "American",
+   "style": "Low, grounded"
+  },
+  "Easton": {
+   "gender": "male",
+   "group": "American",
+   "style": "Punchy"
+  },
+  "Micah": {
+   "gender": "male",
+   "group": "American",
+   "style": "Energetic"
+  },
+  "Trevor": {
+   "gender": "male",
+   "group": "American",
+   "style": "Upbeat"
+  },
+  "Russell": {
+   "gender": "male",
+   "group": "American",
+   "style": "Motivating"
+  },
+  "Preston": {
+   "gender": "male",
+   "group": "American",
+   "style": "Focused"
+  },
+  "Miles": {
+   "gender": "male",
+   "group": "American",
+   "style": "Resonant"
+  },
+  "Maeve": {
+   "gender": "female",
+   "group": "British",
+   "style": "Sparky"
+  },
+  "Freya": {
+   "gender": "female",
+   "group": "British",
+   "style": "Bubbly"
+  },
+  "Pippa": {
+   "gender": "female",
+   "group": "British",
+   "style": "Upbeat"
+  },
+  "Elodie-Rose": {
+   "gender": "female",
+   "group": "British",
+   "style": "Enthusiastic"
+  },
+  "Imogen": {
+   "gender": "female",
+   "group": "British",
+   "style": "Friendly"
+  },
+  "Lottie": {
+   "gender": "female",
+   "group": "British",
+   "style": "Lively"
+  },
+  "Alfie": {
+   "gender": "male",
+   "group": "British",
+   "style": "Punchy"
+  },
+  "Hugh": {
+   "gender": "male",
+   "group": "British",
+   "style": "Soft"
+  },
+  "Edwin": {
+   "gender": "male",
+   "group": "British",
+   "style": "Firm"
+  },
+  "Spencer": {
+   "gender": "male",
+   "group": "British",
+   "style": "Patient"
+  },
+  "Toby": {
+   "gender": "male",
+   "group": "British",
+   "style": "Sparky"
+  },
+  "Teddy": {
+   "gender": "male",
+   "group": "British",
+   "style": "Quick"
+  },
+  "Bryony": {
+   "gender": "female",
+   "group": "British",
+   "style": "Rich, relaxed"
+  },
+  "Captain Silas Blackwater": {
+   "group": "Characters",
+   "style": "Gravelly pirate"
+  },
+  "Morwenna of the Deep": {
+   "group": "Characters",
+   "style": "Husky, sultry"
+  },
+  "Old Mortlake": {
+   "group": "Characters",
+   "style": "Raspy gravedigger"
+  },
+  "Azgorath": {
+   "group": "Characters",
+   "style": "Deep demon"
+  },
+  "Fennick the Young Elf": {
+   "group": "Characters",
+   "style": "Young elf"
+  },
+  "The Thing Under the Stairs": {
+   "group": "Characters",
+   "style": "Growling monster"
+  },
+  "Vyrmathrax the Ancient": {
+   "group": "Characters",
+   "style": "Deep dragon"
+  },
+  "Grub the Ogre": {
+   "group": "Characters",
+   "style": "Gruff ogre"
+  },
+  "Master Aldric": {
+   "group": "Characters",
+   "style": "Old wizard"
+  },
+  "The Snow Queen": {
+   "group": "Characters",
+   "style": "Cold queen"
+  },
+  "Sir Bramwell": {
+   "group": "Characters",
+   "style": "Pompous knight"
+  },
+  "Fairy Godmother": {
+   "group": "Characters",
+   "style": "Warm grandmother"
+  },
+  "default": {}
+ },
+ "kitten": {
+  "eleanor": {
+   "gender": "female",
+   "group": "American",
+   "style": "Somber historian"
+  },
+  "martha": {
+   "gender": "female",
+   "group": "American",
+   "style": "Weathered radio journalist"
+  },
+  "serena": {
+   "gender": "female",
+   "group": "American",
+   "style": "Gentle yoga instructor"
+  },
+  "iris": {
+   "gender": "female",
+   "group": "American",
+   "style": "Hushed museum guide"
+  },
+  "grace": {
+   "gender": "female",
+   "group": "American",
+   "style": "Soothing nurse"
+  },
+  "edith": {
+   "gender": "female",
+   "group": "American",
+   "style": "Elderly grandmother soft"
+  },
+  "otis": {
+   "gender": "male",
+   "group": "American",
+   "style": "Rumbling blues musician"
+  },
+  "vincent": {
+   "gender": "male",
+   "group": "American",
+   "style": "Hushed museum guide"
+  },
+  "max": {
+   "gender": "male",
+   "group": "American",
+   "style": "Energetic sports announcer"
+  },
+  "danny": {
+   "gender": "male",
+   "group": "American",
+   "style": "Cheerful podcast host"
+  }
+ },
+ "pocket": {
+  "alba": {
+   "gender": "female",
+   "style": "Casual"
+  },
+  "cosette": {
+   "gender": "female"
+  },
+  "javert": {
+   "gender": "male"
+  },
+  "marius": {
+   "gender": "male"
+  },
+  "jean": {
+   "gender": "male",
+   "group": "American"
+  },
+  "fantine": {
+   "gender": "female",
+   "group": "British"
+  },
+  "eponine": {
+   "gender": "female",
+   "group": "Scottish"
+  },
+  "azelma": {
+   "gender": "female",
+   "group": "Canadian"
+  }
+ }
+}
