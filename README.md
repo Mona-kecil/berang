@@ -33,7 +33,7 @@ Berang lives in the menu bar, as an otter peeking over the waterline. Its menu h
 | Start or pause reading | Press ⌥⎋ in any app |
 | Read part of the screen | Press ⌥⇧⎋ (Option-Shift-Escape) and drag over it |
 | Listen to a whole book or file | Drop it on Berang's window, or open it with Berang in Finder |
-| Skip or stop | Use the floating player, which shows while Berang reads |
+| Skip or stop | Use the floating player, which shows while Berang reads. Drag it anywhere; it stays there |
 | Change the speed | Click the speed in the player, or scroll over the player. While Berang reads, ⌥⇧. reads faster and ⌥⇧, slower, by 0.1× |
 | Hear and choose a voice | In Berang's window, click your voice. Select any voice to hear it, or type your own words below the list and click Read |
 | Change a shortcut | In Berang's window, open Settings, click the shortcut, and press the new keys |
@@ -136,6 +136,16 @@ With `Fixed = FALSE`, it checks choosing voices as it worked before. TLC then fi
 With `SafeOrder = FALSE`, the change lets go of the old combination before registering the new one, and TLC finds a failed change losing the shortcut. With `Watch = FALSE`, Berang doesn't watch the keyboard while recording, and TLC finds it taking another app's combination. With `Release = FALSE`, a speed shortcut recorded while Berang doesn't read stays registered, and TLC finds Berang holding it with the player closed.
 
 The check runs with read the page, read an area, and one speed shortcut, as the two speed shortcuts behave alike; it covers 5.6 million states in about a minute. To also check both speed shortcuts together, set `Always = {"page"}` and `WhileReading = {"faster", "slower"}` in `Shortcuts.cfg`.
+
+### Placement model
+
+`mac/Model/Place.tla` models where the floating player sits while displays connect and disconnect, also while the player is hidden or Berang is quit. TLC checks that:
+
+- a shown player is always on a display you have;
+- the spot Berang keeps is always one you dragged the player to;
+- whenever that spot's display is connected, a shown player is at your spot.
+
+With `SaveOnAnyMove = TRUE`, Berang saves every move of the player, and TLC finds your spot replaced by where macOS put the player when you unplugged a display.
 
 ### Brand
 

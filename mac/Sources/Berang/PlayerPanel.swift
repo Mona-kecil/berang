@@ -4,10 +4,17 @@ import TextGrab
 
 /// A floating player that never takes focus, so the app being read stays frontmost. It shows while Berang reads,
 /// gets a voice ready, or has something to say, and hides when it stops. Scrolling over it changes the speed.
+///
+/// It sits where you last dragged it, across readings and launches, as Model/Place.tla checks:
+/// - Only your drag saves the spot. macOS moving the player off a display that went away saves nothing.
+/// - Each time it shows, and whenever displays change, it goes to your spot, or to the right edge of the main display
+///   while your spot's display is gone.
 final class PlayerPanel: NSPanel {
     private let player: Player
     /// Scrolling not yet turned into a speed step.
     private var scrolled: CGFloat = 0
+    /// Where the player was when you pressed on it, to tell a drag from a click.
+    private var pressedAt: NSPoint?
 
     init(player: Player, shortcuts: Shortcuts) {
         self.player = player
@@ -23,21 +30,49 @@ final class PlayerPanel: NSPanel {
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         contentView = NSHostingView(rootView: PlayerView(player: player, shortcuts: shortcuts))
         setContentSize(contentView!.fittingSize)
-        if let screen = NSScreen.main?.visibleFrame {
-            setFrameOrigin(NSPoint(x: screen.maxX - frame.width - 24, y: screen.midY - frame.height / 2))
+        place()
+        NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil,
+                                               queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { if self?.isVisible == true { self?.place() } }
         }
         follow(player)
     }
 
     private func follow(_ player: Player) {
         let showing = player.state != .idle
-        if showing, !isVisible { orderFrontRegardless() } else if !showing, isVisible { orderOut(nil) }
+        if showing, !isVisible {
+            place()
+            orderFrontRegardless()
+        } else if !showing, isVisible { orderOut(nil) }
         withObservationTracking { _ = player.state } onChange: { [weak self] in
             Task { @MainActor in self?.follow(player) }
         }
     }
 
     override var canBecomeKey: Bool { true }
+
+    /// Puts the player at your spot, or at the right edge of the main display while your spot's display is gone.
+    private func place() {
+        if let spot = PlayerSpot.saved, let screen = NSScreen.screens.first(where: { $0.displayID == spot.display }) {
+            setFrameOrigin(spot.origin(for: frame.size, in: screen.visibleFrame))
+        } else if let screen = NSScreen.screens.first?.visibleFrame {
+            setFrameOrigin(NSPoint(x: screen.maxX - frame.width - 24, y: screen.midY - frame.height / 2))
+        }
+    }
+
+    /// Saves the spot when a press on the player ends somewhere else: a drag, never a move made by macOS or Berang.
+    override func sendEvent(_ event: NSEvent) {
+        switch event.type {
+        case .leftMouseDown: pressedAt = frame.origin
+        case .leftMouseUp:
+            if let pressedAt, pressedAt != frame.origin, let screen {
+                PlayerSpot.saved = PlayerSpot(frame, in: screen)
+            }
+            pressedAt = nil
+        default: break
+        }
+        super.sendEvent(event)
+    }
 
     /// Grows leftward and down when the content grows, so a message never pushes the panel off the right edge and
     /// the controls stay where they were.
@@ -209,5 +244,43 @@ struct SpeedControls: View {
         }
         .help("\(name)  \(shortcuts.combos[action]!.display)")
         .accessibilityLabel(name)
+    }
+}
+
+/// Where you dragged the player: a display, and the player's top left corner on it as fractions of the display's
+/// room, from the left and from the top. The player's size changes as it shows controls and messages, so the spot
+/// leaves it out. Fractions keep the player on the display when its resolution changes; naming the display keeps it
+/// there when displays are rearranged.
+struct PlayerSpot: Codable {
+    let display: String
+    let x: Double
+    let y: Double
+
+    init(_ frame: NSRect, in screen: NSScreen) {
+        let room = screen.visibleFrame
+        display = screen.displayID
+        x = Double((frame.minX - room.minX) / room.width)
+        y = Double((room.maxY - frame.maxY) / room.height)
+    }
+
+    /// The origin that puts a player of `size` at the spot, kept wholly inside `room`.
+    func origin(for size: NSSize, in room: NSRect) -> NSPoint {
+        let left = room.minX + x * room.width, top = room.maxY - y * room.height
+        return NSPoint(x: min(max(left, room.minX), room.maxX - size.width),
+                       y: min(max(top, room.minY + size.height), room.maxY) - size.height)
+    }
+
+    static var saved: PlayerSpot? {
+        get { UserDefaults.standard.data(forKey: "playerSpot").flatMap { try? JSONDecoder().decode(Self.self, from: $0) } }
+        set { UserDefaults.standard.set(try? JSONEncoder().encode(newValue), forKey: "playerSpot") }
+    }
+}
+
+extension NSScreen {
+    /// The display's lasting identity, the same across launches and rearranging.
+    var displayID: String {
+        let number = (deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value ?? 0
+        guard let uuid = CGDisplayCreateUUIDFromDisplayID(number)?.takeRetainedValue() else { return "\(number)" }
+        return CFUUIDCreateString(nil, uuid) as String
     }
 }
