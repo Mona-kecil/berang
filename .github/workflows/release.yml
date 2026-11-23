@@ -62,18 +62,35 @@ jobs:
           ditto -c -k --keepParent build/Berang.app ../Berang.zip
           shasum -a 256 ../Berang.zip | cut -d ' ' -f 1 > ../Berang.zip.sha256
 
+      # The feed Sparkle checks: the latest release's appcast.xml, describing that release's zip, with the zip and the
+      # feed signed by the update key. generate_appcast also stops if that key doesn't match the app's SUPublicEDKey.
+      - name: Write the update feed
+        env:
+          SPARKLE_ED_KEY: ${{ secrets.SPARKLE_ED_KEY }}
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/sparkle.tar.xz" https://github.com/sparkle-project/Sparkle/releases/download/2.10.1/Sparkle-2.10.1.tar.xz
+          echo "1a856d2a9edb8e628de88121d7be04cf0e2167f8641650b78fca00b14244cf27  $RUNNER_TEMP/sparkle.tar.xz" | shasum -a 256 -c
+          mkdir "$RUNNER_TEMP/sparkle" "$RUNNER_TEMP/feed"
+          tar -xf "$RUNNER_TEMP/sparkle.tar.xz" -C "$RUNNER_TEMP/sparkle"
+          cp Berang.zip "$RUNNER_TEMP/feed/"
+          if [ "$GITHUB_REF_TYPE" = tag ]; then tag=$GITHUB_REF_NAME; else tag=v0.0.0; fi
+          printf '%s\n' "$SPARKLE_ED_KEY" | "$RUNNER_TEMP/sparkle/bin/generate_appcast" --ed-key-file - \
+            --download-url-prefix "https://github.com/$GITHUB_REPOSITORY/releases/download/$tag/" "$RUNNER_TEMP/feed"
+          cp "$RUNNER_TEMP/feed/appcast.xml" appcast.xml
+
       - uses: actions/upload-artifact@v4
         with:
           name: Berang
           path: |
             Berang.zip
             Berang.zip.sha256
+            appcast.xml
 
       - name: Publish
         if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" Berang.zip Berang.zip.sha256 --title "$GITHUB_REF_NAME" --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" Berang.zip Berang.zip.sha256 appcast.xml --title "$GITHUB_REF_NAME" --generate-notes
 
       - name: Remove the signing keychain
         if: always()

@@ -26,6 +26,12 @@ mkdir -p "$app/Contents/Resources"
 for bundle in .xcbuild/Build/Products/Release/*.bundle; do
   [ -e "$bundle" ] && cp -R "$bundle" "$app/Contents/Resources/"
 done
+# Sparkle, which updates the app. Berang isn't sandboxed, so it needs none of Sparkle's XPC services.
+sparkle=$app/Contents/Frameworks/Sparkle.framework
+mkdir -p "$app/Contents/Frameworks"
+ditto .xcbuild/Build/Products/Release/Sparkle.framework "$sparkle"
+rm -rf "$sparkle/XPCServices" "$sparkle/Versions/B/XPCServices"
+install_name_tool -add_rpath @executable_path/../Frameworks "$app/Contents/MacOS/Berang"
 # Each voice's recorded preview, made by `berang-say previews App/Previews <Pocket's model folder>`.
 cp -R App/Previews "$app/Contents/Resources/"
 
@@ -40,6 +46,12 @@ case $identity in
   "Developer ID"*) timestamp=--timestamp ;;
   *) timestamp=--timestamp=none ;;
 esac
-codesign --force --options runtime $timestamp --sign "$identity" "$app"
+# Sparkle's helpers first, then Sparkle, then the app, as Sparkle's documentation does it, without --deep.
+for part in "$sparkle/Versions/B/Autoupdate" "$sparkle/Versions/B/Updater.app" "$sparkle"; do
+  codesign --force --options runtime $timestamp --sign "$identity" "$part"
+done
+# Library validation loads only frameworks from the app's own Apple team. The Berang certificate has no team, so
+# it would refuse Sparkle, signed by the same certificate.
+codesign --force --options runtime $timestamp --entitlements App/Berang.entitlements --sign "$identity" "$app"
 codesign --verify --strict "$app"
 echo "$app signed by $identity"

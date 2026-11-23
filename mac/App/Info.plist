@@ -18,6 +18,16 @@
 	<string>15.0</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>SUFeedURL</key>
+	<string>https://github.com/Mona-kecil/berang/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>Y10AWo/4Ep2QeHMI2Lm04m8pej/Yf43taI/jLV9+8No=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SURequireSignedFeed</key>
+	<true/>
+	<key>SUVerifyUpdateBeforeExtraction</key>
+	<true/>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
