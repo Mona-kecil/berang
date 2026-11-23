@@ -35,9 +35,9 @@ for v in json.load(open(kitten_config))["voices"]["en"]:
     kitten[v["key"]] = {"gender": gender, "group": "American", "style": style}
 
 # Pocket's voices come from recordings in kyutai/tts-voices. VCTK and EARS list their speakers' accents; the
-# others give none. Kyutai named women's voices after women in Les Misérables and men's after men.
+# others give none. Genders come from those lists, from listening (Alba), or from the pitch of each preview.
 pocket = {
-    "alba": {"gender": "female", "group": None, "style": "Casual"},     # alba-mackenna/casual
+    "alba": {"gender": "male", "group": None, "style": "Casual"},       # alba-mackenna/casual
     "cosette": {"gender": "female", "group": None, "style": None},      # Expresso ex04
     "javert": {"gender": "male", "group": None, "style": None},         # a voice donation
     "marius": {"gender": "male", "group": None, "style": None},         # a voice donation
