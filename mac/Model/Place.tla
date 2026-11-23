@@ -1,5 +1,5 @@
 ---- MODULE Place ----
-\* Where the floating player sits, kept across readings and launches. A design, checked before it is built.
+\* Where the floating player sits, kept across readings and launches. Sources/Berang/PlayerPanel.swift.
 \*
 \* You drag the player where you want it, on any screen, and Berang saves that spot as a place on that screen, so
 \* rearranging screens doesn't move it. Screens connect and disconnect at any time, also while the player is hidden
