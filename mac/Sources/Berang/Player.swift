@@ -53,6 +53,9 @@ import TextGrab
     @ObservationIgnored private var ttsEngine: Engine?
     private var needsLoad: Bool { tts == nil || ttsEngine != engine }
     @ObservationIgnored private var page: Page?
+    /// The selection in the page being read when reading started or last moved to one, which the read shortcut
+    /// leaves alone (Model/Jump.tla, Remember).
+    @ObservationIgnored private var seenSelection: Selected?
     /// The block being heard, or about to be.
     @ObservationIgnored private var index = 0
     /// What the queued audio says when, from the block reading started at.
@@ -110,9 +113,25 @@ import TextGrab
         }
     }
 
+    /// The read shortcut. While reading, text newly selected in the page being read moves reading there; otherwise
+    /// it pauses or resumes, like the player's button (Model/Jump.tla).
+    func readOrPause() {
+        if state == .playing || state == .paused, let page, let selection = selected(in: page), selection != seenSelection {
+            seenSelection = selection
+            move(to: selection.block)
+        } else {
+            playPause()
+        }
+    }
+
     func skip(_ delta: Int) {
         guard let page, state == .playing || state == .paused else { return }
-        index = min(max(index + delta, 0), page.blocks.count - 1)
+        move(to: min(max(index + delta, 0), page.blocks.count - 1))
+    }
+
+    /// Plays on from block `b`.
+    private func move(to b: Int) {
+        index = b
         resumedAt = nil
         cancel()
         if state == .paused { audio.resume() }
@@ -236,6 +255,7 @@ import TextGrab
                     pageKey = nil
                 }
                 self.page = page
+                seenSelection = selected(in: page)
                 index = page.start
                 top = if case .file = source { page.start } else { 0 }
                 // A file, or an unscrolled page with nothing selected, continues where the last reading stopped.

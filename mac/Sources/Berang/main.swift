@@ -2,7 +2,7 @@ import AppKit
 
 let app = NSApplication.shared
 let player = Player()
-let shortcuts = Shortcuts(actions: [.page: { player.playPause() }, .area: { player.readScreenArea() },
+let shortcuts = Shortcuts(actions: [.page: { player.readOrPause() }, .area: { player.readScreenArea() },
                                     .faster: { player.nudge(0.1) }, .slower: { player.nudge(-0.1) }])
 player.showing = { shortcuts.reading = $0 }
 let panel = PlayerPanel(player: player, shortcuts: shortcuts)

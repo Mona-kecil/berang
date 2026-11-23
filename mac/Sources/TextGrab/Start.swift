@@ -57,6 +57,11 @@ extension Block {
 }
 
 private func webSelection(_ blocks: [Block], _ web: AXUIElement) -> Selection? {
+    webSelected(blocks, web).map { $0.text.isEmpty ? .caret(block: $0.block) : .range(block: $0.block) }
+}
+
+/// The block a web area's selection starts in, among `blocks`, and the selected text, empty for a caret.
+private func webSelected(_ blocks: [Block], _ web: AXUIElement) -> (block: Int, text: String)? {
     guard let range = web.get("AXSelectedTextMarkerRange"), CFGetTypeID(range) == AXTextMarkerRangeGetTypeID(),
           let element = web.get("AXUIElementForTextMarker", AXTextMarkerRangeCopyStartMarker(range as! AXTextMarkerRange)),
           CFGetTypeID(element) == AXUIElementGetTypeID()
@@ -66,12 +71,39 @@ private func webSelection(_ blocks: [Block], _ web: AXUIElement) -> Selection? {
     for _ in 0..<4 {
         guard let e = candidate else { break }
         if let block = blocks.firstIndex(where: { $0.runs.contains { CFEqual($0.element, e) } }) {
-            let text = web.get("AXStringForTextMarkerRange", range) as? String ?? ""
-            return text.isEmpty ? .caret(block: block) : .range(block: block)
+            return (block, web.get("AXStringForTextMarkerRange", range) as? String ?? "")
         }
         candidate = e.element(kAXParentAttribute)
     }
     return nil
+}
+
+/// Text selected in a page Berang copied: the block it starts in and the text.
+public struct Selected: Equatable, Sendable {
+    public let block: Int
+    public let text: String
+}
+
+/// The text selected now in `page`, as Berang copied it, or nil when none is. The page is asked, not the window in
+/// front. A selection on a page that has changed since, by a followed link or in another tab, is in none of the
+/// copy's elements, so it is nil too (Model/Jump.tla, AskReadPage).
+public func selected(in page: Page) -> Selected? {
+    let viewport = page.viewport
+    switch viewport.string(kAXRoleAttribute) {
+    case kAXTextAreaRole:
+        guard let v = viewport.get(kAXSelectedTextRangeAttribute), CFGetTypeID(v) == AXValueGetTypeID() else { return nil }
+        var r = CFRange()
+        guard AXValueGetValue(v as! AXValue, .cfRange, &r), r.length > 0,
+              let text = viewport.get(kAXSelectedTextAttribute) as? String, !text.isEmpty else { return nil }
+        let blocks = page.blocks
+        let line = max(firstIndex(blocks.count) { (blocks[$0].runs.first?.offset ?? 0) <= r.location } - 1, 0)
+        return Selected(block: line, text: text)
+    case "AXWebArea", _ where pdfDocumentSubroles.contains(viewport.string(kAXSubroleAttribute) ?? ""):
+        guard let s = webSelected(page.blocks, viewport), !s.text.isEmpty else { return nil }
+        return Selected(block: s.block, text: s.text)
+    default:
+        return nil
+    }
 }
 
 /// A text area's lines are its blocks; each block's first run starts at its line's offset.
