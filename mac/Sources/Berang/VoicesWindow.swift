@@ -32,8 +32,20 @@ struct VoicesView: View {
     @State private var tab: Engine
     /// A voice of an engine not yet downloaded, last previewed.
     @State private var considered: (engine: Engine, name: String)?
-    /// Your own words to hear the chosen voice read.
-    @State private var words = "Dr. Rivera's flight leaves at 7:45 on March 3rd, from gate B12. Is it really $1,299 for two nights? She laughed and said, \"Book it anyway.\""
+    /// Your own words to hear the chosen voice read, starting from a sample.
+    @State private var words = Self.samples[0].text
+    @State private var sample = Self.samples[0].name
+
+    /// Texts that test what voices often get wrong. Each fills the box, to edit or replace.
+    private static let samples: [(name: String, text: String)] = [
+        ("Everyday", "Dr. Rivera's flight leaves at 7:45 on March 3rd, from gate B12. Is it really $1,299 for two nights? She laughed and said, \"Book it anyway.\""),
+        ("Numbers", "Order #48213 ships on 12/03/2026. The total is $2,450.75, about 18% less than last year. Call 1-800-555-0199 before 5:30 PM. The parcel weighs 2.5 kg, about 5.5 lbs."),
+        ("Addresses and links", "Send it to 221B Baker Street, London NW1 6XE. The guide is at https://docs.example.com/v2/setup, and questions go to help@example.com."),
+        ("Dialogue", "\"Are you coming?\" she asked.\n\nHe paused at the door. \"Only if you promise not to sing.\"\n\n\"No promises,\" she said, grinning."),
+        ("News", "The city council voted 7 to 2 on Tuesday to extend the night bus service through March. Officials said ridership rose 23 percent after the trial began in October."),
+        ("Technical", "Run npm install, then open localhost:3000. If the build fails with error E404, check that NODE_ENV is set to production and that config.json is valid."),
+        ("Story", "The lighthouse keeper climbed the stairs every evening. She trimmed the wick, wound the clockwork, and watched the beam sweep across the dark water, counting the ships."),
+    ]
 
     var body: some View {
         VStack(spacing: 0) {
@@ -59,8 +71,19 @@ struct VoicesView: View {
                     .font(.body)
                     .frame(height: 72)
                     .accessibilityLabel("Text to read")
-                Button("Read with \(Engine.title(player.voice))") { player.readText(words) }
-                    .disabled(!player.engine.isInstalled || words.allSatisfy(\.isWhitespace))
+                HStack {
+                    Picker("Sample text", selection: $sample) {
+                        ForEach(Self.samples, id: \.name) { Text($0.name).tag($0.name) }
+                    }
+                    .labelsHidden()
+                    .fixedSize()
+                    .onChange(of: sample) { _, name in
+                        if let text = Self.samples.first(where: { $0.name == name })?.text { words = text }
+                    }
+                    Spacer()
+                    Button("Read with \(Engine.title(player.voice))") { player.readText(words) }
+                        .disabled(!player.engine.isInstalled || words.allSatisfy(\.isWhitespace))
+                }
             }
             .padding(12)
             if installed.isEmpty {
