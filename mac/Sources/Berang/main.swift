@@ -18,6 +18,7 @@ app.delegate = opener
 let voices = VoicesWindow(player: player)
 let setup = SetupWindow(player: player, showVoices: voices.show)
 if SetupWindow.isNeeded { setup.show() }
-let menuBar = MenuBar(player: player, panel: panel, setup: setup, voices: voices, shortcut: hotkey.isRegistered ? ("\u{1b}", .option) : nil,
+let updater = Updater()
+let menuBar = MenuBar(player: player, panel: panel, setup: setup, voices: voices, updater: updater, shortcut: hotkey.isRegistered ? ("\u{1b}", .option) : nil,
                       areaShortcut: areaHotkey.isRegistered ? ("\u{1b}", [.option, .shift]) : nil)
 app.run()

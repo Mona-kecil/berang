@@ -54,9 +54,10 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - name: Check the player model with TLC
+      - name: Check the player and update models with TLC
         working-directory: mac/Model
         run: |
           curl -fsSL -o tla2tools.jar https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar
           echo "936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88  tla2tools.jar" | sha256sum -c
           java -cp tla2tools.jar tlc2.TLC -config Player.cfg -workers 1 Player.tla
+          java -cp tla2tools.jar tlc2.TLC -config Update.cfg -workers 1 Update.tla

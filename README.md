@@ -10,7 +10,7 @@ You need a Mac with Apple silicon and macOS 15 or later. Open Terminal and run:
 curl -fsSL https://raw.githubusercontent.com/Mona-kecil/berang/main/install.sh | sh
 ```
 
-This puts Berang in your Applications folder and opens it. Run the same command again to update.
+This puts Berang in your Applications folder and opens it. From version 0.1.2, Berang updates itself: see [Updates](#updates). To update an older version, run the same command again.
 
 Prefer not to use Terminal? Download `Berang.zip` from the [latest release](https://github.com/Mona-kecil/berang/releases/latest), unzip it, and move Berang to Applications. Berang is not notarized by Apple, so the first time you open it, macOS says it can't. Go to System Settings > Privacy & Security and click Open Anyway.
 
@@ -35,8 +35,15 @@ To finish a step later, choose Set Up Berang from the menu bar.
 | Skip, change speed, or stop | Use the floating player |
 | Hear and choose a voice | Choose Voices from the menu bar, and select a voice to hear it |
 | Show or hide the player, or quit | Click the waveform icon in the menu bar |
+| Update Berang | Choose Check for Updates from the menu bar |
 
 Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before, Berang continues where you stopped; Start over goes back to the top. Berang remembers the speed you choose.
+
+### Updates
+
+Berang checks for a new version once a day. If it finds one while you work in another app, the menu bar icon shows a badge and the menu shows Update to, followed by the version. Choose it, then Install Update. Berang installs the update when you choose Install and Relaunch, or when you quit. Your voices, reading positions, and permissions stay.
+
+Each update must be signed with Berang's update key and its certificate, or Berang refuses it.
 
 ## What Berang reads
 
@@ -54,7 +61,7 @@ In PDFs and Apple Books, Berang highlights the paragraph rather than the word. V
 
 ## Privacy
 
-Berang reads and speaks on your Mac. It connects to the internet only to download a voice engine, once: Phonon from the [Phonon release](https://github.com/gradium-ai/xn-ptts/releases/tag/v0.7.1), checked against a known fingerprint; Kitten, if you choose one of its voices, from [KittenML](https://huggingface.co/KittenML/kitten-tts-2-nano) with its word lists from [Hugging Face](https://huggingface.co/beshkenadze/kitten-tts-g2p); and Pocket, if you choose one of its voices, from [Hugging Face](https://huggingface.co/mlx-community/pocket-tts). It asks for two permissions:
+Berang reads and speaks on your Mac. It connects to the internet only to download a voice engine, once: Phonon from the [Phonon release](https://github.com/gradium-ai/xn-ptts/releases/tag/v0.7.1), checked against a known fingerprint; Kitten, if you choose one of its voices, from [KittenML](https://huggingface.co/KittenML/kitten-tts-2-nano) with its word lists from [Hugging Face](https://huggingface.co/beshkenadze/kitten-tts-g2p); and Pocket, if you choose one of its voices, from [Hugging Face](https://huggingface.co/mlx-community/pocket-tts). Once a day, it also checks [GitHub](https://github.com/Mona-kecil/berang/releases) for a new version. The check sends nothing about you or your Mac. It asks for two permissions:
 
 - **Accessibility**, to read the text of other apps.
 - **Screen Recording**, only if you use ⌥⇧⎋ or read an app that draws its own text. Berang recognizes the text on your Mac and keeps no images.
@@ -66,7 +73,8 @@ Quit Berang from the menu bar, then delete:
 - Berang from your Applications folder.
 - The Phonon voice engine, about 300 MB, in `~/Library/Application Support/PhononTTS`.
 - The Kitten and Pocket voice engines, if you downloaded them, 94 MB and 229 MB, in `~/Library/Application Support/Berang`.
-- Your reading positions and speed, in `~/Library/Preferences/io.github.mona-kecil.berang.plist`.
+- Your reading positions, speed, and update settings, in `~/Library/Preferences/io.github.mona-kecil.berang.plist`.
+- Downloaded updates and other caches, in `~/Library/Caches/io.github.mona-kecil.berang`.
 
 You can also remove Berang from System Settings > Privacy & Security > Accessibility and Screen & System Audio Recording.
 
@@ -90,6 +98,21 @@ open mac/build/Berang.app
 ### Player model
 
 `mac/Model/Player.tla` is a TLA+ model of the player: what each request does, step by step, while the voice downloads, loads, waits for an area, or reads. TLC checks that Berang never reads two things at once, never shows playing when nothing plays, keeps the highlight and saved position on what you hear, and reads a request made while the voice gets ready. CI runs it; to run it yourself, see the command at the top of the file. Update it with any change to how `Player.swift` handles requests.
+
+### Update model
+
+`mac/Model/Update.tla` models updates through Sparkle alongside reading and voice engine downloads. Quitting or relaunching for an update can cut a download short. TLC checks that:
+
+- an engine that looks installed is whole;
+- only an update with both signatures intact replaces the app;
+- no update installs an older build;
+- only you stop the reading.
+
+With `Fixed = FALSE`, it checks the install code before these checks existed. TLC then finds a Pocket download cut short after its first file, which left Pocket looking installed but unable to load.
+
+### Releases
+
+A `v*` tag makes the release workflow build, sign, and zip the app. It also writes `appcast.xml`, the feed Berang checks for updates, signed with the update key in the `SPARKLE_ED_KEY` secret. The key's public half is `SUPublicEDKey` in `mac/App/Info.plist`. Keep the private key: without it, Berang can't update itself to any later release.
 
 ### Voice previews
 
@@ -152,4 +175,4 @@ It reads other apps' text, so the app that runs it, such as your terminal, needs
 
 ## License
 
-The code is GPL-3.0. Model weights are not part of this repository, and each keeps its own license.
+The code is GPL-3.0. Model weights are not part of this repository, and each keeps its own license. Updates use [Sparkle](https://sparkle-project.org) (MIT).
