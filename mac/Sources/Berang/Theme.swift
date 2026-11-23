@@ -36,6 +36,21 @@ extension NSColor {
     }
 }
 
+/// Gives the system's keyboard focus ring the control's rounded shape, instead of a plain rectangle.
+extension View {
+    func focusRing(_ radius: CGFloat) -> some View {
+        contentShape(.focusEffect, RoundedRectangle(cornerRadius: radius, style: .continuous))
+    }
+}
+
+/// A button that draws only its label, dimmed while pressed, with the rounded focus ring.
+struct PlainButtonStyle: ButtonStyle {
+    var radius: CGFloat = 10
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.opacity(configuration.isPressed ? 0.7 : 1).contentShape(Rectangle()).focusRing(radius)
+    }
+}
+
 /// A white card resting on a solid edge.
 struct Card: ViewModifier {
     var padding: CGFloat = 12
@@ -80,6 +95,7 @@ struct ChunkyButtonStyle: ButtonStyle {
             )
             .offset(y: pressed ? 2 : 0)
             .contentShape(Rectangle())
+            .focusRing(compact ? 10 : 14)
     }
 }
 
@@ -98,6 +114,7 @@ struct SoftButtonStyle: ButtonStyle {
             )
             .offset(y: pressed ? 1 : 0)
             .contentShape(Rectangle())
+            .focusRing(10)
     }
 }
 
