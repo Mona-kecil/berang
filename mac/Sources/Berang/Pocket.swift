@@ -14,8 +14,10 @@ enum PocketVoice {
         cache.cacheDirectory.appending(path: "mlx-audio").appending(path: repo.replacingOccurrences(of: "/", with: "_"))
     }
 
+    /// The download writes its listing of the model's files last, once every file is in, so a download cut short
+    /// doesn't count (Model/Update.tla).
     static var isInstalled: Bool {
-        FileManager.default.fileExists(atPath: folder.appending(path: "model.safetensors").path)
+        FileManager.default.fileExists(atPath: folder.appending(path: ".mlx-audio-snapshot.json").path)
     }
 
     /// The voices in the downloaded model, alba first, as it is the model's default.

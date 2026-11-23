@@ -18,9 +18,12 @@ enum KittenVoice {
     /// Misaki's lexicons and BART, about 9 MB, from beshkenadze/kitten-tts-g2p (MIT).
     private static let lexicons = HubCache(cacheDirectory: folder.appending(path: "G2P"))
 
+    /// Each model file is moved in once it has fully arrived. The lexicons' download writes its listing of their
+    /// files last, so lexicons cut short don't count (Model/Update.tla).
     static var isInstalled: Bool {
         files.allSatisfy { FileManager.default.fileExists(atPath: folder.appending(path: $0.name).path) }
-            && FileManager.default.fileExists(atPath: folder.appending(path: "G2P/mlx-audio").path)
+            && FileManager.default.fileExists(
+                atPath: folder.appending(path: "G2P/mlx-audio/beshkenadze_kitten-tts-g2p/.mlx-audio-snapshot.json").path)
     }
 
     /// The English voices, from the model's config, without loading it.
