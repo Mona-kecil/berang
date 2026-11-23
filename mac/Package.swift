@@ -21,6 +21,9 @@ let package = Package(
         ]),
         .executableTarget(name: "berang-grab", dependencies: ["TextGrab"]),
         .executableTarget(name: "page-viewer"),
+        .executableTarget(name: "qwen-spike", dependencies: [
+            .product(name: "MLXAudioTTS", package: "mlx-audio-swift"), .product(name: "MLXAudioCore", package: "mlx-audio-swift"),
+        ]),
         .executableTarget(name: "berang-say", dependencies: [
             "Speakable", "Kitten", .product(name: "ptts", package: "xn-ptts"),
             .product(name: "MLXAudioTTS", package: "mlx-audio-swift"), .product(name: "HuggingFace", package: "swift-huggingface"),
