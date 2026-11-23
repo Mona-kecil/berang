@@ -1,10 +1,14 @@
 name: Release
 
 # A tag like v0.2.0 publishes a signed Berang.zip to that tag's GitHub Release. A pull request that changes how
-# releases are built builds the same zip and keeps it as a workflow artifact.
+# releases are built builds the same zip and keeps it as a workflow artifact. On main, a change to how releases are
+# built or to the dependencies rebuilds the cache that tags and pull requests build from.
 on:
   push:
     tags: ["v*"]
+    branches: [main]
+    # GitHub skips path filters for tags, so every tag still releases.
+    paths: [".github/workflows/release.yml", "mac/build-app.sh", "mac/Package.resolved"]
   pull_request:
     paths: [".github/workflows/release.yml", "mac/build-app.sh", "install.sh"]
 
@@ -23,6 +27,14 @@ jobs:
 
       # MLX compiles Metal shaders, which needs Xcode's Metal toolchain.
       - run: xcodebuild -downloadComponent MetalToolchain
+
+      # Keeps Xcode's compiled dependencies, such as MLX, between runs. A tag can use only main's cache, which main
+      # makes whenever the dependencies change.
+      - uses: actions/cache@v4
+        with:
+          path: mac/.xcbuild
+          key: xcbuild-${{ runner.os }}-${{ hashFiles('mac/Package.resolved') }}
+          restore-keys: xcbuild-${{ runner.os }}-
 
       - name: Import the signing certificate
         env:
