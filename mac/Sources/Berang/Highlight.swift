@@ -40,6 +40,12 @@ import TextGrab
         view.layer!.addSublayer(sentenceLayer)
         view.layer!.addSublayer(wordLayer)
         window.contentView = view
+        // Hides or shows at once when you switch apps, instead of at the next tick.
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.update(wordChanged: true) }
+        }
     }
 
     /// Highlights `sentence` and `word`, ranges of the block's text, in block `block` of `page`.
