@@ -12,10 +12,15 @@ let shortcuts = Shortcuts(actions: [
 player.showing = { shortcuts.reading = $0 }
 player.began = { tips.readingStarted(app: $0) }
 let panel = PlayerPanel(player: player, shortcuts: shortcuts, tips: tips)
-/// Files opened with Berang, from Finder's Open With or `open -a Berang`, are read.
+/// Files opened with Berang, from Finder's Open With or `open -a Berang`, stage in Berang's window ready to read.
 final class Opener: NSObject, NSApplicationDelegate {
     func application(_ application: NSApplication, open urls: [URL]) {
-        if let url = urls.first { MainActor.assumeIsolated { player.readFile(url) } }
+        if let url = urls.first {
+            MainActor.assumeIsolated {
+                player.stageFile(url)
+                window.show(.home)
+            }
+        }
     }
 }
 let opener = Opener()

@@ -23,11 +23,22 @@ func ocrParagraphs(_ image: CGImage) -> [PDFParagraph] {
     pdfParagraphs([ocrLines(image)], heights: [CGFloat(image.height)], sizedLines: false)
 }
 
-/// The blocks of the image at `url`, or nil when it is not an image.
-public func readImage(_ url: URL) -> [Block]? {
+/// The paragraphs recognized in the image at `url`, as Sendable kind/text pairs for running Vision off the main actor.
+public func recognizeImageBlocks(_ url: URL) -> [(kind: Block.Kind, text: String)]? {
     guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
           let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else { return nil }
-    return ocrParagraphs(image).map(\.block)
+    return ocrParagraphs(image).map { ($0.block.kind, $0.block.text) }
+}
+
+/// The blocks of the image at `url`, or nil when it is not an image.
+public func readImage(_ url: URL) -> [Block]? {
+    recognizeImageBlocks(url)?.map { Block(kind: $0.kind, text: $0.text, runs: []) }
+}
+
+/// A screen-area page built from recognized paragraph kind/text pairs.
+public func screenAreaPage(_ paragraphs: [(kind: Block.Kind, text: String)]) -> Page {
+    Page(app: "", window: "", blocks: paragraphs.map { Block(kind: $0.kind, text: $0.text, runs: []) },
+         viewport: AXUIElementCreateSystemWide(), clip: nil, start: 0, startPoint: .selection, address: nil)
 }
 
 /// An image that Preview shows from a file, read by recognizing its text. Nil for other windows.
@@ -64,7 +75,10 @@ public func readScreenArea(_ url: URL) -> Page? {
     config.height = Int(shown.height * CGFloat(filter.pointPixelScale))
     config.showsCursor = false
     let image = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
-    return ocrParagraphs(image).map(\.block)
+    let paragraphs = await Task.detached(priority: .userInitiated) {
+        ocrParagraphs(image).map { ($0.block.kind, $0.block.text) }
+    }.value
+    return paragraphs.map { Block(kind: $0.0, text: $0.1, runs: []) }
 }
 
 extension Page {
@@ -99,11 +113,34 @@ public func textPage(_ text: String) -> Page {
                 startPoint: .screen, address: nil)
 }
 
+/// Sendable parsed contents of a file, so PDF/EPUB/image OCR can run off the main actor.
+public struct ParsedFile: Sendable {
+    public let title: String
+    public let blocks: [(kind: Block.Kind, text: String)]
+    public let start: Int
+    public let address: String
+
+    public func page() -> Page {
+        Page(app: "", window: title, blocks: blocks.map { Block(kind: $0.kind, text: $0.text, runs: []) },
+             viewport: AXUIElementCreateSystemWide(), clip: nil, start: start, startPoint: .screen, address: address)
+    }
+}
+
+/// Parses a PDF, EPUB, image, or plain-text file into Sendable blocks off the main actor.
+public func parseFile(_ url: URL) -> ParsedFile? {
+    let book: (blocks: [Block], start: Int)? = url.pathExtension.lowercased() == "epub"
+        ? readEPUB(url)
+        : readFile(url).map { ($0, 0) }
+    guard let book, !book.blocks.isEmpty else { return nil }
+    return ParsedFile(
+        title: url.deletingPathExtension().lastPathComponent,
+        blocks: book.blocks.map { ($0.kind, $0.text) },
+        start: book.start,
+        address: url.absoluteString
+    )
+}
+
 /// A file read whole, to listen to without a window: reading positions are kept by its address.
 public func readFilePage(_ url: URL) -> Page? {
-    let book = url.pathExtension.lowercased() == "epub" ? readEPUB(url) : readFile(url).map { ($0, 0) }
-    return book.map {
-        Page(app: "", window: url.deletingPathExtension().lastPathComponent, blocks: $0.0, viewport: AXUIElementCreateSystemWide(),
-             clip: nil, start: $0.1, startPoint: .screen, address: url.absoluteString)
-    }
+    parseFile(url)?.page()
 }

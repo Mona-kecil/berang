@@ -25,12 +25,10 @@ func checkScreenAccess() throws {
     }
 }
 
-/// Lets the user drag over part of the screen with the system's screenshot tool, and reads the text in it.
+/// Lets the user drag over part of the screen with the system's screenshot tool, saving it to a temp PNG.
 /// Nil when the user presses Escape, or when the pick is cancelled, which closes the crosshair.
-@MainActor func pickScreenArea() async throws -> Page? {
-    let url = FileManager.default.temporaryDirectory.appending(path: "berang-area.png")
-    try? FileManager.default.removeItem(at: url)
-    defer { try? FileManager.default.removeItem(at: url) }
+@MainActor func captureScreenArea() async throws -> URL? {
+    let url = FileManager.default.temporaryDirectory.appending(path: "berang-area-\(UUID().uuidString).png")
     let capture = Process()
     capture.executableURL = URL(filePath: "/usr/sbin/screencapture")
     capture.arguments = ["-i", "-x", url.path]
@@ -48,9 +46,19 @@ func checkScreenAccess() throws {
     } onCancel: {
         running.stop()
     }
-    guard !Task.isCancelled, FileManager.default.fileExists(atPath: url.path) else { return nil }
-    guard let page = readScreenArea(url), !page.blocks.isEmpty else { throw ScreenAreaError.noText }
-    return page
+    guard !Task.isCancelled, FileManager.default.fileExists(atPath: url.path) else {
+        try? FileManager.default.removeItem(at: url)
+        return nil
+    }
+    return url
+}
+
+/// Runs Vision text recognition on `url` off the main actor so the player's loading state stays responsive.
+func recognizeScreenArea(_ url: URL) async throws -> Page {
+    defer { try? FileManager.default.removeItem(at: url) }
+    let paragraphs = await Task.detached(priority: .userInitiated) { recognizeImageBlocks(url) }.value
+    guard let paragraphs, !paragraphs.isEmpty else { throw ScreenAreaError.noText }
+    return screenAreaPage(paragraphs)
 }
 
 /// A child process that a cancelled task stops, even when the cancel comes before the process has started.

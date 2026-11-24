@@ -93,6 +93,27 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
     /// Whether a shortcut doesn't work, which the menu bar icon flags.
     var needsAttention: Bool { working.count < ShortcutAction.allCases.count }
 
+    /// Whether any shortcut differs from its standard default.
+    var isCustomized: Bool { ShortcutAction.allCases.contains { combos[$0] != $0.standard } }
+
+    /// Restores each shortcut to its standard default, keeping any working shortcut if a default can't register
+    /// (Model/Shortcuts.tla, SafeOrder & Release).
+    func resetToDefaults() {
+        cancelRecording()
+        for action in ShortcutAction.allCases where combos[action] != action.standard {
+            let combo = action.standard
+            guard let hotkey = Hotkey(combo, pressed: { [weak self] in self?.pressed(action) }) else {
+                notes[action] = Refusal.anotherApp.message(combo)
+                continue
+            }
+            hotkeys[action] = action.whileReading && !reading ? nil : hotkey
+            combos[action] = combo
+            UserDefaults.standard.removeObject(forKey: "shortcut.\(action.rawValue)")
+            working.insert(action)
+            notes[action] = nil
+        }
+    }
+
     func startRecording(_ action: ShortcutAction) {
         recording = action
         if working.contains(action) { notes[action] = nil }

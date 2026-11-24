@@ -1,5 +1,7 @@
 import AppKit
+import ServiceManagement
 import SwiftUI
+import TextGrab
 import UniformTypeIdentifiers
 
 /// Berang's one window: Home, with setup until Berang can read, and the Voices and Settings pages. It opens from the
@@ -39,6 +41,11 @@ final class BerangWindow: NSWindow {
 @MainActor @Observable final class WindowModel {
     enum Page { case home, voices, settings }
     var page = Page.home
+    /// macOS shows each permission prompt once; kept on the window model so navigating pages doesn't reset it.
+    var askedTrust = false
+    var askedScreen = false
+    /// Stays false while the user finishes first-time setup, so the checklist doesn't snap away mid-click.
+    var setupDismissed = !BerangWindow.setupNeeded
     @ObservationIgnored weak var shortcuts: Shortcuts?
 }
 
@@ -48,11 +55,12 @@ struct RootView: View {
     let updater: Updater
     @Bindable var model: WindowModel
     @State private var dropping = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Group {
             switch model.page {
-            case .home: HomePage(player: player, shortcuts: shortcuts, go: go)
+            case .home: HomePage(player: player, shortcuts: shortcuts, model: model, go: go)
             case .voices: VoicesPage(player: player) { go(.home) }
             case .settings: SettingsPage(shortcuts: shortcuts, updater: updater) { go(.home) }
             }
@@ -67,13 +75,35 @@ struct RootView: View {
         .onAppear { model.shortcuts = shortcuts }
         .overlay {
             if dropping {
-                RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Otter.orange, lineWidth: 2.5).padding(8)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(Otter.orange.opacity(0.08))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .strokeBorder(Otter.orange, style: StrokeStyle(lineWidth: 2.5, dash: [7, 5]))
+                        }
+                        .padding(8)
+                    Text("Drop to open")
+                        .font(Otter.font(13, .heavy))
+                        .foregroundStyle(Otter.ink)
+                        .padding(.horizontal, 14).padding(.vertical, 8)
+                        .raised(18, face: Otter.card, edge: Otter.orange, depth: 2, stroke: Otter.orange, lineWidth: 2)
+                        .transition(reduceMotion ? .opacity : .scale(scale: 0.96).combined(with: .opacity))
+                }
+                .allowsHitTesting(false)
+                .transition(.opacity)
             }
         }
+        .animation(.easeOut(duration: 0.14), value: dropping)
         .onDrop(of: [.fileURL], isTargeted: $dropping) { providers in
             guard let provider = providers.first else { return false }
             _ = provider.loadObject(ofClass: URL.self) { url, _ in
-                if let url { Task { @MainActor in player.readFile(url) } }
+                if let url {
+                    Task { @MainActor in
+                        player.stageFile(url)
+                        if model.page != .home { go(.home) }
+                    }
+                }
             }
             return true
         }
@@ -81,7 +111,9 @@ struct RootView: View {
 
     private func go(_ page: WindowModel.Page) {
         shortcuts.cancelRecording()
-        withAnimation(.snappy(duration: 0.2)) { model.page = page }
+        player.stopPreview()
+        let anim: Animation? = reduceMotion ? .easeOut(duration: 0.15) : .snappy(duration: 0.2)
+        withAnimation(anim) { model.page = page }
     }
 }
 
@@ -90,28 +122,34 @@ struct RootView: View {
 struct HomePage: View {
     let player: Player
     let shortcuts: Shortcuts
+    @Bindable var model: WindowModel
     let go: (WindowModel.Page) -> Void
 
     @State private var trusted = AXIsProcessTrusted()
     @State private var screen = CGPreflightScreenCaptureAccess()
     @State private var voice = Engine.allCases.contains(where: \.isInstalled)
-    /// macOS shows each permission prompt once; after that, Allow opens System Settings instead.
-    @State private var askedTrust = false
-    @State private var askedScreen = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var readyToRead: Bool { trusted && voice }
+    private var hasPendingFile: Bool { player.staged != nil || player.stagingTitle != nil || player.fileError != nil }
+    private var showingWelcome: Bool { !readyToRead || !model.setupDismissed }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            if !trusted || !voice {
+            if showingWelcome {
                 welcome
             } else {
                 home
             }
         }
+        .animation(reduceMotion ? .easeOut(duration: 0.15) : .snappy(duration: 0.22), value: showingWelcome)
+        .animation(reduceMotion ? .easeOut(duration: 0.15) : .snappy(duration: 0.2), value: player.staged != nil)
         .task {
             while !Task.isCancelled {
                 trusted = AXIsProcessTrusted()
                 screen = CGPreflightScreenCaptureAccess()
                 voice = Engine.allCases.contains(where: \.isInstalled)
+                if !trusted || !voice { model.setupDismissed = false }
                 try? await Task.sleep(for: .seconds(1))
             }
         }
@@ -134,11 +172,19 @@ struct HomePage: View {
     // First open: the otter says hello, and setup is a checklist.
     private var welcome: some View {
         VStack(spacing: 12) {
-            OtterImage(pose: .floating, size: 150).padding(.top, 6)
+            OtterImage(pose: .floating, size: 144).padding(.top, 6)
             VStack(spacing: 3) {
-                Text("Hi, I'm Berang").font(Otter.font(22, .heavy)).foregroundStyle(Otter.ink)
-                Text("I read anything on your Mac out loud.").font(Otter.font(13, .medium)).foregroundStyle(Otter.soft)
+                Text(readyToRead ? "You're all set!" : "Hi, I'm Berang")
+                    .font(Otter.font(22, .heavy)).foregroundStyle(Otter.ink)
+                if readyToRead {
+                    (Text("Press ") + keys(.page) + Text(" in any app to hear it read."))
+                        .font(Otter.font(13, .medium)).foregroundStyle(Otter.soft)
+                } else {
+                    Text("I read anything on your Mac out loud.")
+                        .font(Otter.font(13, .medium)).foregroundStyle(Otter.soft)
+                }
             }
+            .multilineTextAlignment(.center)
             VStack(spacing: 0) {
                 check("Let me read other apps", done: trusted) {
                     Button("Allow", action: allowAccessibility).buttonStyle(ChunkyButtonStyle(compact: true))
@@ -146,7 +192,11 @@ struct HomePage: View {
                 Divider().overlay(Otter.edge)
                 check("Pick my voice", done: voice) {
                     if let fraction = player.download {
-                        ProgressView(value: fraction).tint(Otter.orange).frame(width: 80)
+                        HStack(spacing: 6) {
+                            ProgressView(value: fraction).tint(Otter.orange).frame(width: 64)
+                            Text("\(Int((fraction * 100).rounded()))%")
+                                .font(Otter.font(11, .heavy)).monospacedDigit().foregroundStyle(Otter.orange)
+                        }
                     } else if trusted {
                         Button("Choose") { go(.voices) }.buttonStyle(ChunkyButtonStyle(compact: true))
                     } else {
@@ -159,8 +209,27 @@ struct HomePage: View {
                 }
             }
             .card(padding: 12)
-            if case .failed(let message) = player.state, !voice {
+            // Files need a voice, not Accessibility, so a dropped file stays usable even during setup.
+            if let staged = player.staged {
+                stagedFileCard(staged, canRead: voice)
+            } else if let title = player.stagingTitle {
+                stagingLoadingCard(title)
+            } else if let error = player.fileError {
+                Text(error).font(Otter.font(12, .medium)).foregroundStyle(Otter.alert).multilineTextAlignment(.center)
+            } else if let failure = player.downloadError, !voice {
+                Text(failure.message).font(Otter.font(12, .medium)).foregroundStyle(Otter.alert)
+                    .multilineTextAlignment(.center)
+            } else if case .failed(let message) = player.state, !voice {
                 Text(message).font(Otter.font(12, .medium)).foregroundStyle(Otter.alert)
+                    .multilineTextAlignment(.center)
+            }
+            if readyToRead, !hasPendingFile {
+                Button("Start using Berang") {
+                    let anim: Animation? = reduceMotion ? .easeOut(duration: 0.15) : .snappy(duration: 0.22)
+                    withAnimation(anim) { model.setupDismissed = true }
+                }
+                .buttonStyle(ChunkyButtonStyle())
+                .padding(.top, 4)
             }
             Spacer(minLength: 0)
         }
@@ -188,31 +257,103 @@ struct HomePage: View {
         VStack(spacing: 0) {
             HStack { Spacer(); settingsButton }
             Spacer(minLength: 0)
-            VStack(spacing: 4) {
-                OtterImage(pose: .asleep, size: 128).padding(.bottom, 10)
-                (Text("Press ") + keys(.page) + Text(" in any app")).font(Otter.font(18, .bold)).foregroundStyle(Otter.ink)
-                if let broken = [ShortcutAction.page, .area].first(where: { !shortcuts.working.contains($0) }) {
-                    HStack(spacing: 8) {
-                        Text("\(shortcuts.combos[broken]!.display) isn't working.").foregroundStyle(Otter.alert)
-                        Button("Change it") { go(.settings) }.buttonStyle(SoftButtonStyle())
-                    }
-                    .font(Otter.font(12, .semibold))
-                    .padding(.top, 2)
-                } else {
-                    (Text("or ") + keys(.area) + Text(" for part of the screen")).font(Otter.font(12, .medium)).foregroundStyle(Otter.soft)
-                }
-                VStack(spacing: 7) {
-                    Button("Open a File…", action: chooseFile).buttonStyle(ChunkyButtonStyle())
-                    Text("or drop one on this window").font(Otter.font(12, .medium)).foregroundStyle(Otter.soft)
-                }
-                .padding(.top, 22)
+            if let staged = player.staged {
+                stagedFileCard(staged, canRead: true)
+            } else if let title = player.stagingTitle {
+                stagingLoadingCard(title)
+            } else {
+                idleCenter
             }
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
             Spacer(minLength: 0)
             if !screen { screenTip.padding(.bottom, 12) }
             voiceCard
         }
+    }
+
+    private var idleCenter: some View {
+        VStack(spacing: 4) {
+            OtterImage(pose: player.state == .playing ? .floating : .asleep, size: 128).padding(.bottom, 10)
+            (Text("Press ") + keys(.page) + Text(" in any app")).font(Otter.font(18, .bold)).foregroundStyle(Otter.ink)
+            if let broken = [ShortcutAction.page, .area].first(where: { !shortcuts.working.contains($0) }) {
+                HStack(spacing: 8) {
+                    Text("\(shortcuts.combos[broken]!.display) isn't working.").foregroundStyle(Otter.alert)
+                    Button("Change it") { go(.settings) }.buttonStyle(SoftButtonStyle())
+                }
+                .font(Otter.font(12, .semibold))
+                .padding(.top, 2)
+            } else {
+                (Text("or ") + keys(.area) + Text(" for part of the screen")).font(Otter.font(12, .medium)).foregroundStyle(Otter.soft)
+            }
+            VStack(spacing: 7) {
+                Button("Choose a File…", action: chooseFile).buttonStyle(ChunkyButtonStyle())
+                Text("or drop one on this window").font(Otter.font(12, .medium)).foregroundStyle(Otter.soft)
+                if let error = player.fileError {
+                    Text(error)
+                        .font(Otter.font(11.5, .semibold))
+                        .foregroundStyle(Otter.alert)
+                        .padding(.top, 2)
+                }
+            }
+            .padding(.top, 22)
+        }
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
+    }
+
+    private func stagingLoadingCard(_ title: String) -> some View {
+        HStack(spacing: 10) {
+            ProgressView().controlSize(.small)
+            Text("Opening \(title)…").font(Otter.font(13.5, .bold)).foregroundStyle(Otter.ink).lineLimit(1)
+            Spacer()
+            Button { player.clearStaged() } label: {
+                Image(systemName: "xmark").font(.system(size: 11, weight: .heavy)).foregroundStyle(Otter.soft)
+                    .frame(width: 26, height: 26)
+            }
+            .buttonStyle(PlainButtonStyle(radius: 8))
+            .accessibilityLabel("Cancel")
+        }
+        .card(padding: 14)
+    }
+
+    /// Slim confirmation card for a dropped or chosen file (Model/Player.tla, StageOnDrop).
+    private func stagedFileCard(_ file: Player.StagedFile, canRead: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 8) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(file.title).font(Otter.font(15, .heavy)).foregroundStyle(Otter.ink).lineLimit(2)
+                    if file.resumed {
+                        Text("Resume at \(file.percent)%")
+                            .font(Otter.font(12, .bold)).monospacedDigit().foregroundStyle(Otter.teal)
+                    }
+                }
+                Spacer(minLength: 4)
+                Button { player.clearStaged() } label: {
+                    Image(systemName: "xmark").font(.system(size: 11, weight: .heavy)).foregroundStyle(Otter.soft)
+                        .frame(width: 26, height: 26)
+                }
+                .buttonStyle(PlainButtonStyle(radius: 8))
+                .accessibilityLabel("Close file")
+            }
+            if !canRead {
+                Text("Pick a voice above to read this file.").font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft)
+            }
+            HStack(spacing: 8) {
+                Button {
+                    player.readStaged(fromStart: false)
+                } label: {
+                    Label(file.resumed ? "Resume" : "Read aloud", systemImage: "play.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(ChunkyButtonStyle(compact: true))
+                .disabled(!canRead)
+                if file.resumed {
+                    Button("Start over") { player.readStaged(fromStart: true) }
+                        .buttonStyle(SoftButtonStyle())
+                        .disabled(!canRead)
+                }
+            }
+        }
+        .card(padding: 14)
     }
 
     /// A shortcut inside a sentence, in teal, or in red while it isn't working.
@@ -251,23 +392,23 @@ struct HomePage: View {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.pdf, .epub, .image, .plainText]
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        player.readFile(url)
+        player.stageFile(url)
     }
 
     private func allowAccessibility() {
-        if askedTrust {
+        if model.askedTrust {
             openPrivacy("Privacy_Accessibility")
         } else {
-            askedTrust = true
+            model.askedTrust = true
             trusted = AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
         }
     }
 
     private func allowScreenRecording() {
-        if askedScreen {
+        if model.askedScreen {
             openPrivacy("Privacy_ScreenCapture")
         } else {
-            askedScreen = true
+            model.askedScreen = true
             screen = CGRequestScreenCaptureAccess()
         }
     }
@@ -290,12 +431,23 @@ struct SettingsPage: View {
     let updater: Updater
     let back: () -> Void
     @State private var daily = true
+    @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
+    @State private var loginNote: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             PageHeader(title: "Settings", back: back)
             VStack(alignment: .leading, spacing: 7) {
-                SectionLabel("Shortcuts")
+                HStack {
+                    SectionLabel("Shortcuts")
+                    Spacer()
+                    if shortcuts.isCustomized {
+                        Button("Reset", action: shortcuts.resetToDefaults)
+                            .buttonStyle(PlainButtonStyle(radius: 6))
+                            .font(Otter.font(11.5, .bold))
+                            .foregroundStyle(Otter.teal)
+                    }
+                }
                 VStack(spacing: 0) {
                     ForEach(Array(ShortcutAction.allCases.enumerated()), id: \.element) { i, action in
                         if i > 0 { Divider().overlay(Otter.edge) }
@@ -305,10 +457,22 @@ struct SettingsPage: View {
                 .card(padding: 12)
             }
             VStack(alignment: .leading, spacing: 7) {
-                SectionLabel("Updates")
+                SectionLabel("App")
                 VStack(spacing: 0) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Toggle(isOn: Binding(get: { launchAtLogin }, set: { setLaunchAtLogin($0) })) {
+                            Text("Open at login").font(Otter.font(13.5, .bold)).foregroundStyle(Otter.ink)
+                        }
+                        .toggleStyle(.switch)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        if let loginNote {
+                            Text(loginNote).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.alert)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    Divider().overlay(Otter.edge)
                     Toggle(isOn: Binding(get: { daily }, set: { daily = $0; updater.checksDaily = $0 })) {
-                        Text("Check every day").font(Otter.font(13.5, .bold)).foregroundStyle(Otter.ink)
+                        Text("Check for updates daily").font(Otter.font(13.5, .bold)).foregroundStyle(Otter.ink)
                     }
                     .toggleStyle(.switch)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -331,7 +495,32 @@ struct SettingsPage: View {
                 Button("Quit Berang") { NSApp.terminate(nil) }.buttonStyle(SoftButtonStyle())
             }
         }
-        .onAppear { daily = updater.checksDaily }
+        .contentShape(Rectangle())
+        .onTapGesture { if shortcuts.recording != nil { shortcuts.cancelRecording() } }
+        .onAppear {
+            daily = updater.checksDaily
+            launchAtLogin = SMAppService.mainApp.status == .enabled
+            loginNote = SMAppService.mainApp.status == .requiresApproval ? "Allow Berang in Login Items." : nil
+        }
+    }
+
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        loginNote = nil
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            loginNote = error.localizedDescription
+        }
+        let status = SMAppService.mainApp.status
+        launchAtLogin = status == .enabled
+        if status == .requiresApproval {
+            loginNote = "Allow Berang in Login Items."
+            SMAppService.openSystemSettingsLoginItems()
+        }
     }
 }
 

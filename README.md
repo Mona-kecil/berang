@@ -33,7 +33,7 @@ Berang lives in the menu bar, as an otter peeking over the waterline. Its menu h
 | Start or pause reading | Press ⌥⎋ in any app |
 | Read from somewhere else on the page | While Berang reads, select text there and press ⌥⎋ |
 | Read part of the screen | Press ⌥⇧⎋ (Option-Shift-Escape) and drag over it |
-| Listen to a whole book or file | Drop it on Berang's window, or open it with Berang in Finder |
+| Listen to a whole book or file | Drop it on Berang's window or open it with Berang, then click Read |
 | Skip or stop | Point at the floating player, which shows while Berang reads at the edge of the screen. Drag it to either side; it stays there |
 | Change the speed | Click the speed in the player, or scroll over the player. While Berang reads, ⌥⇧. reads faster and ⌥⇧, slower, by 0.1× |
 | Hear and choose a voice | In Berang's window, click your voice. Select any voice to hear it, or type your own words below the list and click Read |
@@ -121,9 +121,11 @@ open mac/build/Berang.app
 - never shows playing when nothing plays;
 - keeps the highlight and saved position on what you hear;
 - reads a request made while the voice gets ready, even if you choose a voice of another engine meanwhile;
-- reads with the engine of the voice you chose.
+- reads with the engine of the voice you chose;
+- stages dropped or opened files in the window instead of speaking unprompted;
+- keeps the player visible in a recognizing state while OCR runs on a screen area or drawn-text window.
 
-With `Fixed = FALSE`, it checks choosing voices as it worked before. TLC then finds the path where Berang asked one engine for another engine's voice. CI runs it; to run it yourself, see the command at the top of the file. Update it with any change to how `Player.swift` handles requests.
+With `Fixed = FALSE`, it checks choosing voices as it worked before, and TLC finds Berang asking one engine for another engine's voice. With `StageOnDrop = FALSE`, dropping a file speaks immediately and violates `NoAutoReadOnDrop`. With `ShowRecognizing = FALSE`, OCR runs with the player hidden and violates `FeedbackDuringOCR`. CI runs it; to run it yourself, see the command at the top of the file. Update it with any change to how `Player.swift` handles requests.
 
 ### Shortcut model
 

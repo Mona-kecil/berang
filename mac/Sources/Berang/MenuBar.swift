@@ -11,6 +11,7 @@ import Keys
     private let shortcuts: Shortcuts
     private let updater: Updater
     private let window: BerangWindow
+    private let status = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     private let play = NSMenuItem(title: "Read This Page", action: #selector(playPause), keyEquivalent: "")
     private let stop = NSMenuItem(title: "Stop", action: #selector(stopReading), keyEquivalent: "")
     private let area = NSMenuItem(title: "Read a Screen Area", action: #selector(readScreenArea), keyEquivalent: "")
@@ -25,6 +26,9 @@ import Keys
         super.init()
         let menu = NSMenu()
         menu.delegate = self
+        status.isEnabled = false
+        status.isHidden = true
+        menu.addItem(status)
         // macOS gives Quit a symbol, so every item gets one to line up.
         for (entry, symbol) in [(stop, "stop.fill"), (area, "rectangle.dashed"), (update, "arrow.down.circle"), (open, "macwindow")] {
             entry.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)
@@ -41,6 +45,14 @@ import Keys
 
     func menuNeedsUpdate(_ menu: NSMenu) {
         let reading = player.state == .playing || player.state == .paused
+        if reading, let info = player.reading {
+            let verb = player.state == .playing ? "Reading" : "Paused"
+            let suffix = info.isFile ? " (\(info.percent)%)" : ""
+            status.title = "\(verb): \(info.title)\(suffix)"
+            status.isHidden = false
+        } else {
+            status.isHidden = true
+        }
         play.title = player.state == .playing ? "Pause" : reading ? "Resume" : "Read This Page"
         play.image = NSImage(systemSymbolName: player.state == .playing ? "pause.fill" : "play.fill", accessibilityDescription: nil)
         stop.isHidden = !reading
