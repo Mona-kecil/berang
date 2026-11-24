@@ -35,3 +35,13 @@ private func blocks(_ texts: String...) -> [Block] { texts.map { Block(kind: .te
     let reloaded = Positions(defaults: defaults, limit: 2)
     #expect(reloaded["b"]?.index == 1 && reloaded["c"]?.index == 2)
 }
+
+@Test func decodesPositionsWithoutTotalAndComputesPercentWhenPresent() throws {
+    let legacy = #"{"index":5,"text":"Hello","date":0}"#.data(using: .utf8)!
+    let decoded = try JSONDecoder().decode(SavedPosition.self, from: legacy)
+    #expect(decoded.total == nil)
+    #expect(decoded.percent == nil)
+
+    let withTotal = SavedPosition(blocks("Hello")[0], at: 34, total: 100)
+    #expect(withTotal.percent == 34)
+}

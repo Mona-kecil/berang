@@ -21,7 +21,7 @@ public struct Page {
 
 /// A paragraph, heading, or list item.
 public struct Block {
-    public enum Kind { case heading, text }
+    public enum Kind: Sendable { case heading, text }
     public let kind: Kind
     public let text: String
     /// Where each piece of `text` came from, so a spoken word can be located on screen later.

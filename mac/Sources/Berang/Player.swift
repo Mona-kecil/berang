@@ -4,14 +4,50 @@ import Observation
 import PhononTTS
 import Speakable
 import TextGrab
+import UniformTypeIdentifiers
 
-/// Reads the window the user was last in, highlighting the sentence and word being heard.
+/// Reads the window the user was last in, highlighting the sentence and word being heard (Model/Player.tla).
 @MainActor @Observable final class Player {
     enum State: Equatable {
-        case idle, downloading, loading, playing, paused
+        case idle, downloading, loading, recognizing, playing, paused
         case failed(String)
 
         var isFailed: Bool { if case .failed = self { true } else { false } }
+    }
+
+    /// A file opened or dropped onto Berang's window, ready to read once the user clicks Read
+    /// (Model/Player.tla, StageOnDrop).
+    struct StagedFile: Equatable {
+        let url: URL
+        let title: String
+        let start: Int
+        let total: Int
+        let resumed: Bool
+
+        var progress: Double { total > 0 ? min(max(Double(start) / Double(total), 0), 1) : 0 }
+        var percent: Int { Int((progress * 100).rounded()) }
+    }
+
+    /// What the player is currently reading or paused on, for the floating player and menu bar.
+    struct ReadingInfo: Equatable {
+        let title: String
+        let subtitle: String?
+        let isFile: Bool
+        let index: Int
+        let total: Int
+
+        var progress: Double { total > 0 ? min(max(Double(index) / Double(total), 0), 1) : 0 }
+        var percent: Int { Int((progress * 100).rounded()) }
+    }
+
+    struct PreviewVoice: Equatable {
+        let engine: Engine
+        let name: String
+    }
+
+    struct DownloadFailure: Equatable {
+        let engine: Engine
+        let message: String
     }
 
     private(set) var state = State.idle {
@@ -36,25 +72,46 @@ import TextGrab
     private(set) var resumedAt: Int?
     /// How much of the voice has downloaded, from 0 to 1, while it downloads.
     private(set) var download: Double?
+    /// An error from downloading an engine in setup or Voices, scoped to the engine that failed.
+    private(set) var downloadError: DownloadFailure?
     /// The engine and voice reading, one of the engine's `voices`. Kept across launches.
     private(set) var engine = Engine(rawValue: UserDefaults.standard.string(forKey: "engine") ?? "") ?? .phonon
     private(set) var voice = UserDefaults.standard.string(forKey: "voice") ?? Engine.phonon.defaultVoice
     /// The engine downloading, while `download` counts.
     private(set) var downloading: Engine?
+    /// The recorded voice preview currently speaking, if any.
+    private(set) var previewing: PreviewVoice?
     /// Whether Berang has read anything yet, which ends setup's last step.
     private(set) var hasRead = UserDefaults.standard.bool(forKey: "hasRead") {
         didSet { UserDefaults.standard.set(hasRead, forKey: "hasRead") }
     }
+    /// File name while a dropped or chosen file is being parsed off the main actor.
+    private(set) var stagingTitle: String?
+    /// A dropped or chosen file waiting for explicit Read (Model/Player.tla, StageOnDrop).
+    private(set) var staged: StagedFile?
+    /// An inline message when a dropped file is unsupported or unreadable.
+    private(set) var fileError: String?
+    /// Live metadata for what is currently playing or paused.
+    private(set) var reading: ReadingInfo?
+    /// Whether the player is currently reading sample text from the Voices window.
+    private(set) var isReadingText = false
 
     @ObservationIgnored private let audio = AudioOut()
     @ObservationIgnored private let highlight = Highlight()
     /// A voice's recorded preview, playing.
     @ObservationIgnored private var clip: AVAudioPlayer?
+    @ObservationIgnored private var clipDelegate: ClipDelegate?
+    @ObservationIgnored private var clipGeneration = 0
+    @ObservationIgnored private var speakingSample = false
     @ObservationIgnored private var tts: (any Speech)?
     /// The engine `tts` runs, which differs from `engine` after a voice of another engine is chosen.
     @ObservationIgnored private var ttsEngine: Engine?
     private var needsLoad: Bool { tts == nil || ttsEngine != engine }
     @ObservationIgnored private var page: Page?
+    @ObservationIgnored private var stagedPage: Page?
+    @ObservationIgnored private var stageTask: Task<Void, Never>?
+    @ObservationIgnored private var stageGeneration = 0
+    @ObservationIgnored private var activeMeta: (title: String, subtitle: String?, isFile: Bool)?
     /// The selection in the page being read when reading started or last moved to one, which the read shortcut
     /// leaves alone (Model/Jump.tla, Remember).
     @ObservationIgnored private var seenSelection: Selected?
@@ -103,6 +160,15 @@ import TextGrab
         min(max((s * 10).rounded() / 10, speeds.lowerBound), speeds.upperBound)
     }
 
+    /// Whether Berang can read the file at `url` (PDF, EPUB, image, or plain text).
+    static func supports(_ url: URL) -> Bool {
+        guard url.isFileURL else { return false }
+        let ext = url.pathExtension.lowercased()
+        if ext == "epub" { return true }
+        guard let type = UTType(filenameExtension: ext) else { return false }
+        return type.conforms(to: .pdf) || type.conforms(to: .epub) || type.conforms(to: .image) || type.conforms(to: .plainText)
+    }
+
     /// Changes the speed by `delta`, as the speed shortcuts do.
     func nudge(_ delta: Float) { speed = Self.step(speed + delta) }
 
@@ -110,7 +176,7 @@ import TextGrab
         switch state {
         case .playing: audio.pause(); state = .paused
         case .paused: audio.resume(); state = .playing
-        case .idle, .failed: open(.window)
+        case .idle, .failed, .recognizing: open(.window)
         case .downloading, .loading: pending = .window
         }
     }
@@ -145,6 +211,9 @@ import TextGrab
     func stop() {
         cancel()
         page = nil
+        activeMeta = nil
+        reading = nil
+        isReadingText = false
         resumedAt = nil
         state = .idle
     }
@@ -162,6 +231,7 @@ import TextGrab
     private func cancel() {
         generation += 1
         task?.cancel()
+        speakingSample = false
         endPreview()
         audio.stop()
         clock?.invalidate()
@@ -169,24 +239,113 @@ import TextGrab
         highlight.hide()
     }
 
+    /// Stops any playing voice preview clip or synthesized voice sample (e.g. when leaving Voices).
+    func stopPreview() {
+        endPreview()
+        if speakingSample {
+            speakingSample = false
+            generation += 1
+            task?.cancel()
+            audio.stop()
+        }
+    }
+
     private func endPreview() {
+        clipGeneration += 1
         clip?.stop()
         clip = nil
+        clipDelegate = nil
+        previewing = nil
+    }
+
+    private func playClip(at url: URL, engine: Engine, name: String) -> Bool {
+        guard let player = try? AVAudioPlayer(contentsOf: url) else { return false }
+        clipGeneration += 1
+        let id = clipGeneration
+        let delegate = ClipDelegate { [weak self] in
+            Task { @MainActor in
+                if self?.clipGeneration == id { self?.endPreview() }
+            }
+        }
+        player.delegate = delegate
+        clip = player
+        clipDelegate = delegate
+        guard player.play() else {
+            endPreview()
+            return false
+        }
+        previewing = PreviewVoice(engine: engine, name: name)
+        return true
     }
 
     /// Reads the text in an area of the screen the user drags over, stopping what is playing.
     func readScreenArea() { open(.screenArea) }
 
-    /// Reads a PDF, EPUB, image, or text file, from where it was last left.
-    func readFile(_ url: URL) { open(.file(url)) }
+    /// Stages a PDF, EPUB, image, or text file off the main actor without speaking until the user clicks Read
+    /// (Model/Player.tla, StageOnDrop).
+    func stageFile(_ url: URL) {
+        stageGeneration += 1
+        let sg = stageGeneration
+        stageTask?.cancel()
+        fileError = nil
+        guard Self.supports(url) else {
+            stagingTitle = nil
+            staged = nil
+            stagedPage = nil
+            fileError = "Berang reads PDF, EPUB, images, and plain text."
+            return
+        }
+        staged = nil
+        stagedPage = nil
+        stagingTitle = url.deletingPathExtension().lastPathComponent
+        stageTask = Task { [weak self] in
+            let parsed = await Task.detached(priority: .userInitiated) { parseFile(url) }.value
+            guard let self, self.stageGeneration == sg, !Task.isCancelled else { return }
+            self.stagingTitle = nil
+            guard let parsed else {
+                self.fileError = "Berang can't read \(url.lastPathComponent)."
+                return
+            }
+            let file = parsed.page()
+            let saved = file.address.flatMap { self.positions[$0]?.index(in: file.blocks) }
+            let resumed = saved != nil && saved != file.start
+            let start = resumed ? saved! : file.start
+            self.stagedPage = file
+            self.staged = StagedFile(
+                url: url,
+                title: file.window,
+                start: start,
+                total: file.blocks.count,
+                resumed: resumed
+            )
+        }
+    }
+
+    /// Starts reading the staged file, from its saved spot or from the start (Model/Player.tla, YouStartStaged).
+    /// Keeps the staged file visible until playback begins so a failed voice load can be retried from Home.
+    func readStaged(fromStart: Bool = false) {
+        guard let staged, let file = stagedPage else { return }
+        fileError = nil
+        open(.stagedFile(url: staged.url, page: file, fromStart: fromStart))
+    }
+
+    /// Dismisses the staged file card without starting playback (Model/Player.tla, YouClearStaged).
+    func clearStaged() {
+        stageGeneration += 1
+        stageTask?.cancel()
+        stagingTitle = nil
+        staged = nil
+        stagedPage = nil
+        fileError = nil
+    }
 
     /// Reads text typed or pasted into the Voices window, to hear a voice on your own words.
     func readText(_ text: String) { open(.text(text)) }
 
-    private enum Source { case window, screenArea, file(URL), text(String) }
+    private enum Source { case window, screenArea, stagedFile(url: URL, page: Page, fromStart: Bool), text(String) }
 
     /// Starts a request, replacing whatever was playing or waiting. While the voice downloads or loads, the
-    /// request waits for it instead.
+    /// request waits for it instead. During `.recognizing`, a new request replaces OCR immediately (Model/Player.tla).
     private func open(_ source: Source) {
         if state == .downloading || state == .loading {
             pending = source
@@ -203,7 +362,7 @@ import TextGrab
             guard AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
             else { throw GrabError.notTrusted }
         case .screenArea: try checkScreenAccess()
-        case .file, .text: break
+        case .stagedFile, .text: break
         }
     }
 
@@ -216,7 +375,8 @@ import TextGrab
                 if needsLoad {
                     active = requested
                     defer { if g == generation { active = nil } }
-                    try await installVoice()
+                    try await installVoice(generation: g)
+                    guard g == generation else { return }
                     state = .loading
                     guard try await loadVoice(g) else { return }
                     if let latest = pending {
@@ -225,7 +385,9 @@ import TextGrab
                         try allow(source)
                     }
                 }
+                endPreview()
                 var page: Page
+                var resumes = false
                 switch source {
                 case .window:
                     guard let target else { throw PhononError(description: "Open a page to read, then press play.") }
@@ -236,34 +398,53 @@ import TextGrab
                             CGRequestScreenCaptureAccess()
                             throw ScreenAreaError.drawnText(app: page.app)
                         }
+                        state = .recognizing  // Model/Player.tla, ShowRecognizing
                         page = page.with(try await readScreen(frame))
                         guard g == generation else { return }
                     }
                     guard !page.blocks.isEmpty else { throw PhononError(description: "\(page.app) shows no text to read.") }
                     pageKey = page.address ?? target.bundleIdentifier.map { "\($0) \(page.window)" }
+                    resumes = page.startPoint == .screen && page.start == 0
+                    let title = page.window.isEmpty ? page.app : page.window
+                    activeMeta = (title: title, subtitle: page.window.isEmpty ? nil : page.app, isFile: false)
+                    isReadingText = false
                 case .screenArea:
                     state = .idle  // not loading while the user picks
-                    let area = try await pickScreenArea()
-                    guard g == generation, let area else { return }
-                    page = area
+                    guard let captured = try await captureScreenArea() else { return }
+                    guard g == generation else {
+                        try? FileManager.default.removeItem(at: captured)
+                        return
+                    }
+                    endPreview()
+                    state = .recognizing  // Model/Player.tla, ShowRecognizing
+                    page = try await recognizeScreenArea(captured)
+                    guard g == generation else { return }
                     pageKey = nil
-                case .file(let url):
-                    guard let file = readFilePage(url), !file.blocks.isEmpty
-                    else { throw PhononError(description: "Berang can't read \(url.lastPathComponent).") }
+                    activeMeta = (title: "Screen area", subtitle: nil, isFile: false)
+                    isReadingText = false
+                case .stagedFile(let url, let file, let fromStart):
                     page = file
                     pageKey = file.address
+                    resumes = !fromStart
+                    activeMeta = (title: file.window, subtitle: nil, isFile: true)
+                    isReadingText = false
+                    if staged?.url == url {
+                        staged = nil
+                        stagedPage = nil
+                    }
                 case .text(let text):
                     page = textPage(text)
                     guard !page.blocks.isEmpty else { throw PhononError(description: "Type something to read.") }
                     pageKey = nil
+                    activeMeta = (title: "Sample text", subtitle: nil, isFile: false)
+                    isReadingText = true
                 }
                 self.page = page
                 seenSelection = selected(in: page)
                 began?({ if case .window = source { true } else { false } }())
                 index = page.start
-                top = if case .file = source { page.start } else { 0 }
+                top = if case .stagedFile = source { page.start } else { 0 }
                 // A file, or an unscrolled page with nothing selected, continues where the last reading stopped.
-                let resumes = if case .file = source { true } else { page.startPoint == .screen && page.start == 0 }
                 if resumes, let pageKey, let saved = positions[pageKey]?.index(in: page.blocks), saved != page.start {
                     index = saved
                     resumedAt = saved
@@ -275,6 +456,7 @@ import TextGrab
             } catch {
                 guard g == generation, !(error is CancellationError) else { return }
                 pending = nil
+                isReadingText = false
                 state = .failed("\(error)")
             }
         }
@@ -289,16 +471,19 @@ import TextGrab
         } else {
             stop()
         }
-        clip = try? AVAudioPlayer(contentsOf: url)
-        clip?.play()
+        _ = playClip(at: url, engine: engine, name: name)
     }
 
     /// Downloads an engine ahead of reading, as setup and the Voices window offer, then reads with `voice`.
     func downloadVoice(_ engine: Engine, then voice: String? = nil) {
         guard !engine.isInstalled, state == .idle || state.isFailed else { return }
+        cancel()
+        if downloadError?.engine == engine { downloadError = nil }
+        let g = generation
         task = Task {
             do {
-                try await installVoice(engine)
+                try await installVoice(engine, generation: g)
+                guard g == generation else { return }
                 state = .idle
                 if let voice, pending == nil {
                     choose(engine, voice)
@@ -309,8 +494,15 @@ import TextGrab
                     start(latest)
                 }
             } catch {
+                guard g == generation, !(error is CancellationError) else { return }
+                let hadPending = pending != nil
                 pending = nil
-                state = .failed("\(error)")
+                if hadPending {
+                    state = .failed("\(error)")
+                } else {
+                    downloadError = DownloadFailure(engine: engine, message: "\(error)")
+                    state = .idle
+                }
             }
         }
     }
@@ -328,7 +520,7 @@ import TextGrab
             if switching { audition() } else if let tts { Task { try? await tts.setVoice(name) } }
         case .downloading:
             preview(engine, name)  // beside the download, which then loads the chosen engine
-        case .loading, .idle, .failed:
+        case .loading, .idle, .failed, .recognizing:
             audition()
         }
     }
@@ -341,11 +533,8 @@ import TextGrab
         let waiting = state == .loading ? pending ?? active : nil
         stop()
         pending = waiting
-        if let url = engine.preview(voice), let player = try? AVAudioPlayer(contentsOf: url) {
-            clip = player
-            player.play()
-        }
-        let speaks = clip == nil
+        let playedClip = engine.preview(voice).map { playClip(at: $0, engine: engine, name: voice) } ?? false
+        let speaks = !playedClip
         guard needsLoad || speaks else { return }
         let g = generation
         task = Task {
@@ -361,6 +550,8 @@ import TextGrab
                     }
                 }
                 guard speaks, let tts else { return }
+                speakingSample = true
+                defer { if g == generation { speakingSample = false } }
                 for chunk in prepare(voiceSampleText) {
                     for try await part in tts.stream(chunk.text) {
                         try Task.checkCancellation()
@@ -393,14 +584,21 @@ import TextGrab
         return true
     }
 
-    private func installVoice(_ engine: Engine? = nil) async throws {
+    private func installVoice(_ engine: Engine? = nil, generation g: Int) async throws {
         let engine = engine ?? self.engine
         guard !engine.isInstalled else { return }
         state = .downloading
         downloading = engine
         download = 0
-        defer { download = nil; downloading = nil }
-        try await engine.install { [weak self] in self?.download = $0 }
+        defer {
+            if g == generation {
+                download = nil
+                downloading = nil
+            }
+        }
+        try await engine.install { [weak self] fraction in
+            if self?.generation == g { self?.download = fraction }
+        }
     }
 
     /// Plays from `index` to the end of the page, for request `g`. A skip cancels this task and starts another.
@@ -465,10 +663,29 @@ import TextGrab
     private func heard(_ b: Int) {
         guard let page else { return }
         index = b
-        if let pageKey { positions[pageKey] = SavedPosition(page.blocks[b], at: b) }
+        if let pageKey {
+            // Only file reads know the full document's block count; Preview/browser PDFs expose a partial window.
+            let total = activeMeta?.isFile == true ? page.blocks.count : nil
+            positions[pageKey] = SavedPosition(page.blocks[b], at: b, total: total)
+        }
+        if let meta = activeMeta {
+            reading = ReadingInfo(
+                title: meta.title,
+                subtitle: meta.subtitle,
+                isFile: meta.isFile,
+                index: b,
+                total: page.blocks.count
+            )
+        }
         if let r = resumedAt, b >= r + 2 { resumedAt = nil }
         page.blocks[b].scrollToVisible()
     }
+}
+
+private final class ClipDelegate: NSObject, AVAudioPlayerDelegate, @unchecked Sendable {
+    let finished: @Sendable () -> Void
+    init(finished: @escaping @Sendable () -> Void) { self.finished = finished }
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) { finished() }
 }
 
 /// Five seconds of voice audio.

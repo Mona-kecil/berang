@@ -55,11 +55,26 @@ extension View {
     }
 }
 
-/// A button that draws only its label, dimmed while pressed, with the rounded focus ring.
+/// A button that draws only its label, dimmed with subtle press feedback and the rounded focus ring.
 struct PlainButtonStyle: ButtonStyle {
     var radius: CGFloat = 10
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label.opacity(configuration.isPressed ? 0.7 : 1).contentShape(Rectangle()).focusRing(radius)
+        PlainButtonBody(configuration: configuration, radius: radius)
+    }
+}
+
+private struct PlainButtonBody: View {
+    let configuration: ButtonStyle.Configuration
+    let radius: CGFloat
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.7 : 1)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.96 : 1)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.12), value: configuration.isPressed)
+            .contentShape(Rectangle())
+            .focusRing(radius)
             .dimmedWhenDisabled()
     }
 }
@@ -107,6 +122,7 @@ private struct Raised<S: InsettableShape>: ViewModifier {
     let stroke: Color?
     let lineWidth: CGFloat
     @Environment(\.sunk) private var sunk
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
         content
@@ -116,6 +132,7 @@ private struct Raised<S: InsettableShape>: ViewModifier {
                     .background(shape.fill(edge).offset(y: sunk ? 1 : depth))
             )
             .offset(y: sunk ? depth - 1 : 0)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.1), value: sunk)
     }
 }
 

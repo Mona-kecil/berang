@@ -25,6 +25,19 @@ struct VoicesPage: View {
 
     enum Filter: String, CaseIterable { case all = "All", female = "Female", male = "Male", characters = "Characters", mine = "On this Mac" }
 
+    private var hasInstalledEngine: Bool { Engine.allCases.contains(where: \.isInstalled) }
+
+    /// The uninstalled voice currently highlighted, which always shows its Download card right away.
+    private var downloadTarget: Voice? {
+        if let considered, !considered.engine.isInstalled { return considered }
+        if !player.engine.isInstalled { return Voice(engine: player.engine, name: player.voice) }
+        return nil
+    }
+
+    private var visibleFilters: [Filter] {
+        hasInstalledEngine ? Filter.allCases : Filter.allCases.filter { $0 != .mine }
+    }
+
     /// Texts that test what voices often get wrong. Each fills the box, to edit or replace.
     static let samples: [(name: String, text: String)] = [
         ("Everyday", "Dr. Rivera's flight leaves at 7:45 on March 3rd, from gate B12. Is it really $1,299 for two nights? She laughed and said, \"Book it anyway.\""),
@@ -39,14 +52,24 @@ struct VoicesPage: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             PageHeader(title: "Voices", back: back)
-            TextField("Search: deep, british, female…", text: $search)
-                .textFieldStyle(.plain)
-                .font(Otter.font(13))
-                .padding(.horizontal, 12).padding(.vertical, 8)
-                .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Otter.card)
-                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Otter.edge, lineWidth: 2)))
             HStack(spacing: 6) {
-                ForEach(Filter.allCases, id: \.self) { f in
+                Image(systemName: "magnifyingglass").font(.system(size: 12, weight: .bold)).foregroundStyle(Otter.soft)
+                TextField("Search: deep, british, female…", text: $search)
+                    .textFieldStyle(.plain)
+                    .font(Otter.font(13))
+                if !search.isEmpty {
+                    Button { search = "" } label: {
+                        Image(systemName: "xmark.circle.fill").font(.system(size: 13)).foregroundStyle(Otter.soft)
+                    }
+                    .buttonStyle(PlainButtonStyle(radius: 6))
+                    .accessibilityLabel("Clear search")
+                }
+            }
+            .padding(.horizontal, 10).padding(.vertical, 8)
+            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Otter.card)
+                .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Otter.edge, lineWidth: 2)))
+            HStack(spacing: 6) {
+                ForEach(visibleFilters, id: \.self) { f in
                     Button(f.rawValue) { filter = f }.buttonStyle(ChipStyle(on: filter == f))
                 }
             }
@@ -69,9 +92,10 @@ struct VoicesPage: View {
             }
             .onAppear { scroller.scrollTo(Voice(engine: player.engine, name: player.voice), anchor: .center) }
             }
-            if let considered, !considered.engine.isInstalled { download(considered) }
-            tryIt
+            if let target = downloadTarget { download(target) }
+            if hasInstalledEngine { tryIt }
         }
+        .onDisappear { player.stopPreview() }
         .task {
             // An engine's voices appear once it finishes downloading.
             while !Task.isCancelled {
@@ -125,24 +149,33 @@ struct VoicesPage: View {
         considered.map { $0 == voice } ?? (voice.engine == player.engine && voice.name == player.voice)
     }
 
+    private func isSpeaking(_ voice: Voice) -> Bool {
+        player.previewing == Player.PreviewVoice(engine: voice.engine, name: voice.name)
+    }
+
     private func row(_ voice: Voice) -> some View {
         let on = isSelected(voice)
+        let speaking = isSpeaking(voice)
+        let symbol = speaking ? "speaker.wave.2.fill" : (on && voice.engine.isInstalled ? "checkmark" : "play.fill")
         return Button { select(voice) } label: {
             HStack(spacing: 10) {
-                Image(systemName: on ? "speaker.wave.2.fill" : "play.fill")
-                    .font(.system(size: 9, weight: .bold))
+                Image(systemName: symbol)
+                    .font(.system(size: 9.5, weight: .bold))
                     .foregroundStyle(on ? .white : Otter.teal)
                     .frame(width: 26, height: 26)
                     .background(Circle().fill(on ? Otter.orange : Otter.card))
                     .background(Circle().fill(on ? Otter.orangeEdge : Otter.edge).offset(y: 2))
-                Text(voice.title).font(Otter.font(13, .bold)).foregroundStyle(Otter.ink)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(voice.title).font(Otter.font(13, .bold)).foregroundStyle(Otter.ink)
+                    if let summary = voice.profile?.summary, !summary.isEmpty {
+                        Text(summary).font(Otter.font(11, .medium)).foregroundStyle(Otter.soft).lineLimit(1)
+                    }
+                }
                 Spacer(minLength: 8)
                 if !voice.engine.isInstalled {
                     Text("↓ \(megabytes(voice.engine.size)) MB").font(Otter.font(10.5, .heavy)).foregroundStyle(Otter.soft)
                         .padding(.horizontal, 6).padding(.vertical, 2)
                         .background(RoundedRectangle(cornerRadius: 6).fill(Otter.edge.opacity(0.5)))
-                } else if let summary = voice.profile?.summary, !summary.isEmpty {
-                    Text(summary).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft).lineLimit(1)
                 }
             }
             .padding(.horizontal, 8).padding(.vertical, 6)
@@ -166,21 +199,38 @@ struct VoicesPage: View {
     }
 
     private func download(_ voice: Voice) -> some View {
-        HStack(spacing: 10) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(voice.title) needs \(voice.engine.title)").font(Otter.font(13, .bold)).foregroundStyle(Otter.ink)
-                Text("One download, \(megabytes(voice.engine.size)) MB").font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft)
-            }
-            Spacer()
-            if player.downloading == voice.engine, let fraction = player.download {
-                ProgressView(value: fraction).tint(Otter.orange).frame(width: 90)
-            } else {
-                Button("Download") { player.downloadVoice(voice.engine, then: voice.name) }
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(voice.title) needs \(voice.engine.title)").font(Otter.font(13, .bold)).foregroundStyle(Otter.ink)
+                    Text("One download, \(megabytes(voice.engine.size)) MB").font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft)
+                }
+                Spacer()
+                if player.downloading == voice.engine, let fraction = player.download {
+                    HStack(spacing: 8) {
+                        ProgressView(value: fraction).tint(Otter.orange).frame(width: 68)
+                        Text("\(Int((fraction * 100).rounded()))%")
+                            .font(Otter.font(11.5, .heavy)).monospacedDigit().foregroundStyle(Otter.orange)
+                    }
+                } else {
+                    let failed = player.downloadError?.engine == voice.engine
+                    Button(failed ? "Retry" : "Download") {
+                        player.downloadVoice(voice.engine, then: voice.name)
+                    }
                     .buttonStyle(ChunkyButtonStyle(compact: true))
                     .disabled(player.state == .downloading || player.state == .loading)
+                }
+            }
+            if let failure = player.downloadError, failure.engine == voice.engine, player.downloading == nil {
+                Text(failure.message).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.alert)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .card()
+    }
+
+    private var testingText: Bool {
+        player.isReadingText && (player.state == .playing || player.state == .paused)
     }
 
     private var tryIt: some View {
@@ -202,9 +252,14 @@ struct VoicesPage: View {
                 .font(Otter.font(12, .bold))
                 .accessibilityLabel("Sample text")
                 Spacer()
-                Button("Read with \(Engine.title(player.voice))") { player.readText(words) }
-                    .buttonStyle(ChunkyButtonStyle(compact: true))
-                    .disabled(!player.engine.isInstalled || words.allSatisfy(\.isWhitespace))
+                if testingText {
+                    Button("Stop") { player.stop() }
+                        .buttonStyle(SoftButtonStyle())
+                } else {
+                    Button("Read with \(Engine.title(player.voice))") { player.readText(words) }
+                        .buttonStyle(ChunkyButtonStyle(compact: true))
+                        .disabled(!player.engine.isInstalled || words.allSatisfy(\.isWhitespace))
+                }
             }
         }
         .card(padding: 10)

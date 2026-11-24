@@ -269,6 +269,16 @@ struct PlayerView: View {
         // The panel never takes focus from the app being read, so its controls show no focus ring.
         .focusEffectDisabled()
         .onChange(of: player.state == .idle) { _, idle in if idle { showsSpeed = false } }
+        .onChange(of: dock.dragging) { _, dragging in if dragging { showsSpeed = false } }
+        .task(id: player.state) {
+            // Soft transient notices auto-dismiss instead of lingering at the edge of the screen.
+            guard case .failed(let message) = player.state,
+                  message == ScreenAreaError.noText.description else { return }
+            try? await Task.sleep(for: .seconds(4))
+            if !Task.isCancelled, case .failed(let current) = player.state, current == message {
+                player.stop()
+            }
+        }
     }
 
     /// Play and the speed, and while the pointer is over it, the rest.
@@ -303,6 +313,7 @@ struct PlayerView: View {
         .accessibilityElement(children: .contain)
         .accessibilityAction(named: "Previous paragraph") { player.skip(-1) }
         .accessibilityAction(named: "Next paragraph") { player.skip(1) }
+        .accessibilityAction(named: "Start over", player.startOver)
         .accessibilityAction(named: "Stop", player.stop)
     }
 
@@ -315,13 +326,24 @@ struct PlayerView: View {
             : RectangleCornerRadii(topLeading: 0, bottomLeading: 0, bottomTrailing: r, topTrailing: r)
     }
 
-    /// The speed panel, Start over, a problem, and tips, as cards beside the bar, toward the middle of the screen.
+    /// The speed panel, hover context for files, Start over, OCR status, a problem, and tips, as cards beside the bar.
     @ViewBuilder private var cards: some View {
         let failure: String? = if case .failed(let message) = player.state { message } else { nil }
-        if showsSpeed || player.resumedAt != nil || failure != nil || tips.showing != nil {
+        let fileContext: Player.ReadingInfo? = if dock.open, reading, let info = player.reading, info.isFile { info } else { nil }
+        let recognizing = player.state == .recognizing
+        if showsSpeed || fileContext != nil || recognizing || player.resumedAt != nil || failure != nil || tips.showing != nil {
             VStack(alignment: dock.side == .right ? .trailing : .leading, spacing: 8) {
                 if showsSpeed {
                     SpeedControls(player: player, shortcuts: shortcuts).padding(12).floating(14).transition(.opacity)
+                }
+                if let fileContext {
+                    contextCard(fileContext).padding(.horizontal, 12).padding(.vertical, 9).floating(14).transition(.opacity)
+                }
+                if recognizing {
+                    Text("Reading screen…")
+                        .font(Otter.font(12, .semibold)).foregroundStyle(Otter.ink)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .floating(14)
                 }
                 if player.resumedAt != nil {
                     Button("Start over", systemImage: "arrow.counterclockwise", action: player.startOver)
@@ -334,6 +356,31 @@ struct PlayerView: View {
                 }
                 if let failure { self.failure(failure).padding(12).floating(14) }
                 if let tip = tips.showing { tipRow(tip).padding(.leading, 12).padding(.vertical, 6).floating(14).transition(.opacity) }
+            }
+        }
+    }
+
+    /// Quiet wayfinding card on hover for files (where no document is open on screen).
+    private func contextCard(_ info: Player.ReadingInfo) -> some View {
+        HStack(alignment: .center, spacing: 8) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(info.title)
+                    .font(Otter.font(12, .bold)).foregroundStyle(Otter.ink)
+                    .lineLimit(1)
+                Text("\(info.percent)%")
+                    .font(Otter.font(10.5, .semibold)).monospacedDigit().foregroundStyle(Otter.teal)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: 158, alignment: .leading)
+            if player.resumedAt == nil {
+                Button(action: player.startOver) {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.system(size: 11, weight: .bold)).foregroundStyle(Otter.teal)
+                        .frame(width: 26, height: 26)
+                }
+                .buttonStyle(PlainButtonStyle(radius: 7))
+                .help("Start over")
+                .accessibilityLabel("Start over")
             }
         }
     }
@@ -365,7 +412,7 @@ struct PlayerView: View {
     @ViewBuilder private var mainIcon: some View {
         switch player.state {
         case .downloading: ProgressView(value: player.download ?? 0).progressViewStyle(.circular).controlSize(.small).tint(.white)
-        case .loading: ProgressView().controlSize(.small).tint(.white)
+        case .loading, .recognizing: ProgressView().controlSize(.small).tint(.white)
         case .playing: Image(systemName: "pause.fill").font(.system(size: 14, weight: .bold)).foregroundStyle(.white)
         // Nudged right: a triangle centered by its box looks left of center.
         default: Image(systemName: "play.fill").font(.system(size: 14, weight: .bold)).foregroundStyle(.white).offset(x: 1)
@@ -373,20 +420,29 @@ struct PlayerView: View {
     }
 
     @ViewBuilder private func failure(_ message: String) -> some View {
-        VStack(spacing: 8) {
-            Text(message).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.ink).multilineTextAlignment(.center)
-                .frame(width: 214).fixedSize(horizontal: false, vertical: true)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 6) {
+                Text(message).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.ink)
+                    .frame(width: 192, alignment: .leading).fixedSize(horizontal: false, vertical: true)
+                Button(action: player.stop) {
+                    Image(systemName: "xmark").font(.system(size: 8.5, weight: .heavy)).foregroundStyle(Otter.soft)
+                        .frame(width: 22, height: 22)
+                }
+                .buttonStyle(PlainButtonStyle(radius: 6))
+                .accessibilityLabel("Dismiss")
+            }
             if message == GrabError.notTrusted.description {
                 Button("Open Accessibility Settings") {
                     openPrivacy("Privacy_Accessibility")
                 }
+                .buttonStyle(SoftButtonStyle())
             } else if message.hasSuffix(ScreenAreaError.turnOn) {
                 Button("Open Screen Recording Settings") {
                     openPrivacy("Privacy_ScreenCapture")
                 }
+                .buttonStyle(SoftButtonStyle())
             }
         }
-        .buttonStyle(SoftButtonStyle())
     }
 }
 
