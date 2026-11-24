@@ -3,7 +3,7 @@ import Observation
 
 /// What the player teaches, one line at a time, while you read.
 enum Tip: String, CaseIterable {
-    case jump, speed, move
+    case jump, speed, move, more
 
     @MainActor func text(_ shortcuts: Shortcuts) -> String {
         // A shortcut never breaks across lines.
@@ -11,7 +11,8 @@ enum Tip: String, CaseIterable {
         return switch self {
         case .jump: "To read from somewhere else, select it and press \(keys(.page))"
         case .speed: "Scroll over the player to change the speed, or press \(keys(.faster)) to go faster and \(keys(.slower)) to go slower"
-        case .move: "Drag the player anywhere. It stays there."
+        case .move: "Drag the player to either side of the screen. It stays there."
+        case .more: "Point at the player to skip or stop"
         }
     }
 }
