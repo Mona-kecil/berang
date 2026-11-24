@@ -103,7 +103,7 @@ final class KittenSpeech: Speech, @unchecked Sendable {
                 let task = Task {
                     await previous?.value
                     do {
-                        let phonemes = try misaki.process(text: text, language: "en-us")
+                        let phonemes = try misaki.process(text: Self.unhyphenated(text), language: "en-us")
                         for (i, piece) in Self.pieces(phonemes).enumerated() {
                             try Task.checkCancellation()
                             continuation.yield(kitten.speak(piece, voice: voice, keepStart: i == 0))
@@ -119,6 +119,12 @@ final class KittenSpeech: Speech, @unchecked Sendable {
             }
             continuation.onTermination = { _ in task.cancel() }
         }
+    }
+
+    /// Misaki writes the hyphen in "per-project" or "twenty-one" as a dash, which Kitten pauses at, so a joined
+    /// word is said as two words in a row instead.
+    private static func unhyphenated(_ text: String) -> String {
+        text.replacing(/(\w)-(?=\w)/) { "\($0.1) " }
     }
 
     /// Phonemes cut at spaces into pieces Kitten was trained on.
