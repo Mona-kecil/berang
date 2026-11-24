@@ -231,11 +231,15 @@ struct PageHeader: View {
     let title: String
     var back: (() -> Void)? = nil
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 0) {
             if let back {
-                Button(action: back) { Image(systemName: "chevron.left").font(.system(size: 15, weight: .heavy)) }
-                    .buttonStyle(PlainButtonStyle(radius: 6)).foregroundStyle(Otter.ink).accessibilityLabel("Back")
-                    .keyboardShortcut("[", modifiers: .command)
+                // The padding makes the arrow easier to hit and keeps the title where it was.
+                Button(action: back) {
+                    Image(systemName: "chevron.left").font(.system(size: 15, weight: .heavy))
+                        .padding(.vertical, 6).padding(.trailing, 6)
+                }
+                .buttonStyle(PlainButtonStyle(radius: 6)).foregroundStyle(Otter.ink).accessibilityLabel("Back")
+                .keyboardShortcut("[", modifiers: .command)
             }
             Text(title).font(Otter.font(21, .heavy)).foregroundStyle(Otter.ink)
             Spacer()

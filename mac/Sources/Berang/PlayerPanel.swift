@@ -113,7 +113,8 @@ struct PlayerView: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            HStack(spacing: 10) {
+            // 160 points of buttons spread over the width.
+            HStack(spacing: 13.5) {
                 Button { player.skip(-1) } label: { small("backward.fill") }
                     .disabled(!reading)
                     .accessibilityLabel("Previous paragraph")
@@ -149,10 +150,12 @@ struct PlayerView: View {
             }
             if let tip = tips.showing { tipRow(tip) }
         }
+        // One width in every state, so the panel never grows sideways and the buttons stay under the pointer.
+        .frame(width: 214)
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .background(RoundedRectangle(cornerRadius: 22, style: .continuous).fill(Otter.card)
-            .shadow(color: Otter.ink.opacity(0.22), radius: 12, y: 6))
+            .shadow(color: Otter.shadow, radius: 12, y: 6))
         .padding(14)
         .fontDesign(.rounded)
         // The panel never takes focus from the app being read, so its controls show no focus ring.
@@ -163,11 +166,11 @@ struct PlayerView: View {
     private func tipRow(_ tip: Tip) -> some View {
         HStack(alignment: .top, spacing: 6) {
             Text(tip.text(shortcuts)).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft)
-                .frame(width: 196, alignment: .leading)
+                .frame(width: 184, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
             Button { tips.learn(tip) } label: {
                 Image(systemName: "xmark").font(.system(size: 8, weight: .heavy)).foregroundStyle(Otter.soft)
-                    .frame(width: 16, height: 16)
+                    .frame(width: 24, height: 24)
             }
             .buttonStyle(PlainButtonStyle(radius: 5))
             .accessibilityLabel("Dismiss tip")
@@ -194,19 +197,18 @@ struct PlayerView: View {
     @ViewBuilder private func failure(_ message: String) -> some View {
         VStack(spacing: 6) {
             Text(message).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.ink).multilineTextAlignment(.center)
-                .frame(width: 200).fixedSize(horizontal: false, vertical: true)
+                .frame(width: 214).fixedSize(horizontal: false, vertical: true)
             if message == GrabError.notTrusted.description {
                 Button("Open Accessibility Settings") {
                     openPrivacy("Privacy_Accessibility")
                 }
-                .font(Otter.font(11.5, .bold))
             } else if message.hasSuffix(ScreenAreaError.turnOn) {
                 Button("Open Screen Recording Settings") {
                     openPrivacy("Privacy_ScreenCapture")
                 }
-                .font(Otter.font(11.5, .bold))
             }
         }
+        .buttonStyle(SoftButtonStyle())
     }
 
 }

@@ -9,9 +9,15 @@ enum Otter {
     static let ink = dynamic(light: 0x123B3A, dark: 0xE4F3F0)
     static let soft = dynamic(light: 0x4D7C79, dark: 0x9CC4BF)
     static let teal = dynamic(light: 0x0F7D7A, dark: 0x3FB8B2)
-    static let orange = Color(hex: 0xFF8A3D)
-    static let orangeEdge = Color(hex: 0xD9661F)
+    /// Dark enough for white text to stay readable on it.
+    static let orange = Color(hex: 0xE0661F)
+    static let orangeEdge = Color(hex: 0xA74B16)
     static let alert = dynamic(light: 0xB42318, dark: 0xFF8A80)
+    /// The floating player's shadow. Ink would turn it into a pale glow in Dark Mode.
+    static let shadow = Color(nsColor: NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+            ? .black.withAlphaComponent(0.5) : NSColor(hex: 0x123B3A).withAlphaComponent(0.22)
+    })
 
     /// The app's rounded type at `size`.
     static func font(_ size: CGFloat, _ weight: Font.Weight = .semibold) -> Font {
