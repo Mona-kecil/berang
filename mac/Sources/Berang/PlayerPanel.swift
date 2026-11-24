@@ -35,10 +35,12 @@ final class PlayerPanel: NSPanel {
         let host = NSHostingView(rootView: PlayerView(player: player, shortcuts: shortcuts, tips: tips) { [weak self] in
             self?.fit($0)
         })
+        // Measured first: without sizing options, the view reports no size.
+        let size = host.fittingSize
         // The player sizes the window itself, through `fit`, so content that animates away isn't cut off.
         host.sizingOptions = []
         contentView = host
-        setContentSize(host.fittingSize)
+        setContentSize(size)
         place()
         NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil,
                                                queue: .main) { [weak self] _ in
@@ -181,15 +183,18 @@ struct PlayerView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .background(RoundedRectangle(cornerRadius: 22, style: .continuous).fill(Otter.card)
-            .shadow(color: Otter.shadow, radius: 12, y: 6))
+            .shadow(color: Otter.shadow, radius: 6, y: 3))
         // Start over and tips come and go on their own. Changes that shortcuts make, such as the speed, stay instant.
         .animation(motion, value: player.resumedAt != nil)
         .animation(motion, value: tips.showing)
+        // The window's edge would cut the shadow off in a hard line, so the shadow fades out within this margin.
         .padding(14)
         .fixedSize()
         .onGeometryChange(for: CGSize.self, of: \.size, action: resized)
-        // The window stays larger while a row closes; the player keeps to its top.
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        // The window stays larger while a row closes, and is briefly smaller while one opens. The player keeps to the
+        // window's top either way: with no minimum, the frame would take the player's height, and the window would
+        // center it, shifting it up until the window caught up.
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
         .fontDesign(.rounded)
         // The panel never takes focus from the app being read, so its controls show no focus ring.
         .focusEffectDisabled()
