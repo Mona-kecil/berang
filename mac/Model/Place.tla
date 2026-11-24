@@ -1,8 +1,9 @@
 ---- MODULE Place ----
 \* Where the floating player sits, kept across readings and launches. Sources/Berang/PlayerPanel.swift.
 \*
-\* You drag the player where you want it, on any screen, and Berang saves that spot as a place on that screen, so
-\* rearranging screens doesn't move it. Screens connect and disconnect at any time, also while the player is hidden
+\* The player rests against the left or right edge of a screen. You drag it anywhere; when you let go, it snaps to
+\* the nearer edge of the screen you dropped it on, at the height you dropped it. Berang saves that spot as a screen,
+\* an edge, and a height on that screen, so rearranging screens doesn't move it. Screens connect and disconnect at any time, also while the player is hidden
 \* or Berang is quit. When a screen goes away, macOS moves the player onto one that remains, and Berang hears of that
 \* move like any other. When the screen comes back, Berang moves the player back to your spot. Each time the player
 \* shows, and whenever screens change, Berang puts it at your spot, or at the right edge of the main screen, here the
@@ -14,9 +15,12 @@
 CONSTANTS SaveOnAnyMove
 
 Screens == {"laptop", "external"}
-Spots == {"laptopEdge", "laptopCorner", "externalCorner", "externalMiddle"}
-ScreenOf(s) == IF s \in {"laptopEdge", "laptopCorner"} THEN "laptop" ELSE "external"
-Default == "laptopEdge"
+\* Where you can leave the player: an edge of a screen, at some height. One height per edge covers the rest.
+Spots == {"laptopRight", "laptopLeft", "externalRight", "externalLeft"}
+\* Where macOS can also put it, when the screen it was on goes away: anywhere on the laptop's screen.
+Places == Spots \cup {"laptopElsewhere"}
+ScreenOf(s) == IF s \in {"laptopRight", "laptopLeft", "laptopElsewhere"} THEN "laptop" ELSE "external"
+Default == "laptopRight"
 None == "none"
 
 VARIABLES connected, running, shown, at, saved, chosen
@@ -48,7 +52,7 @@ ReadingStops ==
 Unplug ==
     /\ "external" \in connected /\ connected' = {"laptop"}
     /\ IF running /\ shown /\ ScreenOf(at) = "external"
-       THEN \E s \in Spots :
+       THEN \E s \in Places :
                 /\ ScreenOf(s) = "laptop" /\ at' = s
                 /\ saved' = IF SaveOnAnyMove THEN s ELSE saved
        ELSE UNCHANGED <<at, saved>>

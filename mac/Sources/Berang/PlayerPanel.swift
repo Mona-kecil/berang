@@ -5,19 +5,25 @@ import TextGrab
 /// A floating player that never takes focus, so the app being read stays frontmost. It shows while Berang reads,
 /// gets a voice ready, or has something to say, and hides when it stops. Scrolling over it changes the speed.
 ///
-/// It sits where you last dragged it, across readings and launches, as Model/Place.tla checks:
+/// It rests against the left or right edge of a screen. You drag it anywhere; when you let go, it slides to the nearer
+/// edge, or to the edge you flicked it toward, at the height you let go. It stays there across readings and
+/// launches, as Model/Place.tla checks:
 /// - Only your drag saves the spot. macOS moving the player off a display that went away saves nothing.
 /// - Each time it shows, and whenever displays change, it goes to your spot, or to the right edge of the main display
 ///   while your spot's display is gone.
 final class PlayerPanel: NSPanel {
     private let player: Player
     private let tips: Tips
+    private let dock = Dock()
     /// Scrolling not yet turned into a speed step.
     private var scrolled: CGFloat = 0
-    /// Where the player was when you pressed on it, to tell a drag from a click.
-    private var pressedAt: NSPoint?
     /// A smaller size waiting for the content to finish closing.
     private var shrink: Task<Void, Never>?
+    /// While you press on the player: where the window was, to tell a drag from a click, and the pointer's recent
+    /// path, to tell a flick from a drop.
+    private var press: (origin: NSPoint, path: [(x: CGFloat, time: TimeInterval)], timer: Timer)?
+    /// Closing the controls a moment after the pointer leaves, so passing over the edge doesn't flicker them.
+    private var close: Task<Void, Never>?
 
     init(player: Player, shortcuts: Shortcuts, tips: Tips) {
         self.player = player
@@ -26,15 +32,16 @@ final class PlayerPanel: NSPanel {
         isMovableByWindowBackground = true
         isOpaque = false
         backgroundColor = .clear
-        // The pill draws its own soft shadow; a window shadow would trace the transparent margin around it.
+        // The player draws its own shadow; a window shadow would trace the transparent margin around it.
         hasShadow = false
         level = .floating
         hidesOnDeactivate = false
         becomesKeyOnlyIfNeeded = true
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        let host = NSHostingView(rootView: PlayerView(player: player, shortcuts: shortcuts, tips: tips) { [weak self] in
-            self?.fit($0)
+        let host = PlayerHost(rootView: PlayerView(player: player, shortcuts: shortcuts, tips: tips, dock: dock) {
+            [weak self] in self?.fit($0)
         })
+        host.pointer = { [weak self] inside in self?.pointer(inside) }
         // Measured first: without sizing options, the view reports no size.
         let size = host.fittingSize
         // The player sizes the window itself, through `fit`, so content that animates away isn't cut off.
@@ -68,44 +75,109 @@ final class PlayerPanel: NSPanel {
     /// Grows at once, so content opening has room, and shrinks once content closing has faded out.
     private func fit(_ size: CGSize) {
         shrink?.cancel()
-        guard isVisible, size.height < frame.height else { return setContentSize(size) }
+        guard isVisible, size.height < frame.height || size.width < frame.width else { return setContentSize(size) }
         shrink = Task { [weak self] in
             try? await Task.sleep(for: PlayerView.motionTime)
             if !Task.isCancelled { self?.setContentSize(size) }
         }
     }
 
-    /// Puts the player at your spot, or at the right edge of the main display while your spot's display is gone.
-    private func place() {
-        if let spot = PlayerSpot.saved, let screen = NSScreen.screens.first(where: { $0.displayID == spot.display }) {
-            setFrameOrigin(spot.origin(for: frame.size, in: screen.visibleFrame))
-        } else if let screen = NSScreen.screens.first?.visibleFrame {
-            setFrameOrigin(NSPoint(x: screen.maxX - frame.width - 24, y: screen.midY - frame.height / 2))
+    /// Opens the controls while the pointer is over the player.
+    private func pointer(_ inside: Bool) {
+        close?.cancel()
+        if inside {
+            dock.open = true
+            tips.learn(.more)
+        } else {
+            close = Task { [weak self] in
+                try? await Task.sleep(for: .milliseconds(350))
+                if !Task.isCancelled { self?.dock.open = false }
+            }
         }
     }
 
-    /// Saves the spot when a press on the player ends somewhere else: a drag, never a move made by macOS or Berang.
+    /// Puts the player at your spot, or at the right edge of the main display while your spot's display is gone.
+    private func place() {
+        if let spot = PlayerSpot.saved, let screen = NSScreen.screens.first(where: { $0.displayID == spot.display }) {
+            dock.side = spot.side
+            setFrameOrigin(spot.origin(for: frame.size, in: screen.visibleFrame))
+        } else if let room = NSScreen.screens.first?.visibleFrame {
+            dock.side = .right
+            setFrameOrigin(NSPoint(x: Self.x(for: .right, width: frame.width, in: room), y: room.midY - frame.height / 2))
+        }
+    }
+
+    /// The window's left side for a player resting on `side` of `room`. The margin for the shadow on the edge's side
+    /// hangs off the screen, so the player itself touches the edge.
+    static func x(for side: Dock.Side, width: CGFloat, in room: NSRect) -> CGFloat {
+        side == .left ? room.minX - PlayerView.margin : room.maxX - width + PlayerView.margin
+    }
+
     override func sendEvent(_ event: NSEvent) {
         switch event.type {
-        case .leftMouseDown: pressedAt = frame.origin
-        case .leftMouseUp:
-            if let pressedAt, pressedAt != frame.origin, let screen {
-                PlayerSpot.saved = PlayerSpot(frame, in: screen)
-                tips.learn(.move)
-            }
-            pressedAt = nil
+        case .leftMouseDown: pressed()
+        case .leftMouseUp: released()
         default: break
         }
         super.sendEvent(event)
     }
 
-    /// Grows leftward and down when the content grows, so a message never pushes the panel off the right edge and
-    /// the controls stay where they were.
+    /// Follows the pointer while the button is down, since macOS moves the window itself and reports nothing on the way.
+    private func pressed() {
+        let timer = Timer(timeInterval: 1.0 / 60, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.track() }
+        }
+        // Common modes, so it also runs while macOS moves the window.
+        RunLoop.main.add(timer, forMode: .common)
+        press = (frame.origin, [], timer)
+    }
+
+    private func track() {
+        guard var press else { return }
+        let now = NSEvent.mouseLocation, time = ProcessInfo.processInfo.systemUptime
+        press.path = press.path.filter { time - $0.time < 0.1 } + [(now.x, time)]
+        self.press = press
+        if !dock.dragging, frame.origin != press.origin { dock.dragging = true }
+    }
+
+    /// A press that moved the player ends in a slide to an edge, and saves the spot: only your drag saves it, never a
+    /// move made by macOS or Berang.
+    private func released() {
+        guard let press else { return }
+        press.timer.invalidate()
+        self.press = nil
+        guard dock.dragging || frame.origin != press.origin else { return }
+        let samples = press.path
+        let speed = samples.count > 1 ? (samples.last!.x - samples.first!.x) / max(samples.last!.time - samples.first!.time, 0.001) : 0
+        let center = NSPoint(x: frame.midX, y: frame.midY)
+        guard let screen = NSScreen.screens.first(where: { $0.frame.contains(center) }) ?? screen else { return }
+        let room = screen.visibleFrame
+        // Where the player is heading, not only where it was let go: a flick picks the edge it was thrown toward.
+        let side: Dock.Side = center.x + speed * 0.2 < room.midX ? .left : .right
+        let y = min(max(frame.minY, room.minY - PlayerView.margin), room.maxY - frame.height + PlayerView.margin)
+        let target = NSRect(x: Self.x(for: side, width: frame.width, in: room), y: y, width: frame.width, height: frame.height)
+        dock.side = side
+        dock.dragging = false
+        if NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
+            setFrame(target, display: true)
+        } else {
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.3
+                context.timingFunction = CAMediaTimingFunction(controlPoints: 0.23, 1, 0.32, 1)
+                animator().setFrame(target, display: true)
+            }
+        }
+        PlayerSpot.saved = PlayerSpot(top: target.maxY - PlayerView.margin, side: side, on: screen)
+        tips.learn(.move)
+    }
+
+    /// Keeps the edge it rests on and its top in place when the content changes size, so the controls stay where
+    /// they were and a message never pushes the player off the screen.
     override func setFrame(_ rect: NSRect, display: Bool) {
         var rect = rect
-        if frame.width > 0, rect.width != frame.width { rect.origin.x = frame.maxX - rect.width }
+        if frame.width > 0, rect.width != frame.width, dock.side == .right { rect.origin.x = frame.maxX - rect.width }
         if frame.height > 0, rect.height != frame.height {
-            rect.origin.y = max(frame.maxY - rect.height, screen?.visibleFrame.minY ?? -.infinity)
+            rect.origin.y = max(frame.maxY - rect.height, (screen?.visibleFrame.minY ?? -.infinity) - PlayerView.margin)
         }
         super.setFrame(rect, display: display)
     }
@@ -124,101 +196,168 @@ final class PlayerPanel: NSPanel {
     }
 }
 
+/// The floating player's place on screen and what it shows, shared by its window and its view.
+@MainActor @Observable final class Dock {
+    enum Side: String, Codable { case left, right }
+    var side = Side.right
+    /// The pointer is over the player, so it shows every control.
+    var open = false
+    /// You're dragging the player, so it is round on every side.
+    var dragging = false
+}
+
+/// Tells the window when the pointer enters and leaves the player, also while another app is active.
+private final class PlayerHost: NSHostingView<PlayerView> {
+    var pointer: (Bool) -> Void = { _ in }
+
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        for area in trackingAreas where area.owner === self && area.userInfo?["player"] != nil { removeTrackingArea(area) }
+        addTrackingArea(NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect],
+                                       owner: self, userInfo: ["player": true]))
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        super.mouseEntered(with: event)
+        if event.trackingArea?.userInfo?["player"] != nil { pointer(true) }
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        super.mouseExited(with: event)
+        if event.trackingArea?.userInfo?["player"] != nil { pointer(false) }
+    }
+}
+
 struct PlayerView: View {
     let player: Player
     let shortcuts: Shortcuts
     let tips: Tips
+    let dock: Dock
     /// Called with the player's new size when its content changes.
     let resized: (CGSize) -> Void
     @State private var showsSpeed = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// Room around the player for its shadow. On the screen's edge, it hangs off the screen.
+    static let margin: CGFloat = 14
     /// How long a row takes to open or close, with time for the spring to settle.
     static let motionTime = Duration.milliseconds(250)
-    /// Rows open and close with the panel growing and their content fading. With Reduce Motion, they just appear.
+    /// Controls and cards open and close with the player growing and their content fading. With Reduce Motion, they
+    /// just appear.
     private var motion: Animation? { reduceMotion ? nil : .snappy(duration: 0.2) }
+    private var expanded: Bool { dock.open || showsSpeed }
 
     var body: some View {
-        VStack(spacing: 8) {
-            // 160 points of buttons spread over the width.
-            HStack(spacing: 13.5) {
-                Button { player.skip(-1) } label: { small("backward.fill") }
-                    .disabled(!reading)
-                    .accessibilityLabel("Previous paragraph")
-                Button(action: player.playPause) {
-                    mainIcon.frame(width: 40, height: 40)
-                        .raised(in: Circle(), face: Otter.orange, edge: Otter.orangeEdge, depth: 2.5)
-                }
-                .buttonStyle(KeyButtonStyle(radius: 20))
-                .accessibilityLabel(player.state == .playing ? "Pause" : "Play")
-                Button { player.skip(1) } label: { small("forward.fill") }
-                    .disabled(!reading)
-                    .accessibilityLabel("Next paragraph")
-                Button { withAnimation(motion) { showsSpeed.toggle() } } label: {
-                    Text(speedLabel(player.speed)).font(Otter.font(12.5, .heavy)).monospacedDigit().foregroundStyle(Otter.ink)
-                        .frame(minWidth: 36, minHeight: 28)
-                        .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(showsSpeed ? Otter.mint : .clear))
-                }
-                .accessibilityLabel("Speed, \(speedLabel(player.speed))")
-                .accessibilityAddTraits(showsSpeed ? .isSelected : [])
-                Button(action: player.stop) { small("xmark") }
-                    .accessibilityLabel("Stop")
-            }
-            .buttonStyle(PlainButtonStyle(radius: 10))
-            if showsSpeed { SpeedControls(player: player, shortcuts: shortcuts).padding(.top, 4).transition(.opacity) }
-            if player.resumedAt != nil {
-                Button("Start over", systemImage: "arrow.counterclockwise", action: player.startOver)
-                    .buttonStyle(PlainButtonStyle(radius: 6))
-                    .font(Otter.font(11.5, .bold))
-                    .foregroundStyle(Otter.teal)
-                    .transition(.opacity)
-            }
-            if case .failed(let message) = player.state {
-                failure(message)
-            }
-            if let tip = tips.showing { tipRow(tip).transition(.opacity) }
+        HStack(alignment: .top, spacing: 8) {
+            if dock.side == .right { cards; bar } else { bar; cards }
         }
-        // One width in every state, so the panel never grows sideways and the buttons stay under the pointer.
-        .frame(width: 214)
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(RoundedRectangle(cornerRadius: 22, style: .continuous).fill(Otter.card)
-            .shadow(color: Otter.shadow, radius: 6, y: 3))
-        // Start over and tips come and go on their own. Changes that shortcuts make, such as the speed, stay instant.
+        // Start over, tips, and the controls come and go on their own. Changes that shortcuts make, such as the
+        // speed, stay instant.
         .animation(motion, value: player.resumedAt != nil)
         .animation(motion, value: tips.showing)
-        // The window's edge would cut the shadow off in a hard line, so the shadow fades out within this margin.
-        .padding(14)
+        .animation(motion, value: dock.open)
+        .animation(motion, value: dock.dragging)
+        .padding(Self.margin)
         .fixedSize()
         .onGeometryChange(for: CGSize.self, of: \.size, action: resized)
-        // The window stays larger while a row closes, and is briefly smaller while one opens. The player keeps to the
-        // window's top either way: with no minimum, the frame would take the player's height, and the window would
-        // center it, shifting it up until the window caught up.
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
+        // The window stays larger while something closes, and is briefly smaller while something opens. The player
+        // keeps to the window's top and its edge either way: with no minimum, the frame would take the player's size,
+        // and the window would center it, shifting it until the window caught up.
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity,
+               alignment: dock.side == .right ? .topTrailing : .topLeading)
         .fontDesign(.rounded)
         // The panel never takes focus from the app being read, so its controls show no focus ring.
         .focusEffectDisabled()
         .onChange(of: player.state == .idle) { _, idle in if idle { showsSpeed = false } }
     }
 
+    /// Play and the speed, and while the pointer is over it, the rest.
+    private var bar: some View {
+        VStack(spacing: 2) {
+            Capsule().fill(Otter.hair).frame(width: 16, height: 4).padding(.vertical, 3)
+            Button(action: player.playPause) {
+                mainIcon.frame(width: 34, height: 34).background(Circle().fill(Otter.orange))
+            }
+            .accessibilityLabel(player.state == .playing ? "Pause" : "Play")
+            Button { withAnimation(motion) { showsSpeed.toggle() } } label: {
+                Text(speedLabel(player.speed)).font(Otter.font(12, .semibold)).monospacedDigit().foregroundStyle(Otter.ink)
+                    .frame(width: 40, height: 28)
+                    .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(showsSpeed ? Otter.hair : .clear))
+            }
+            .accessibilityLabel("Speed, \(speedLabel(player.speed))")
+            .accessibilityAddTraits(showsSpeed ? .isSelected : [])
+            if expanded {
+                VStack(spacing: 2) {
+                    icon("backward.fill", "Previous paragraph") { player.skip(-1) }.disabled(!reading)
+                    icon("forward.fill", "Next paragraph") { player.skip(1) }.disabled(!reading)
+                    icon("xmark", "Stop", action: player.stop)
+                }
+                .transition(.opacity)
+            }
+        }
+        .padding(.vertical, 6)
+        .frame(width: 46)
+        .buttonStyle(PlainButtonStyle(radius: 8))
+        .floating(corners)
+        // The controls that show only under the pointer stay reachable without it.
+        .accessibilityElement(children: .contain)
+        .accessibilityAction(named: "Previous paragraph") { player.skip(-1) }
+        .accessibilityAction(named: "Next paragraph") { player.skip(1) }
+        .accessibilityAction(named: "Stop", player.stop)
+    }
+
+    /// Round toward the screen, square against its edge, and round all over while you drag it.
+    private var corners: RectangleCornerRadii {
+        let r: CGFloat = 14
+        if dock.dragging { return RectangleCornerRadii(topLeading: r, bottomLeading: r, bottomTrailing: r, topTrailing: r) }
+        return dock.side == .right
+            ? RectangleCornerRadii(topLeading: r, bottomLeading: r, bottomTrailing: 0, topTrailing: 0)
+            : RectangleCornerRadii(topLeading: 0, bottomLeading: 0, bottomTrailing: r, topTrailing: r)
+    }
+
+    /// The speed panel, Start over, a problem, and tips, as cards beside the bar, toward the middle of the screen.
+    @ViewBuilder private var cards: some View {
+        let failure: String? = if case .failed(let message) = player.state { message } else { nil }
+        if showsSpeed || player.resumedAt != nil || failure != nil || tips.showing != nil {
+            VStack(alignment: dock.side == .right ? .trailing : .leading, spacing: 8) {
+                if showsSpeed {
+                    SpeedControls(player: player, shortcuts: shortcuts).padding(12).floating(14).transition(.opacity)
+                }
+                if player.resumedAt != nil {
+                    Button("Start over", systemImage: "arrow.counterclockwise", action: player.startOver)
+                        .buttonStyle(PlainButtonStyle(radius: 6))
+                        .font(Otter.font(12, .semibold))
+                        .foregroundStyle(Otter.teal)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .floating(14)
+                        .transition(.opacity)
+                }
+                if let failure { self.failure(failure).padding(12).floating(14) }
+                if let tip = tips.showing { tipRow(tip).padding(.leading, 12).padding(.vertical, 6).floating(14).transition(.opacity) }
+            }
+        }
+    }
+
+    private func icon(_ symbol: String, _ name: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol).font(.system(size: 11, weight: .semibold)).foregroundStyle(Otter.ink)
+                .frame(width: 30, height: 28)
+        }
+        .accessibilityLabel(name)
+    }
+
     private func tipRow(_ tip: Tip) -> some View {
-        HStack(alignment: .top, spacing: 6) {
+        HStack(alignment: .center, spacing: 2) {
             Text(tip.text(shortcuts)).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft)
                 .frame(width: 184, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
             Button { tips.learn(tip) } label: {
                 Image(systemName: "xmark").font(.system(size: 8, weight: .heavy)).foregroundStyle(Otter.soft)
-                    .frame(width: 24, height: 24)
+                    .frame(width: 28, height: 28)
             }
-            .buttonStyle(PlainButtonStyle(radius: 5))
+            .buttonStyle(PlainButtonStyle(radius: 6))
             .accessibilityLabel("Dismiss tip")
         }
-    }
-
-    private func small(_ symbol: String) -> some View {
-        Image(systemName: symbol).font(.system(size: 11, weight: .bold)).foregroundStyle(Otter.teal)
-            .frame(width: 28, height: 28)
-            .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Otter.mint))
     }
 
     private var reading: Bool { player.state == .playing || player.state == .paused }
@@ -227,13 +366,14 @@ struct PlayerView: View {
         switch player.state {
         case .downloading: ProgressView(value: player.download ?? 0).progressViewStyle(.circular).controlSize(.small).tint(.white)
         case .loading: ProgressView().controlSize(.small).tint(.white)
-        case .playing: Image(systemName: "pause.fill").font(.system(size: 16, weight: .bold)).foregroundStyle(.white)
-        default: Image(systemName: "play.fill").font(.system(size: 16, weight: .bold)).foregroundStyle(.white)
+        case .playing: Image(systemName: "pause.fill").font(.system(size: 14, weight: .bold)).foregroundStyle(.white)
+        // Nudged right: a triangle centered by its box looks left of center.
+        default: Image(systemName: "play.fill").font(.system(size: 14, weight: .bold)).foregroundStyle(.white).offset(x: 1)
         }
     }
 
     @ViewBuilder private func failure(_ message: String) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             Text(message).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.ink).multilineTextAlignment(.center)
                 .frame(width: 214).fixedSize(horizontal: false, vertical: true)
             if message == GrabError.notTrusted.description {
@@ -248,7 +388,6 @@ struct PlayerView: View {
         }
         .buttonStyle(SoftButtonStyle())
     }
-
 }
 
 /// The speed, as "1×" or "2.3×".
@@ -310,27 +449,28 @@ struct SpeedControls: View {
     }
 }
 
-/// Where you dragged the player: a display, and the player's top left corner on it as fractions of the display's
-/// room, from the left and from the top. The player's size changes as it shows controls and messages, so the spot
-/// leaves it out. Fractions keep the player on the display when its resolution changes; naming the display keeps it
-/// there when displays are rearranged.
+/// Where you left the player: a display, the edge it rests on, and its top as a fraction of the display's room from
+/// the top. The player's size changes as it shows controls and messages, so the spot leaves it out. The fraction
+/// keeps the player on the display when its resolution changes; naming the display keeps it there when displays are
+/// rearranged. Spots saved before the player rested on an edge don't read, and the player starts at the right edge.
 struct PlayerSpot: Codable {
     let display: String
-    let x: Double
+    let side: Dock.Side
     let y: Double
 
-    init(_ frame: NSRect, in screen: NSScreen) {
+    init(top: CGFloat, side: Dock.Side, on screen: NSScreen) {
         let room = screen.visibleFrame
         display = screen.displayID
-        x = Double((frame.minX - room.minX) / room.width)
-        y = Double((room.maxY - frame.maxY) / room.height)
+        self.side = side
+        y = Double((room.maxY - top) / room.height)
     }
 
-    /// The origin that puts a player of `size` at the spot, kept wholly inside `room`.
+    /// The window origin that puts a player of window `size` at the spot, kept between the menu bar and the Dock.
     func origin(for size: NSSize, in room: NSRect) -> NSPoint {
-        let left = room.minX + x * room.width, top = room.maxY - y * room.height
-        return NSPoint(x: min(max(left, room.minX), room.maxX - size.width),
-                       y: min(max(top, room.minY + size.height), room.maxY) - size.height)
+        let top = room.maxY - y * room.height + PlayerView.margin
+        let m = PlayerView.margin
+        return NSPoint(x: PlayerPanel.x(for: side, width: size.width, in: room),
+                       y: min(max(top, room.minY - m + size.height), room.maxY + m) - size.height)
     }
 
     static var saved: PlayerSpot? {

@@ -19,6 +19,12 @@ enum Otter {
             ? .black.withAlphaComponent(0.4) : NSColor(hex: 0x123B3A).withAlphaComponent(0.18)
     })
 
+    /// A hairline around glass, faint enough to read only as an edge.
+    static let hair = Color(nsColor: NSColor(name: nil) { appearance in
+        appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+            ? .white.withAlphaComponent(0.12) : NSColor(hex: 0x123B3A).withAlphaComponent(0.12)
+    })
+
     /// The app's rounded type at `size`.
     static func font(_ size: CGFloat, _ weight: Font.Weight = .semibold) -> Font {
         .system(size: size, weight: weight, design: .rounded)
@@ -117,6 +123,57 @@ private struct DimmedWhenDisabled: ViewModifier {
     @Environment(\.isEnabled) private var enabled
     // Flattened first, so a raised face doesn't show its edge through it.
     func body(content: Content) -> some View { content.compositingGroup().opacity(enabled ? 1 : 0.4) }
+}
+
+extension View {
+    /// Frosted glass cut to `radii`, with a hairline and a soft shadow, for what floats over other apps.
+    func floating(_ radii: RectangleCornerRadii) -> some View {
+        let shape = UnevenRoundedRectangle(cornerRadii: radii, style: .continuous)
+        return background {
+            ZStack {
+                shape.fill(.black)
+                    .shadow(color: Otter.shadow, radius: 6, y: 3)
+                    // Only the shadow outside the shape shows: under the glass it would cloud it.
+                    .mask { Rectangle().padding(-24).overlay { shape.blendMode(.destinationOut) }.compositingGroup() }
+                Glass(radii: radii)
+            }
+        }
+        .overlay { shape.strokeBorder(Otter.hair, lineWidth: 0.5) }
+    }
+
+    func floating(_ radius: CGFloat) -> some View {
+        floating(RectangleCornerRadii(topLeading: radius, bottomLeading: radius, bottomTrailing: radius, topTrailing: radius))
+    }
+}
+
+/// The frosted glass of macOS panels, blurring what is behind the window, cut to `radii`.
+private struct Glass: NSViewRepresentable {
+    let radii: RectangleCornerRadii
+
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.material = .popover
+        view.blendingMode = .behindWindow
+        // Otherwise the glass turns flat whenever Berang isn't the active app, which is nearly always.
+        view.state = .active
+        return view
+    }
+
+    func updateNSView(_ view: NSVisualEffectView, context: Context) {
+        // A small image of the shape whose corners stay put while its middle stretches to the view's size.
+        let r = radii
+        let insets = NSEdgeInsets(top: max(r.topLeading, r.topTrailing), left: max(r.topLeading, r.bottomLeading),
+                                  bottom: max(r.bottomLeading, r.bottomTrailing), right: max(r.topTrailing, r.bottomTrailing))
+        let size = NSSize(width: insets.left + insets.right + 1, height: insets.top + insets.bottom + 1)
+        let mask = NSImage(size: size, flipped: true) { rect in
+            NSColor.black.setFill()
+            NSBezierPath(cgPath: UnevenRoundedRectangle(cornerRadii: r, style: .continuous).path(in: rect).cgPath).fill()
+            return true
+        }
+        mask.capInsets = insets
+        mask.resizingMode = .stretch
+        view.maskImage = mask
+    }
 }
 
 /// A small uppercase heading over a group of cards.

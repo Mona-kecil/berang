@@ -34,7 +34,7 @@ Berang lives in the menu bar, as an otter peeking over the waterline. Its menu h
 | Read from somewhere else on the page | While Berang reads, select text there and press ⌥⎋ |
 | Read part of the screen | Press ⌥⇧⎋ (Option-Shift-Escape) and drag over it |
 | Listen to a whole book or file | Drop it on Berang's window, or open it with Berang in Finder |
-| Skip or stop | Use the floating player, which shows while Berang reads. Drag it anywhere; it stays there |
+| Skip or stop | Point at the floating player, which shows while Berang reads at the edge of the screen. Drag it to either side; it stays there |
 | Change the speed | Click the speed in the player, or scroll over the player. While Berang reads, ⌥⇧. reads faster and ⌥⇧, slower, by 0.1× |
 | Hear and choose a voice | In Berang's window, click your voice. Select any voice to hear it, or type your own words below the list and click Read |
 | Change a shortcut | In Berang's window, open Settings, click the shortcut, and press the new keys |
@@ -42,7 +42,7 @@ Berang lives in the menu bar, as an otter peeking over the waterline. Its menu h
 
 Reading starts at the text you selected, at the paragraph you clicked, or at the first paragraph on screen. On a page you read before, Berang continues where you stopped; Start over goes back to the top. Berang remembers the speed you choose, from 0.5× to 3×. Under the speed, the player shows about how many words a minute you hear, measured from what the voice has read. Click the speed there to go back to 1×.
 
-While you read, the player shows one short tip at a time: reading from somewhere else, changing the speed, and moving the player. A tip goes away once you use what it shows or dismiss it, and after three readings anyway.
+While you read, the player shows one short tip at a time: reading from somewhere else, changing the speed, moving the player, and pointing at it for more controls. A tip goes away once you use what it shows or dismiss it, and after three readings anyway.
 
 ### Shortcuts
 
@@ -152,10 +152,10 @@ With `Remember = FALSE`, Berang forgets the selection it moved to, and TLC finds
 
 ### Placement model
 
-`mac/Model/Place.tla` models where the floating player sits while displays connect and disconnect, also while the player is hidden or Berang is quit. TLC checks that:
+`mac/Model/Place.tla` models where the floating player sits while displays connect and disconnect, also while the player is hidden or Berang is quit. The player rests against the left or right edge of a display; when you drop it, it slides to the nearer edge at the height you dropped it. A spot is a display, an edge, and a height. TLC checks that:
 
 - a shown player is always on a display you have;
-- the spot Berang keeps is always one you dragged the player to;
+- the spot Berang keeps is always one you dragged the player to, never where macOS put it;
 - whenever that spot's display is connected, a shown player is at your spot.
 
 With `SaveOnAnyMove = TRUE`, Berang saves every move of the player, and TLC finds your spot replaced by where macOS put the player when you unplugged a display.

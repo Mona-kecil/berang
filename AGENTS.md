@@ -66,9 +66,9 @@ where they differ.
 - Send key presses only while a window you own is in front, and check that right before each key. Use a throwaway
   TextEdit document or a small test app. An app launched from the shell in the background can't bring itself to the
   front, so wrap the test app as a `.app` and start it with `open`.
-- Click by screen position only after you confirm the target window's exact frame. The player's size changes with
-  Start over, tips, and the speed panel, and its height changes where it is placed. A missed click lands in another
-  app.
+- Click by screen position only after you confirm the target window's exact frame. The player's size changes when the
+  pointer is over it and with Start over, tips, and the speed panel, and its window hangs 14 points off the screen's
+  edge. A missed click lands in another app.
 - UI scripting can't see the floating player. Find it with `CGWindowListCopyWindowInfo` and capture it with
   `screencapture -l <window id>`. Pick it by size: the reading highlight is a window on the same layer.
 - Capture only Berang's own windows, never the whole screen.
