@@ -12,7 +12,8 @@ Notes for coding agents. The README describes the app; this file describes how t
   page with two or three options and let the owner choose. Don't settle on one alone.
 - Avoid accidental triggers. A plain click or a selection alone must never change what Berang does. Use a deliberate
   gesture, such as selecting text and then pressing the read shortcut.
-- Teach every new control in the app: a tip in the player (`Tips.swift`) or a row on the home page.
+- Teach every new control in the app with a tip in the player (`Tips.swift`). Home shows only the read shortcut,
+  opening a file, and the voice; add to it only what every user needs.
 - Write user-facing text plainly, without jargon.
 
 ## Design
@@ -20,7 +21,7 @@ Notes for coding agents. The README describes the app; this file describes how t
 - Every element on screen does a job for the user. Leave out taglines, decoration, cards inside cards, and anything
   the screen already says. If a screen needs a caption or a divider to make sense, change the layout instead.
 - Explain only what's wrong or what the user must do: missing Accessibility access, no voice, a failed download. Put
-  the rest in a tip or a home page row.
+  the rest in a tip.
 - Use the colors, fonts, and button styles in `Theme.swift`. Don't add one-off colors, sizes, or shadows.
 - Numbers that change while you watch, such as the speed, use `.monospacedDigit()`.
 
