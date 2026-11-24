@@ -16,7 +16,7 @@ enum Otter {
     /// The floating player's shadow. Ink would turn it into a pale glow in Dark Mode.
     static let shadow = Color(nsColor: NSColor(name: nil) { appearance in
         appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
-            ? .black.withAlphaComponent(0.5) : NSColor(hex: 0x123B3A).withAlphaComponent(0.22)
+            ? .black.withAlphaComponent(0.4) : NSColor(hex: 0x123B3A).withAlphaComponent(0.18)
     })
 
     /// The app's rounded type at `size`.

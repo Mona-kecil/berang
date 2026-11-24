@@ -70,6 +70,14 @@ import TextGrab
     /// is asked again when that moves, as it does when the page scrolls or its window moves.
     private func update(wordChanged: Bool) {
         guard let page, let target else { return }
+        // The highlight floats above every app, so it shows only while the page's app is in front. Over another app
+        // it would mark text that isn't there. Once the app is back, the next tick draws it again.
+        var pid: pid_t = 0
+        AXUIElementGetPid(page.viewport, &pid)
+        guard NSWorkspace.shared.frontmostApplication?.processIdentifier == pid else {
+            sentenceChanged = true
+            return window.orderOut(nil)
+        }
         let block = page.blocks[target.block]
         let first = block.frame(of: target.sentence.lowerBound..<target.sentence.lowerBound + 1)
         let moved = sentenceChanged || first != anchor
