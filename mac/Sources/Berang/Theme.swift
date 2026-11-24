@@ -54,24 +54,69 @@ struct PlainButtonStyle: ButtonStyle {
     var radius: CGFloat = 10
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.opacity(configuration.isPressed ? 0.7 : 1).contentShape(Rectangle()).focusRing(radius)
+            .dimmedWhenDisabled()
     }
 }
 
-/// A white card resting on a solid edge.
-struct Card: ViewModifier {
-    var padding: CGFloat = 12
-    func body(content: Content) -> some View {
-        content
-            .padding(padding)
-            .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Otter.card)
-                    .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Otter.edge).offset(y: 3))
-            )
+/// A button whose label is `raised`: pressed, the label sinks onto its edge like a key.
+struct KeyButtonStyle: ButtonStyle {
+    var radius: CGFloat = 10
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.environment(\.sunk, configuration.isPressed).contentShape(Rectangle()).focusRing(radius)
+            .dimmedWhenDisabled()
     }
+}
+
+extension EnvironmentValues {
+    /// Whether the button around a `raised` view is pressed.
+    @Entry var sunk = false
 }
 
 extension View {
-    func card(padding: CGFloat = 12) -> some View { modifier(Card(padding: padding)) }
+    /// Sets the view on a solid edge `depth` points below it. While its button is pressed, it sinks until 1 point of
+    /// the edge shows.
+    func raised(_ radius: CGFloat, face: Color = Otter.card, edge: Color = Otter.edge, depth: CGFloat = 2,
+                stroke: Color? = nil, lineWidth: CGFloat = 0) -> some View {
+        raised(in: RoundedRectangle(cornerRadius: radius, style: .continuous), face: face, edge: edge, depth: depth,
+               stroke: stroke, lineWidth: lineWidth)
+    }
+
+    func raised(in shape: some InsettableShape, face: Color = Otter.card, edge: Color = Otter.edge, depth: CGFloat = 2,
+                stroke: Color? = nil, lineWidth: CGFloat = 0) -> some View {
+        modifier(Raised(shape: shape, face: face, edge: edge, depth: depth, stroke: stroke, lineWidth: lineWidth))
+    }
+
+    /// Fades a control that can't be used.
+    func dimmedWhenDisabled() -> some View { modifier(DimmedWhenDisabled()) }
+
+    /// A white card resting on a solid edge.
+    func card(padding: CGFloat = 12) -> some View { self.padding(padding).raised(16, depth: 3) }
+}
+
+private struct Raised<S: InsettableShape>: ViewModifier {
+    let shape: S
+    let face: Color
+    let edge: Color
+    let depth: CGFloat
+    let stroke: Color?
+    let lineWidth: CGFloat
+    @Environment(\.sunk) private var sunk
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                shape.fill(face)
+                    .overlay { if let stroke { shape.strokeBorder(stroke, lineWidth: lineWidth) } }
+                    .background(shape.fill(edge).offset(y: sunk ? 1 : depth))
+            )
+            .offset(y: sunk ? depth - 1 : 0)
+    }
+}
+
+private struct DimmedWhenDisabled: ViewModifier {
+    @Environment(\.isEnabled) private var enabled
+    // Flattened first, so a raised face doesn't show its edge through it.
+    func body(content: Content) -> some View { content.compositingGroup().opacity(enabled ? 1 : 0.4) }
 }
 
 /// A small uppercase heading over a group of cards.
@@ -88,39 +133,32 @@ struct SectionLabel: View {
 struct ChunkyButtonStyle: ButtonStyle {
     var compact = false
     func makeBody(configuration: Configuration) -> some View {
-        let pressed = configuration.isPressed
         configuration.label
             .font(Otter.font(compact ? 12 : 13.5, .heavy))
             .foregroundStyle(.white)
             .padding(.horizontal, compact ? 11 : 16)
             .padding(.vertical, compact ? 5 : 9)
-            .background(
-                RoundedRectangle(cornerRadius: compact ? 10 : 14, style: .continuous).fill(Otter.orange)
-                    .background(RoundedRectangle(cornerRadius: compact ? 10 : 14, style: .continuous)
-                        .fill(Otter.orangeEdge).offset(y: pressed ? 1 : 3))
-            )
-            .offset(y: pressed ? 2 : 0)
+            .raised(compact ? 10 : 14, face: Otter.orange, edge: Otter.orangeEdge, depth: 3)
+            .environment(\.sunk, configuration.isPressed)
             .contentShape(Rectangle())
             .focusRing(compact ? 10 : 14)
+            .dimmedWhenDisabled()
     }
 }
 
 /// A quiet white button on its edge, for secondary actions.
 struct SoftButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
-        let pressed = configuration.isPressed
         configuration.label
             .font(Otter.font(12.5, .bold))
             .foregroundStyle(Otter.teal)
             .padding(.horizontal, 11)
             .padding(.vertical, 5)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Otter.card)
-                    .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Otter.edge).offset(y: pressed ? 1 : 2))
-            )
-            .offset(y: pressed ? 1 : 0)
+            .raised(10)
+            .environment(\.sunk, configuration.isPressed)
             .contentShape(Rectangle())
             .focusRing(10)
+            .dimmedWhenDisabled()
     }
 }
 
@@ -135,12 +173,7 @@ struct KeyCap: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
             .frame(minWidth: 64)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Otter.card)
-                    .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .strokeBorder(tint ?? Otter.edge, lineWidth: tint == nil ? 1.5 : 2.5))
-                    .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Otter.edge).offset(y: 2))
-            )
+            .raised(10, stroke: tint ?? Otter.edge, lineWidth: tint == nil ? 1.5 : 2.5)
     }
 }
 
