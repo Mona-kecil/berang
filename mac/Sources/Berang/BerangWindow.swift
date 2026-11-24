@@ -47,6 +47,7 @@ struct RootView: View {
     let shortcuts: Shortcuts
     let updater: Updater
     @Bindable var model: WindowModel
+    @State private var dropping = false
 
     var body: some View {
         Group {
@@ -64,7 +65,12 @@ struct RootView: View {
         .fontDesign(.rounded)
         .tint(Otter.teal)
         .onAppear { model.shortcuts = shortcuts }
-        .onDrop(of: [.fileURL], isTargeted: nil) { providers in
+        .overlay {
+            if dropping {
+                RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Otter.orange, lineWidth: 2.5).padding(8)
+            }
+        }
+        .onDrop(of: [.fileURL], isTargeted: $dropping) { providers in
             guard let provider = providers.first else { return false }
             _ = provider.loadObject(ofClass: URL.self) { url, _ in
                 if let url { Task { @MainActor in player.readFile(url) } }
@@ -92,23 +98,13 @@ struct HomePage: View {
     /// macOS shows each permission prompt once; after that, Allow opens System Settings instead.
     @State private var askedTrust = false
     @State private var askedScreen = false
-    @State private var dropping = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             if !trusted || !voice {
                 welcome
             } else {
-                HStack {
-                    Text("Berang").font(Otter.font(22, .heavy)).foregroundStyle(Otter.ink)
-                    Spacer()
-                    settingsButton
-                }
-                howTo
-                dropZone
-                voiceCard
-                Spacer(minLength: 0)
-                if !screen { screenTip } else { OtterImage(pose: .asleep, size: 120).frame(maxWidth: .infinity) }
+                home
             }
         }
         .task {
@@ -187,79 +183,60 @@ struct HomePage: View {
         .padding(.vertical, 8)
     }
 
-    // Home: how to start reading in any app.
-    private var howTo: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            SectionLabel("Read anything")
-            VStack(spacing: 0) {
-                shortcutRow(.page, title: "The page you're on", detail: "In any app, press")
-                Divider().overlay(Otter.edge)
-                shortcutRow(.area, title: "Part of the screen", detail: "Press, then drag over it")
-                Divider().overlay(Otter.edge)
-                shortcutRow(.page, title: "Somewhere else on the page", detail: "While reading, select it, then press")
+    // Home: the one shortcut that reads any app, a file, and the voice.
+    private var home: some View {
+        VStack(spacing: 0) {
+            HStack { Spacer(); settingsButton }
+            Spacer(minLength: 0)
+            VStack(spacing: 4) {
+                OtterImage(pose: .asleep, size: 128).padding(.bottom, 10)
+                (Text("Press ") + keys(.page) + Text(" in any app")).font(Otter.font(18, .bold)).foregroundStyle(Otter.ink)
+                if let broken = [ShortcutAction.page, .area].first(where: { !shortcuts.working.contains($0) }) {
+                    HStack(spacing: 8) {
+                        Text("\(shortcuts.combos[broken]!.display) isn't working.").foregroundStyle(Otter.alert)
+                        Button("Change it") { go(.settings) }.buttonStyle(SoftButtonStyle())
+                    }
+                    .font(Otter.font(12, .semibold))
+                    .padding(.top, 2)
+                } else {
+                    (Text("or ") + keys(.area) + Text(" for part of the screen")).font(Otter.font(12, .medium)).foregroundStyle(Otter.soft)
+                }
+                VStack(spacing: 7) {
+                    Button("Open a File…", action: chooseFile).buttonStyle(ChunkyButtonStyle())
+                    Text("or drop one on this window").font(Otter.font(12, .medium)).foregroundStyle(Otter.soft)
+                }
+                .padding(.top, 22)
             }
-            .card(padding: 12)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            Spacer(minLength: 0)
+            if !screen { screenTip.padding(.bottom, 12) }
+            voiceCard
         }
     }
 
-    private func shortcutRow(_ action: ShortcutAction, title: String, detail: String) -> some View {
-        let working = shortcuts.working.contains(action)
-        return HStack {
-            VStack(alignment: .leading, spacing: 1) {
-                Text(title).font(Otter.font(13.5, .bold)).foregroundStyle(Otter.ink)
-                Text(working ? detail : "This shortcut isn't working. Change it in Settings.")
-                    .font(Otter.font(11.5, .medium)).foregroundStyle(working ? Otter.soft : Otter.alert)
-            }
-            Spacer()
-            KeyCap(text: shortcuts.combos[action]!.display, tint: working ? nil : Otter.alert)
-        }
-        .padding(.vertical, 6)
-    }
-
-    private var dropZone: some View {
-        VStack(spacing: 2) {
-            Text("Drop a PDF or EPUB here").font(Otter.font(13.5, .bold)).foregroundStyle(Otter.ink)
-            HStack(spacing: 3) {
-                Text("or").foregroundStyle(Otter.soft)
-                Button("choose a file", action: chooseFile).buttonStyle(PlainButtonStyle(radius: 4)).foregroundStyle(Otter.teal)
-            }
-            .font(Otter.font(12, .bold))
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
-        .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Otter.card.opacity(dropping ? 0.9 : 0.45))
-            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(dropping ? Otter.orange : Otter.edge, style: StrokeStyle(lineWidth: 2.5, dash: [6, 5]))))
-        .onDrop(of: [.fileURL], isTargeted: $dropping) { providers in
-            guard let provider = providers.first else { return false }
-            _ = provider.loadObject(ofClass: URL.self) { url, _ in
-                if let url { Task { @MainActor in player.readFile(url) } }
-            }
-            return true
-        }
+    /// A shortcut inside a sentence, in teal, or in red while it isn't working.
+    private func keys(_ action: ShortcutAction) -> Text {
+        Text(shortcuts.combos[action]!.display).fontWeight(.heavy)
+            .foregroundStyle(shortcuts.working.contains(action) ? Otter.teal : Otter.alert)
     }
 
     private var voiceCard: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            SectionLabel("Voice")
-            Button { go(.voices) } label: {
-                HStack(spacing: 10) {
-                    Text(String(Engine.title(player.voice).prefix(2)))
-                        .font(Otter.font(13, .heavy)).foregroundStyle(.white)
-                        .frame(width: 34, height: 34).background(Circle().fill(Otter.teal))
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(Engine.title(player.voice)).font(Otter.font(14, .bold)).foregroundStyle(Otter.ink)
-                        Text(player.engine.profile(player.voice)?.summary.nonEmpty ?? player.engine.title)
-                            .font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft)
-                    }
-                    Spacer()
-                    Text("Change").font(Otter.font(13, .heavy)).foregroundStyle(Otter.teal)
+        Button { go(.voices) } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "waveform").font(.system(size: 16, weight: .semibold)).foregroundStyle(Otter.teal)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(Engine.title(player.voice)).font(Otter.font(14, .bold)).foregroundStyle(Otter.ink)
+                    Text(player.engine.profile(player.voice)?.summary.nonEmpty ?? player.engine.title)
+                        .font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft).lineLimit(1)
                 }
-                .card(padding: 11)
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right").font(.system(size: 12, weight: .bold)).foregroundStyle(Otter.soft)
             }
-            .buttonStyle(KeyButtonStyle(radius: 16))
-            .accessibilityLabel("Voice: \(Engine.title(player.voice)). Change")
+            .card(padding: 12)
         }
+        .buttonStyle(KeyButtonStyle(radius: 16))
+        .accessibilityLabel("Voice: \(Engine.title(player.voice)). Change")
     }
 
     private var screenTip: some View {
