@@ -125,13 +125,12 @@ struct HomePage: View {
         Button { go(.settings) } label: {
             Image(systemName: "gearshape.fill").font(.system(size: 14, weight: .bold)).foregroundStyle(Otter.teal)
                 .frame(width: 30, height: 30)
-                .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Otter.card)
-                    .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(Otter.edge).offset(y: 2)))
                 .overlay(alignment: .topTrailing) {
                     if shortcuts.needsAttention { Circle().fill(Otter.orange).frame(width: 9, height: 9).offset(x: 3, y: -3) }
                 }
+                .raised(10)
         }
-        .buttonStyle(PlainButtonStyle(radius: 10))
+        .buttonStyle(KeyButtonStyle(radius: 10))
         .accessibilityLabel(shortcuts.needsAttention ? "Settings, a shortcut needs attention" : "Settings")
         .keyboardShortcut(",", modifiers: .command)
     }
@@ -257,9 +256,8 @@ struct HomePage: View {
                     Text("Change").font(Otter.font(13, .heavy)).foregroundStyle(Otter.teal)
                 }
                 .card(padding: 11)
-                .contentShape(Rectangle())
             }
-            .buttonStyle(PlainButtonStyle(radius: 16))
+            .buttonStyle(KeyButtonStyle(radius: 16))
             .accessibilityLabel("Voice: \(Engine.title(player.voice)). Change")
         }
     }
@@ -386,7 +384,7 @@ struct ShortcutRecorder: View {
                 KeyCap(text: recording ? "…" : shortcuts.combos[action]!.display,
                        tint: recording ? Otter.orange : working ? nil : Otter.alert)
             }
-            .buttonStyle(PlainButtonStyle(radius: 10))
+            .buttonStyle(KeyButtonStyle(radius: 10))
             .accessibilityLabel("\(action.title): \(shortcuts.combos[action]!.display). Change")
         }
         .padding(.vertical, 8)

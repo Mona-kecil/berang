@@ -219,10 +219,11 @@ struct ChipStyle: ButtonStyle {
             .font(Otter.font(11.5, .bold))
             .foregroundStyle(on ? .white : Otter.ink)
             .padding(.horizontal, 9).padding(.vertical, 4)
-            .background(Capsule().fill(on ? Otter.teal : Otter.card)
-                .background(Capsule().fill(on ? Otter.teal.opacity(0.6) : Otter.edge).offset(y: 2)))
+            .raised(in: Capsule(), face: on ? Otter.teal : Otter.card, edge: on ? Otter.teal.opacity(0.6) : Otter.edge)
+            .environment(\.sunk, configuration.isPressed)
             .fixedSize()
             .focusRing(12)
+            .dimmedWhenDisabled()
     }
 }
 

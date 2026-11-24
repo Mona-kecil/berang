@@ -120,9 +120,9 @@ struct PlayerView: View {
                     .accessibilityLabel("Previous paragraph")
                 Button(action: player.playPause) {
                     mainIcon.frame(width: 40, height: 40)
-                        .background(Circle().fill(Otter.orange))
-                        .background(Circle().fill(Otter.orangeEdge).offset(y: 2.5))
+                        .raised(in: Circle(), face: Otter.orange, edge: Otter.orangeEdge, depth: 2.5)
                 }
+                .buttonStyle(KeyButtonStyle(radius: 20))
                 .accessibilityLabel(player.state == .playing ? "Pause" : "Play")
                 Button { player.skip(1) } label: { small("forward.fill") }
                     .disabled(!reading)
