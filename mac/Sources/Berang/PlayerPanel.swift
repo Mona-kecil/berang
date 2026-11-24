@@ -16,6 +16,8 @@ final class PlayerPanel: NSPanel {
     private var scrolled: CGFloat = 0
     /// Where the player was when you pressed on it, to tell a drag from a click.
     private var pressedAt: NSPoint?
+    /// A smaller size waiting for the content to finish closing.
+    private var shrink: Task<Void, Never>?
 
     init(player: Player, shortcuts: Shortcuts, tips: Tips) {
         self.player = player
@@ -30,8 +32,13 @@ final class PlayerPanel: NSPanel {
         hidesOnDeactivate = false
         becomesKeyOnlyIfNeeded = true
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        contentView = NSHostingView(rootView: PlayerView(player: player, shortcuts: shortcuts, tips: tips))
-        setContentSize(contentView!.fittingSize)
+        let host = NSHostingView(rootView: PlayerView(player: player, shortcuts: shortcuts, tips: tips) { [weak self] in
+            self?.fit($0)
+        })
+        // The player sizes the window itself, through `fit`, so content that animates away isn't cut off.
+        host.sizingOptions = []
+        contentView = host
+        setContentSize(host.fittingSize)
         place()
         NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil,
                                                queue: .main) { [weak self] _ in
@@ -55,6 +62,16 @@ final class PlayerPanel: NSPanel {
     }
 
     override var canBecomeKey: Bool { true }
+
+    /// Grows at once, so content opening has room, and shrinks once content closing has faded out.
+    private func fit(_ size: CGSize) {
+        shrink?.cancel()
+        guard isVisible, size.height < frame.height else { return setContentSize(size) }
+        shrink = Task { [weak self] in
+            try? await Task.sleep(for: PlayerView.motionTime)
+            if !Task.isCancelled { self?.setContentSize(size) }
+        }
+    }
 
     /// Puts the player at your spot, or at the right edge of the main display while your spot's display is gone.
     private func place() {
@@ -109,7 +126,15 @@ struct PlayerView: View {
     let player: Player
     let shortcuts: Shortcuts
     let tips: Tips
+    /// Called with the player's new size when its content changes.
+    let resized: (CGSize) -> Void
     @State private var showsSpeed = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// How long a row takes to open or close, with time for the spring to settle.
+    static let motionTime = Duration.milliseconds(250)
+    /// Rows open and close with the panel growing and their content fading. With Reduce Motion, they just appear.
+    private var motion: Animation? { reduceMotion ? nil : .snappy(duration: 0.2) }
 
     var body: some View {
         VStack(spacing: 8) {
@@ -127,7 +152,7 @@ struct PlayerView: View {
                 Button { player.skip(1) } label: { small("forward.fill") }
                     .disabled(!reading)
                     .accessibilityLabel("Next paragraph")
-                Button { showsSpeed.toggle() } label: {
+                Button { withAnimation(motion) { showsSpeed.toggle() } } label: {
                     Text(speedLabel(player.speed)).font(Otter.font(12.5, .heavy)).monospacedDigit().foregroundStyle(Otter.ink)
                         .frame(minWidth: 36, minHeight: 28)
                         .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(showsSpeed ? Otter.mint : .clear))
@@ -138,17 +163,18 @@ struct PlayerView: View {
                     .accessibilityLabel("Stop")
             }
             .buttonStyle(PlainButtonStyle(radius: 10))
-            if showsSpeed { SpeedControls(player: player, shortcuts: shortcuts).padding(.top, 4) }
+            if showsSpeed { SpeedControls(player: player, shortcuts: shortcuts).padding(.top, 4).transition(.opacity) }
             if player.resumedAt != nil {
                 Button("Start over", systemImage: "arrow.counterclockwise", action: player.startOver)
                     .buttonStyle(PlainButtonStyle(radius: 6))
                     .font(Otter.font(11.5, .bold))
                     .foregroundStyle(Otter.teal)
+                    .transition(.opacity)
             }
             if case .failed(let message) = player.state {
                 failure(message)
             }
-            if let tip = tips.showing { tipRow(tip) }
+            if let tip = tips.showing { tipRow(tip).transition(.opacity) }
         }
         // One width in every state, so the panel never grows sideways and the buttons stay under the pointer.
         .frame(width: 214)
@@ -156,7 +182,14 @@ struct PlayerView: View {
         .padding(.vertical, 10)
         .background(RoundedRectangle(cornerRadius: 22, style: .continuous).fill(Otter.card)
             .shadow(color: Otter.shadow, radius: 12, y: 6))
+        // Start over and tips come and go on their own. Changes that shortcuts make, such as the speed, stay instant.
+        .animation(motion, value: player.resumedAt != nil)
+        .animation(motion, value: tips.showing)
         .padding(14)
+        .fixedSize()
+        .onGeometryChange(for: CGSize.self, of: \.size, action: resized)
+        // The window stays larger while a row closes; the player keeps to its top.
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .fontDesign(.rounded)
         // The panel never takes focus from the app being read, so its controls show no focus ring.
         .focusEffectDisabled()
