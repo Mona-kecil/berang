@@ -15,6 +15,43 @@ Notes for coding agents. The README describes the app; this file describes how t
 - Teach every new control in the app: a tip in the player (`Tips.swift`) or a row on the home page.
 - Write user-facing text plainly, without jargon.
 
+## Design
+
+- Every element on screen does a job for the user. Leave out taglines, decoration, cards inside cards, and anything
+  the screen already says. If a screen needs a caption or a divider to make sense, change the layout instead.
+- Explain only what's wrong or what the user must do: missing Accessibility access, no voice, a failed download. Put
+  the rest in a tip or a home page row.
+- Use the colors, fonts, and button styles in `Theme.swift`. Don't add one-off colors, sizes, or shadows.
+- Numbers that change while you watch, such as the speed, use `.monospacedDigit()`.
+
+## Motion
+
+SwiftUI and AppKit animate well: `withAnimation`, springs such as `.snappy` and `.smooth`, `.transition`,
+`.contentTransition(.numericText())`, and `NSAnimationContext` with `window.animator()` for windows.
+
+- Animate a change only when it shows where something came from or went, such as a page swap or a panel opening.
+- Don't animate what a shortcut does. Speed steps, jumps, and start and stop take effect at once.
+- Use springs, so a new change starts from where the view is now. Things that appear use a spring or ease-out under
+  0.3 s, never ease-in. Page swaps use `.snappy(duration: 0.2)`, as `RootView.go` does.
+- With Reduce Motion on, replace movement with a short fade. Read `@Environment(\.accessibilityReduceMotion)` in
+  SwiftUI and `NSWorkspace.shared.accessibilityDisplayShouldReduceMotion` in AppKit.
+- The reading highlight follows the voice and never eases. `Highlight.draw` turns off implicit layer animation; keep
+  it that way.
+
+## Skills
+
+`.agents/skills` (linked as `.claude/skills`) holds four of Emil Kowalski's skills, copied from
+[emilkowalski/skills](https://github.com/emilkowalski/skills) at `64eb3de` under the MIT license, with each skill's
+"Initial Response" step removed.
+
+- `write-swift` for any Swift change. Its concurrency section assumes Swift 6.2's main-actor-by-default mode. This
+  package uses tools version 6.0 without it, so keep the explicit `@MainActor` annotations.
+- `emil-design-eng` and `apple-design` when you build or change UI.
+- `review-animations` before you merge a change that adds or changes motion.
+
+The design skills give CSS and JavaScript examples. Use the SwiftUI or AppKit equivalent, and follow the rules above
+where they differ.
+
 ## Shipping
 
 - Branch before you commit. Merge your own pull request with a rebase once every check passes.
