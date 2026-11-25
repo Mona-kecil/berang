@@ -222,8 +222,10 @@ struct PlayerView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     static let margin: CGFloat = 14
-    static let motionTime = Duration.milliseconds(250)
-    private var motion: Animation? { reduceMotion ? nil : .snappy(duration: 0.2) }
+    static let springDuration: TimeInterval = 0.2
+    /// The spring, and time for it to settle.
+    static let motionTime = Duration.seconds(springDuration + 0.05)
+    private var motion: Animation? { reduceMotion ? nil : .snappy(duration: Self.springDuration) }
     private var expanded: Bool { dock.open || showsSpeed }
 
     var body: some View {
