@@ -52,6 +52,7 @@ func checkScreenAccess() throws {
     return url
 }
 
+/// Runs Vision text recognition on `url` off the main actor so the player's loading state stays responsive.
 func recognizeScreenArea(_ url: URL) async throws -> Page {
     defer { try? FileManager.default.removeItem(at: url) }
     let paragraphs = await Task.detached(priority: .userInitiated) { recognizeImageBlocks(url) }.value

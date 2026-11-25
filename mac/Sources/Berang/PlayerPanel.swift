@@ -17,6 +17,7 @@ final class PlayerPanel: NSPanel {
     private var scrolled: CGFloat = 0
     private var pendingShrink: Task<Void, Never>?
     private var press: (origin: NSPoint, path: [(x: CGFloat, time: TimeInterval)], timer: Timer)?
+    /// Closing the controls a moment after the pointer leaves, so passing over the edge doesn't flicker them.
     private var close: Task<Void, Never>?
 
     init(player: Player, shortcuts: Shortcuts, tips: Tips) {
@@ -99,6 +100,8 @@ final class PlayerPanel: NSPanel {
         }
     }
 
+    /// The window's left side for a player resting on `side` of `room`. The margin for the shadow on the edge's side
+    /// hangs off the screen, so the player itself touches the edge.
     static func x(for side: Dock.Side, width: CGFloat, in room: NSRect) -> CGFloat {
         side == .left ? room.minX - PlayerView.margin : room.maxX - width + PlayerView.margin
     }
@@ -221,6 +224,7 @@ struct PlayerView: View {
     @State private var showsSpeed = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    /// Room around the player for its shadow. On the screen's edge, it hangs off the screen.
     static let margin: CGFloat = 14
     static let springDuration: TimeInterval = 0.2
     /// The spring, and time for it to settle.
@@ -285,6 +289,7 @@ struct PlayerView: View {
         .frame(width: 46)
         .buttonStyle(PlainButtonStyle(radius: 8))
         .floating(corners)
+        // The controls that show only under the pointer stay reachable without it.
         .accessibilityElement(children: .contain)
         .accessibilityAction(named: "Previous paragraph") { player.skip(-1) }
         .accessibilityAction(named: "Next paragraph") { player.skip(1) }
@@ -333,6 +338,7 @@ struct PlayerView: View {
         }
     }
 
+    /// Quiet wayfinding card on hover for files (where no document is open on screen).
     private func contextCard(_ info: Player.ReadingInfo) -> some View {
         HStack(alignment: .center, spacing: 8) {
             VStack(alignment: .leading, spacing: 1) {
