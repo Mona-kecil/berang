@@ -653,10 +653,7 @@ import UniformTypeIdentifiers
     private func heard(_ b: Int) {
         guard let page else { return }
         index = b
-        if let pageKey {
-            let total = activeMeta?.isFile == true ? page.blocks.count : nil
-            positions[pageKey] = SavedPosition(page.blocks[b], at: b, total: total)
-        }
+        if let pageKey { positions[pageKey] = SavedPosition(page.blocks[b], at: b) }
         if let meta = activeMeta {
             reading = ReadingInfo(
                 title: meta.title,
