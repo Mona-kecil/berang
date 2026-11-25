@@ -4,10 +4,10 @@
 \* The player rests against the left or right edge of a screen. You drag it anywhere; when you let go, it snaps to
 \* the nearer edge of the screen you dropped it on, at the height you dropped it. Berang saves that spot as a screen,
 \* an edge, and a height on that screen, so rearranging screens doesn't move it. Screens connect and disconnect at
-\* any time, also while the player is hidden or Berang is quit. When a screen goes away, macOS moves the player onto one that remains, and Berang hears of that
-\* move like any other. When the screen comes back, Berang moves the player back to your spot. Each time the player
-\* shows, and whenever screens change, Berang puts it at your spot, or at the right edge of the main screen, here the
-\* laptop's, while your spot's screen is gone.
+\* any time, also while the player is hidden or Berang is quit. When a screen goes away, macOS moves the player onto
+\* one that remains, and Berang hears of that move like any other. When the screen comes back, Berang moves the
+\* player back to your spot. Each time the player shows, and whenever screens change, Berang puts it at your spot, or
+\* at the right edge of the main screen, here the laptop's, while your spot's screen is gone.
 \*
 \* Berang saves the spot only when you drag the player. With SaveOnAnyMove = TRUE it saves every move, and TLC finds
 \* the spot you chose lost after unplugging a screen.

@@ -141,6 +141,7 @@ extension View {
             ZStack {
                 shape.fill(.black)
                     .shadow(color: Otter.shadow, radius: 6, y: 3)
+                    // Only the shadow outside the shape shows: under the glass it would cloud it.
                     .mask { outside(shape) }
                 Glass(radii: radii)
             }

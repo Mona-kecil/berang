@@ -288,6 +288,7 @@ struct PageHeader: View {
     var body: some View {
         HStack(spacing: 0) {
             if let back {
+                // The padding makes the arrow easier to hit and keeps the title where it was.
                 Button(action: back) {
                     Image(systemName: "chevron.left").font(.system(size: 15, weight: .heavy))
                         .padding(.vertical, 6).padding(.trailing, 6)

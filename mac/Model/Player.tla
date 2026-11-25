@@ -65,6 +65,7 @@ YouOpen(src, delib) ==
     /\ \/ Preparing /\ pending' = src /\ UNCHANGED <<ui, tasks, current, shown, loadedEng>>
        \/ ~Preparing /\ Begin(src, delib) /\ UNCHANGED pending
 YouOpenArea == YouOpen("area", TRUE) /\ UNCHANGED staged
+\* Typed text in Voices ("Read with X") starts reading explicitly, like a file once confirmed.
 YouReadText == YouOpen("file", TRUE) /\ UNCHANGED staged
 
 YouDropFile ==
@@ -175,6 +176,8 @@ DownloadFinishesOf(i) ==
           /\ ui' = "loading" /\ pending' = "none" /\ loadedEng' = "none" /\ UNCHANGED shown
     /\ UNCHANGED <<chosen, current, reason, ignored, staged>>
 
+\* A setup download with nothing waiting reports its error inline in the window (ui stays idle).
+\* Any download with a waiting request reports the failure in the floating player (ui = "failed").
 DownloadFailsOf(i) ==
     /\ tasks[i].stage = "download" /\ Live(i)
     /\ tasks' = Set(i, "stage", "done")

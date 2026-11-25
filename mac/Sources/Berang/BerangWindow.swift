@@ -44,6 +44,7 @@ final class BerangWindow: NSWindow {
     /// macOS shows each permission prompt once; kept on the window model so navigating pages doesn't reset it.
     var askedTrust = false
     var askedScreen = false
+    /// Stays false while the user finishes first-time setup, so the checklist doesn't snap away mid-click.
     var setupDismissed = !BerangWindow.setupNeeded
     @ObservationIgnored weak var shortcuts: Shortcuts?
 }
