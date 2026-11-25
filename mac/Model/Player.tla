@@ -32,13 +32,10 @@ Set(i, f, v) == [tasks EXCEPT ![i][f] = v]
 Task(src, stage, e, delib) == [src |-> src, stage |-> stage, cancelled |-> FALSE, eng |-> e, deliberate |-> delib]
 \* cancel() stops the current task and any preview.
 Cancelled(t) == [i \in DOMAIN t |-> IF i = current \/ t[i].stage = "clip" THEN [t[i] EXCEPT !.cancelled = TRUE] ELSE t[i]]
-\* Reading, pick, OCR, or a sample starting ends a preview that played while the voice got ready.
 Quiet(t) == [i \in DOMAIN t |-> IF t[i].stage = "clip" THEN [t[i] EXCEPT !.stage = "done"] ELSE t[i]]
 Preparing == ui \in {"downloading", "loading"}
 OcrUI == IF ShowRecognizing THEN "recognizing" ELSE "idle"
 
-\* Where a request goes once the voice is ready: an area waits for a drag; a file or text reads;
-\* a window reads, unless the app draws its own text, which is recognized first.
 Ready(src) == CASE src = "area" -> {<<"pick", "idle">>}
                 [] src = "sample" -> {<<"sample", "idle">>}
                 [] src = "file" -> {<<"read", "playing">>}
@@ -68,11 +65,8 @@ YouOpen(src, delib) ==
     /\ \/ Preparing /\ pending' = src /\ UNCHANGED <<ui, tasks, current, shown, loadedEng>>
        \/ ~Preparing /\ Begin(src, delib) /\ UNCHANGED pending
 YouOpenArea == YouOpen("area", TRUE) /\ UNCHANGED staged
-\* Typed text in Voices ("Read with X") starts reading explicitly, like a file once confirmed.
 YouReadText == YouOpen("file", TRUE) /\ UNCHANGED staged
 
-\* Dropping or opening a file stages (or replaces) it in the window until you explicitly click Read
-\* (unless StageOnDrop = FALSE, which starts reading immediately without deliberate confirmation).
 YouDropFile ==
     IF StageOnDrop THEN
         /\ staged' = TRUE
@@ -181,8 +175,6 @@ DownloadFinishesOf(i) ==
           /\ ui' = "loading" /\ pending' = "none" /\ loadedEng' = "none" /\ UNCHANGED shown
     /\ UNCHANGED <<chosen, current, reason, ignored, staged>>
 
-\* A setup download with nothing waiting reports its error inline in the window (ui stays idle).
-\* Any download with a waiting request reports the failure in the floating player (ui = "failed").
 DownloadFailsOf(i) ==
     /\ tasks[i].stage = "download" /\ Live(i)
     /\ tasks' = Set(i, "stage", "done")

@@ -5,9 +5,7 @@ import TextGrab
 /// A floating player that never takes focus, so the app being read stays frontmost. It shows while Berang reads,
 /// gets a voice ready, or has something to say, and hides when it stops. Scrolling over it changes the speed.
 ///
-/// It rests against the left or right edge of a screen. You drag it anywhere; when you let go, it slides to the nearer
-/// edge, or to the edge you flicked it toward, at the height you let go. It stays there across readings and
-/// launches, as Model/Place.tla checks:
+/// Model/Place.tla checks:
 /// - Only your drag saves the spot. macOS moving the player off a display that went away saves nothing.
 /// - Each time it shows, and whenever displays change, it goes to your spot, or to the right edge of the main display
 ///   while your spot's display is gone.
@@ -17,12 +15,8 @@ final class PlayerPanel: NSPanel {
     private let dock = Dock()
     /// Scrolling not yet turned into a speed step.
     private var scrolled: CGFloat = 0
-    /// A smaller size waiting for the content to finish closing.
-    private var shrink: Task<Void, Never>?
-    /// While you press on the player: where the window was, to tell a drag from a click, and the pointer's recent
-    /// path, to tell a flick from a drop.
+    private var pendingShrink: Task<Void, Never>?
     private var press: (origin: NSPoint, path: [(x: CGFloat, time: TimeInterval)], timer: Timer)?
-    /// Closing the controls a moment after the pointer leaves, so passing over the edge doesn't flicker them.
     private var close: Task<Void, Never>?
 
     init(player: Player, shortcuts: Shortcuts, tips: Tips) {
@@ -72,17 +66,15 @@ final class PlayerPanel: NSPanel {
 
     override var canBecomeKey: Bool { true }
 
-    /// Grows at once, so content opening has room, and shrinks once content closing has faded out.
     private func fit(_ size: CGSize) {
-        shrink?.cancel()
+        pendingShrink?.cancel()
         guard isVisible, size.height < frame.height || size.width < frame.width else { return setContentSize(size) }
-        shrink = Task { [weak self] in
+        pendingShrink = Task { [weak self] in
             try? await Task.sleep(for: PlayerView.motionTime)
             if !Task.isCancelled { self?.setContentSize(size) }
         }
     }
 
-    /// Opens the controls while the pointer is over the player.
     private func pointer(_ inside: Bool) {
         close?.cancel()
         if inside {
@@ -107,8 +99,6 @@ final class PlayerPanel: NSPanel {
         }
     }
 
-    /// The window's left side for a player resting on `side` of `room`. The margin for the shadow on the edge's side
-    /// hangs off the screen, so the player itself touches the edge.
     static func x(for side: Dock.Side, width: CGFloat, in room: NSRect) -> CGFloat {
         side == .left ? room.minX - PlayerView.margin : room.maxX - width + PlayerView.margin
     }
@@ -140,8 +130,6 @@ final class PlayerPanel: NSPanel {
         if !dock.dragging, frame.origin != press.origin { dock.dragging = true }
     }
 
-    /// A press that moved the player ends in a slide to an edge, and saves the spot: only your drag saves it, never a
-    /// move made by macOS or Berang.
     private func released() {
         guard let press else { return }
         press.timer.invalidate()
@@ -152,8 +140,8 @@ final class PlayerPanel: NSPanel {
         let center = NSPoint(x: frame.midX, y: frame.midY)
         guard let screen = NSScreen.screens.first(where: { $0.frame.contains(center) }) ?? screen else { return }
         let room = screen.visibleFrame
-        // Where the player is heading, not only where it was let go: a flick picks the edge it was thrown toward.
-        let side: Dock.Side = center.x + speed * 0.2 < room.midX ? .left : .right
+        let thrownToX = center.x + speed * 0.2
+        let side: Dock.Side = thrownToX < room.midX ? .left : .right
         let y = min(max(frame.minY, room.minY - PlayerView.margin), room.maxY - frame.height + PlayerView.margin)
         let target = NSRect(x: Self.x(for: side, width: frame.width, in: room), y: y, width: frame.width, height: frame.height)
         dock.side = side
@@ -196,17 +184,13 @@ final class PlayerPanel: NSPanel {
     }
 }
 
-/// The floating player's place on screen and what it shows, shared by its window and its view.
 @MainActor @Observable final class Dock {
     enum Side: String, Codable { case left, right }
     var side = Side.right
-    /// The pointer is over the player, so it shows every control.
     var open = false
-    /// You're dragging the player, so it is round on every side.
     var dragging = false
 }
 
-/// Tells the window when the pointer enters and leaves the player, also while another app is active.
 private final class PlayerHost: NSHostingView<PlayerView> {
     var pointer: (Bool) -> Void = { _ in }
 
@@ -233,17 +217,12 @@ struct PlayerView: View {
     let shortcuts: Shortcuts
     let tips: Tips
     let dock: Dock
-    /// Called with the player's new size when its content changes.
     let resized: (CGSize) -> Void
     @State private var showsSpeed = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    /// Room around the player for its shadow. On the screen's edge, it hangs off the screen.
     static let margin: CGFloat = 14
-    /// How long a row takes to open or close, with time for the spring to settle.
     static let motionTime = Duration.milliseconds(250)
-    /// Controls and cards open and close with the player growing and their content fading. With Reduce Motion, they
-    /// just appear.
     private var motion: Animation? { reduceMotion ? nil : .snappy(duration: 0.2) }
     private var expanded: Bool { dock.open || showsSpeed }
 
@@ -251,8 +230,6 @@ struct PlayerView: View {
         HStack(alignment: .top, spacing: 8) {
             if dock.side == .right { cards; bar } else { bar; cards }
         }
-        // Start over, tips, and the controls come and go on their own. Changes that shortcuts make, such as the
-        // speed, stay instant.
         .animation(motion, value: player.resumedAt != nil)
         .animation(motion, value: tips.showing)
         .animation(motion, value: dock.open)
@@ -266,12 +243,10 @@ struct PlayerView: View {
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity,
                alignment: dock.side == .right ? .topTrailing : .topLeading)
         .fontDesign(.rounded)
-        // The panel never takes focus from the app being read, so its controls show no focus ring.
         .focusEffectDisabled()
         .onChange(of: player.state == .idle) { _, idle in if idle { showsSpeed = false } }
         .onChange(of: dock.dragging) { _, dragging in if dragging { showsSpeed = false } }
         .task(id: player.state) {
-            // Soft transient notices auto-dismiss instead of lingering at the edge of the screen.
             guard case .failed(let message) = player.state,
                   message == ScreenAreaError.noText.description else { return }
             try? await Task.sleep(for: .seconds(4))
@@ -281,7 +256,6 @@ struct PlayerView: View {
         }
     }
 
-    /// Play and the speed, and while the pointer is over it, the rest.
     private var bar: some View {
         VStack(spacing: 2) {
             Capsule().fill(Otter.hair).frame(width: 16, height: 4).padding(.vertical, 3)
@@ -309,7 +283,6 @@ struct PlayerView: View {
         .frame(width: 46)
         .buttonStyle(PlainButtonStyle(radius: 8))
         .floating(corners)
-        // The controls that show only under the pointer stay reachable without it.
         .accessibilityElement(children: .contain)
         .accessibilityAction(named: "Previous paragraph") { player.skip(-1) }
         .accessibilityAction(named: "Next paragraph") { player.skip(1) }
@@ -317,7 +290,6 @@ struct PlayerView: View {
         .accessibilityAction(named: "Stop", player.stop)
     }
 
-    /// Round toward the screen, square against its edge, and round all over while you drag it.
     private var corners: RectangleCornerRadii {
         let r: CGFloat = 14
         if dock.dragging { return RectangleCornerRadii(topLeading: r, bottomLeading: r, bottomTrailing: r, topTrailing: r) }
@@ -326,7 +298,6 @@ struct PlayerView: View {
             : RectangleCornerRadii(topLeading: 0, bottomLeading: 0, bottomTrailing: r, topTrailing: r)
     }
 
-    /// The speed panel, hover context for files, Start over, OCR status, a problem, and tips, as cards beside the bar.
     @ViewBuilder private var cards: some View {
         let failure: String? = if case .failed(let message) = player.state { message } else { nil }
         let fileContext: Player.ReadingInfo? = if dock.open, reading, let info = player.reading, info.isFile { info } else { nil }
@@ -360,7 +331,6 @@ struct PlayerView: View {
         }
     }
 
-    /// Quiet wayfinding card on hover for files (where no document is open on screen).
     private func contextCard(_ info: Player.ReadingInfo) -> some View {
         HStack(alignment: .center, spacing: 8) {
             VStack(alignment: .leading, spacing: 1) {
@@ -521,7 +491,6 @@ struct PlayerSpot: Codable {
         y = Double((room.maxY - top) / room.height)
     }
 
-    /// The window origin that puts a player of window `size` at the spot, kept between the menu bar and the Dock.
     func origin(for size: NSSize, in room: NSRect) -> NSPoint {
         let top = room.maxY - y * room.height + PlayerView.margin
         let m = PlayerView.margin

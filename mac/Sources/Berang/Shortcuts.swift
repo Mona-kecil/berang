@@ -93,7 +93,6 @@ enum ShortcutAction: String, CaseIterable, Identifiable {
     /// Whether a shortcut doesn't work, which the menu bar icon flags.
     var needsAttention: Bool { working.count < ShortcutAction.allCases.count }
 
-    /// Whether any shortcut differs from its standard default.
     var isCustomized: Bool { ShortcutAction.allCases.contains { combos[$0] != $0.standard } }
 
     /// Restores each shortcut to its standard default, keeping any working shortcut if a default can't register

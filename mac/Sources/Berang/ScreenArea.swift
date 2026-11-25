@@ -25,7 +25,6 @@ func checkScreenAccess() throws {
     }
 }
 
-/// Lets the user drag over part of the screen with the system's screenshot tool, saving it to a temp PNG.
 /// Nil when the user presses Escape, or when the pick is cancelled, which closes the crosshair.
 @MainActor func captureScreenArea() async throws -> URL? {
     let url = FileManager.default.temporaryDirectory.appending(path: "berang-area-\(UUID().uuidString).png")
@@ -53,7 +52,6 @@ func checkScreenAccess() throws {
     return url
 }
 
-/// Runs Vision text recognition on `url` off the main actor so the player's loading state stays responsive.
 func recognizeScreenArea(_ url: URL) async throws -> Page {
     defer { try? FileManager.default.removeItem(at: url) }
     let paragraphs = await Task.detached(priority: .userInitiated) { recognizeImageBlocks(url) }.value

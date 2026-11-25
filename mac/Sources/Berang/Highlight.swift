@@ -40,7 +40,6 @@ import TextGrab
         view.layer!.addSublayer(sentenceLayer)
         view.layer!.addSublayer(wordLayer)
         window.contentView = view
-        // Hides or shows at once when you switch apps, instead of at the next tick.
         NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
         ) { [weak self] _ in
@@ -72,15 +71,17 @@ import TextGrab
         window.orderOut(nil)
     }
 
+    private static func isFrontmost(_ page: Page) -> Bool {
+        var pid: pid_t = 0
+        AXUIElementGetPid(page.viewport, &pid)
+        return NSWorkspace.shared.frontmostApplication?.processIdentifier == pid
+    }
+
     /// Asks the app where the text is drawn now. Each tick asks only where the sentence's first letter is; the rest
     /// is asked again when that moves, as it does when the page scrolls or its window moves.
     private func update(wordChanged: Bool) {
         guard let page, let target else { return }
-        // The highlight floats above every app, so it shows only while the page's app is in front. Over another app
-        // it would mark text that isn't there. Once the app is back, the next tick draws it again.
-        var pid: pid_t = 0
-        AXUIElementGetPid(page.viewport, &pid)
-        guard NSWorkspace.shared.frontmostApplication?.processIdentifier == pid else {
+        guard Self.isFrontmost(page) else {
             sentenceChanged = true
             return window.orderOut(nil)
         }

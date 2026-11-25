@@ -27,7 +27,6 @@ struct VoicesPage: View {
 
     private var hasInstalledEngine: Bool { Engine.allCases.contains(where: \.isInstalled) }
 
-    /// The uninstalled voice currently highlighted, which always shows its Download card right away.
     private var downloadTarget: Voice? {
         if let considered, !considered.engine.isInstalled { return considered }
         if !player.engine.isInstalled { return Voice(engine: player.engine, name: player.voice) }
@@ -230,7 +229,7 @@ struct VoicesPage: View {
     }
 
     private var testingText: Bool {
-        player.isReadingText && (player.state == .playing || player.state == .paused)
+        player.isReadingVoicesText && (player.state == .playing || player.state == .paused)
     }
 
     private var tryIt: some View {
@@ -275,7 +274,7 @@ struct ChipStyle: ButtonStyle {
             .foregroundStyle(on ? .white : Otter.ink)
             .padding(.horizontal, 9).padding(.vertical, 4)
             .raised(in: Capsule(), face: on ? Otter.teal : Otter.card, edge: on ? Otter.teal.opacity(0.6) : Otter.edge)
-            .environment(\.sunk, configuration.isPressed)
+            .environment(\.keyPressed, configuration.isPressed)
             .fixedSize()
             .focusRing(12)
             .dimmedWhenDisabled()
@@ -289,7 +288,6 @@ struct PageHeader: View {
     var body: some View {
         HStack(spacing: 0) {
             if let back {
-                // The padding makes the arrow easier to hit and keeps the title where it was.
                 Button(action: back) {
                     Image(systemName: "chevron.left").font(.system(size: 15, weight: .heavy))
                         .padding(.vertical, 6).padding(.trailing, 6)

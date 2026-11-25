@@ -44,7 +44,6 @@ final class BerangWindow: NSWindow {
     /// macOS shows each permission prompt once; kept on the window model so navigating pages doesn't reset it.
     var askedTrust = false
     var askedScreen = false
-    /// Stays false while the user finishes first-time setup, so the checklist doesn't snap away mid-click.
     var setupDismissed = !BerangWindow.setupNeeded
     @ObservationIgnored weak var shortcuts: Shortcuts?
 }
@@ -252,7 +251,6 @@ struct HomePage: View {
         .padding(.vertical, 8)
     }
 
-    // Home: the one shortcut that reads any app, a file, and the voice.
     private var home: some View {
         VStack(spacing: 0) {
             HStack { Spacer(); settingsButton }
@@ -315,7 +313,7 @@ struct HomePage: View {
         .card(padding: 14)
     }
 
-    /// Slim confirmation card for a dropped or chosen file (Model/Player.tla, StageOnDrop).
+    /// Model/Player.tla, StageOnDrop.
     private func stagedFileCard(_ file: Player.StagedFile, canRead: Bool) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 8) {
@@ -356,7 +354,6 @@ struct HomePage: View {
         .card(padding: 14)
     }
 
-    /// A shortcut inside a sentence, in teal, or in red while it isn't working.
     private func keys(_ action: ShortcutAction) -> Text {
         Text(shortcuts.combos[action]!.display).fontWeight(.heavy)
             .foregroundStyle(shortcuts.working.contains(action) ? Otter.teal : Otter.alert)

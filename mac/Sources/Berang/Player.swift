@@ -28,7 +28,6 @@ import UniformTypeIdentifiers
         var percent: Int { Int((progress * 100).rounded()) }
     }
 
-    /// What the player is currently reading or paused on, for the floating player and menu bar.
     struct ReadingInfo: Equatable {
         let title: String
         let subtitle: String?
@@ -72,29 +71,23 @@ import UniformTypeIdentifiers
     private(set) var resumedAt: Int?
     /// How much of the voice has downloaded, from 0 to 1, while it downloads.
     private(set) var download: Double?
-    /// An error from downloading an engine in setup or Voices, scoped to the engine that failed.
     private(set) var downloadError: DownloadFailure?
     /// The engine and voice reading, one of the engine's `voices`. Kept across launches.
     private(set) var engine = Engine(rawValue: UserDefaults.standard.string(forKey: "engine") ?? "") ?? .phonon
     private(set) var voice = UserDefaults.standard.string(forKey: "voice") ?? Engine.phonon.defaultVoice
     /// The engine downloading, while `download` counts.
     private(set) var downloading: Engine?
-    /// The recorded voice preview currently speaking, if any.
     private(set) var previewing: PreviewVoice?
     /// Whether Berang has read anything yet, which ends setup's last step.
     private(set) var hasRead = UserDefaults.standard.bool(forKey: "hasRead") {
         didSet { UserDefaults.standard.set(hasRead, forKey: "hasRead") }
     }
-    /// File name while a dropped or chosen file is being parsed off the main actor.
     private(set) var stagingTitle: String?
     /// A dropped or chosen file waiting for explicit Read (Model/Player.tla, StageOnDrop).
     private(set) var staged: StagedFile?
-    /// An inline message when a dropped file is unsupported or unreadable.
     private(set) var fileError: String?
-    /// Live metadata for what is currently playing or paused.
     private(set) var reading: ReadingInfo?
-    /// Whether the player is currently reading sample text from the Voices window.
-    private(set) var isReadingText = false
+    private(set) var isReadingVoicesText = false
 
     @ObservationIgnored private let audio = AudioOut()
     @ObservationIgnored private let highlight = Highlight()
@@ -160,7 +153,6 @@ import UniformTypeIdentifiers
         min(max((s * 10).rounded() / 10, speeds.lowerBound), speeds.upperBound)
     }
 
-    /// Whether Berang can read the file at `url` (PDF, EPUB, image, or plain text).
     static func supports(_ url: URL) -> Bool {
         guard url.isFileURL else { return false }
         let ext = url.pathExtension.lowercased()
@@ -213,7 +205,7 @@ import UniformTypeIdentifiers
         page = nil
         activeMeta = nil
         reading = nil
-        isReadingText = false
+        isReadingVoicesText = false
         resumedAt = nil
         state = .idle
     }
@@ -239,7 +231,6 @@ import UniformTypeIdentifiers
         highlight.hide()
     }
 
-    /// Stops any playing voice preview clip or synthesized voice sample (e.g. when leaving Voices).
     func stopPreview() {
         endPreview()
         if speakingSample {
@@ -281,8 +272,7 @@ import UniformTypeIdentifiers
     /// Reads the text in an area of the screen the user drags over, stopping what is playing.
     func readScreenArea() { open(.screenArea) }
 
-    /// Stages a PDF, EPUB, image, or text file off the main actor without speaking until the user clicks Read
-    /// (Model/Player.tla, StageOnDrop).
+    /// Stages a file without speaking until the user clicks Read (Model/Player.tla, StageOnDrop).
     func stageFile(_ url: URL) {
         stageGeneration += 1
         let sg = stageGeneration
@@ -345,7 +335,7 @@ import UniformTypeIdentifiers
     private enum Source { case window, screenArea, stagedFile(url: URL, page: Page, fromStart: Bool), text(String) }
 
     /// Starts a request, replacing whatever was playing or waiting. While the voice downloads or loads, the
-    /// request waits for it instead. During `.recognizing`, a new request replaces OCR immediately (Model/Player.tla).
+    /// request waits for it instead (Model/Player.tla).
     private func open(_ source: Source) {
         if state == .downloading || state == .loading {
             pending = source
@@ -407,7 +397,7 @@ import UniformTypeIdentifiers
                     resumes = page.startPoint == .screen && page.start == 0
                     let title = page.window.isEmpty ? page.app : page.window
                     activeMeta = (title: title, subtitle: page.window.isEmpty ? nil : page.app, isFile: false)
-                    isReadingText = false
+                    isReadingVoicesText = false
                 case .screenArea:
                     state = .idle  // not loading while the user picks
                     guard let captured = try await captureScreenArea() else { return }
@@ -421,13 +411,13 @@ import UniformTypeIdentifiers
                     guard g == generation else { return }
                     pageKey = nil
                     activeMeta = (title: "Screen area", subtitle: nil, isFile: false)
-                    isReadingText = false
+                    isReadingVoicesText = false
                 case .stagedFile(let url, let file, let fromStart):
                     page = file
                     pageKey = file.address
                     resumes = !fromStart
                     activeMeta = (title: file.window, subtitle: nil, isFile: true)
-                    isReadingText = false
+                    isReadingVoicesText = false
                     if staged?.url == url {
                         staged = nil
                         stagedPage = nil
@@ -437,7 +427,7 @@ import UniformTypeIdentifiers
                     guard !page.blocks.isEmpty else { throw PhononError(description: "Type something to read.") }
                     pageKey = nil
                     activeMeta = (title: "Sample text", subtitle: nil, isFile: false)
-                    isReadingText = true
+                    isReadingVoicesText = true
                 }
                 self.page = page
                 seenSelection = selected(in: page)
@@ -456,7 +446,7 @@ import UniformTypeIdentifiers
             } catch {
                 guard g == generation, !(error is CancellationError) else { return }
                 pending = nil
-                isReadingText = false
+                isReadingVoicesText = false
                 state = .failed("\(error)")
             }
         }
@@ -664,7 +654,6 @@ import UniformTypeIdentifiers
         guard let page else { return }
         index = b
         if let pageKey {
-            // Only file reads know the full document's block count; Preview/browser PDFs expose a partial window.
             let total = activeMeta?.isFile == true ? page.blocks.count : nil
             positions[pageKey] = SavedPosition(page.blocks[b], at: b, total: total)
         }

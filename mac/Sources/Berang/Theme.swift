@@ -19,7 +19,6 @@ enum Otter {
             ? .black.withAlphaComponent(0.4) : NSColor(hex: 0x123B3A).withAlphaComponent(0.18)
     })
 
-    /// A hairline around glass, faint enough to read only as an edge.
     static let hair = Color(nsColor: NSColor(name: nil) { appearance in
         appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
             ? .white.withAlphaComponent(0.12) : NSColor(hex: 0x123B3A).withAlphaComponent(0.12)
@@ -55,7 +54,6 @@ extension View {
     }
 }
 
-/// A button that draws only its label, dimmed with subtle press feedback and the rounded focus ring.
 struct PlainButtonStyle: ButtonStyle {
     var radius: CGFloat = 10
     func makeBody(configuration: Configuration) -> some View {
@@ -79,23 +77,19 @@ private struct PlainButtonBody: View {
     }
 }
 
-/// A button whose label is `raised`: pressed, the label sinks onto its edge like a key.
 struct KeyButtonStyle: ButtonStyle {
     var radius: CGFloat = 10
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label.environment(\.sunk, configuration.isPressed).contentShape(Rectangle()).focusRing(radius)
+        configuration.label.environment(\.keyPressed, configuration.isPressed).contentShape(Rectangle()).focusRing(radius)
             .dimmedWhenDisabled()
     }
 }
 
 extension EnvironmentValues {
-    /// Whether the button around a `raised` view is pressed.
-    @Entry var sunk = false
+    @Entry var keyPressed = false
 }
 
 extension View {
-    /// Sets the view on a solid edge `depth` points below it. While its button is pressed, it sinks until 1 point of
-    /// the edge shows.
     func raised(_ radius: CGFloat, face: Color = Otter.card, edge: Color = Otter.edge, depth: CGFloat = 2,
                 stroke: Color? = nil, lineWidth: CGFloat = 0) -> some View {
         raised(in: RoundedRectangle(cornerRadius: radius, style: .continuous), face: face, edge: edge, depth: depth,
@@ -107,10 +101,8 @@ extension View {
         modifier(Raised(shape: shape, face: face, edge: edge, depth: depth, stroke: stroke, lineWidth: lineWidth))
     }
 
-    /// Fades a control that can't be used.
     func dimmedWhenDisabled() -> some View { modifier(DimmedWhenDisabled()) }
 
-    /// A white card resting on a solid edge.
     func card(padding: CGFloat = 12) -> some View { self.padding(padding).raised(16, depth: 3) }
 }
 
@@ -121,7 +113,7 @@ private struct Raised<S: InsettableShape>: ViewModifier {
     let depth: CGFloat
     let stroke: Color?
     let lineWidth: CGFloat
-    @Environment(\.sunk) private var sunk
+    @Environment(\.keyPressed) private var keyPressed
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
@@ -129,10 +121,10 @@ private struct Raised<S: InsettableShape>: ViewModifier {
             .background(
                 shape.fill(face)
                     .overlay { if let stroke { shape.strokeBorder(stroke, lineWidth: lineWidth) } }
-                    .background(shape.fill(edge).offset(y: sunk ? 1 : depth))
+                    .background(shape.fill(edge).offset(y: keyPressed ? 1 : depth))
             )
-            .offset(y: sunk ? depth - 1 : 0)
-            .animation(reduceMotion ? nil : .easeOut(duration: 0.1), value: sunk)
+            .offset(y: keyPressed ? depth - 1 : 0)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.1), value: keyPressed)
     }
 }
 
@@ -143,15 +135,13 @@ private struct DimmedWhenDisabled: ViewModifier {
 }
 
 extension View {
-    /// Frosted glass cut to `radii`, with a hairline and a soft shadow, for what floats over other apps.
     func floating(_ radii: RectangleCornerRadii) -> some View {
         let shape = UnevenRoundedRectangle(cornerRadii: radii, style: .continuous)
         return background {
             ZStack {
                 shape.fill(.black)
                     .shadow(color: Otter.shadow, radius: 6, y: 3)
-                    // Only the shadow outside the shape shows: under the glass it would cloud it.
-                    .mask { Rectangle().padding(-24).overlay { shape.blendMode(.destinationOut) }.compositingGroup() }
+                    .mask { outside(shape) }
                 Glass(radii: radii)
             }
         }
@@ -163,7 +153,10 @@ extension View {
     }
 }
 
-/// The frosted glass of macOS panels, blurring what is behind the window, cut to `radii`.
+private func outside(_ shape: some Shape) -> some View {
+    Rectangle().padding(-24).overlay { shape.blendMode(.destinationOut) }.compositingGroup()
+}
+
 private struct Glass: NSViewRepresentable {
     let radii: RectangleCornerRadii
 
@@ -213,7 +206,7 @@ struct ChunkyButtonStyle: ButtonStyle {
             .padding(.horizontal, compact ? 11 : 16)
             .padding(.vertical, compact ? 5 : 9)
             .raised(compact ? 10 : 14, face: Otter.orange, edge: Otter.orangeEdge, depth: 3)
-            .environment(\.sunk, configuration.isPressed)
+            .environment(\.keyPressed, configuration.isPressed)
             .contentShape(Rectangle())
             .focusRing(compact ? 10 : 14)
             .dimmedWhenDisabled()
@@ -229,7 +222,7 @@ struct SoftButtonStyle: ButtonStyle {
             .padding(.horizontal, 11)
             .padding(.vertical, 5)
             .raised(10)
-            .environment(\.sunk, configuration.isPressed)
+            .environment(\.keyPressed, configuration.isPressed)
             .contentShape(Rectangle())
             .focusRing(10)
             .dimmedWhenDisabled()
