@@ -254,7 +254,7 @@ It reads other apps' text, so the app that runs it, such as your terminal, needs
 
 ### Website
 
-`site` is berang.monosodiums.com, served by Cloudflare from `site/public`. `site/public/_redirects` sends https://berang.monosodiums.com/install to `install.sh`, so the page's install line stays short. The page's audio and word timings come from `berang-say site site/text/<name>.txt <dir> kitten/eleanor`, which reads the text through Berang's own cleanup and voices. `site/tools/pitch.py <dir>` measures how much each voice's pitch and loudness change from sentence to sentence. Run `npx wrangler dev` in `site` to try it, and `npx wrangler deploy` to publish it.
+`site` is berang.monosodiums.com, served by Cloudflare from `site/public`. `site/public/_redirects` sends https://berang.monosodiums.com/install to `install.sh`, so the page's install line stays short. The page's audio and word timings come from `site/tools/build-audio.sh`, which runs `berang-say site` on `site/text/hero.txt` and `hard.txt` through Berang's own cleanup and voices, writes the clips to `site/public/assets/{hero,hard}`, and rebuilds `site/public/assets/timing.js`. It needs Berang installed with the Kitten voices, and the Phonon engine for the Phonon voices; `--kitten-only` records only the Kitten voices and keeps the Phonon ones as they are. `berang-say site <text-file> <dir> <voice> ...` records one text on its own, and `site/tools/pitch.py <dir>` measures how much each voice's pitch and loudness change from sentence to sentence in its `timing.json`. Run `npx wrangler dev` in `site` to try it, and `npx wrangler deploy` to publish it.
 
 ## License
 
