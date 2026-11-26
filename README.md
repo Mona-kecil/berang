@@ -240,6 +240,10 @@ It reads other apps' text, so the app that runs it, such as your terminal, needs
 
 `swift test` also reads 29 saved pages in `mac/Tests/TextGrabTests/Pages`: openly licensed web pages saved from WebKit and Chrome, two TextEdit documents, a VS Code editor, and five PDFs. Each page keeps its accessibility tree, compressed, and the Markdown the grabber read from it, so a change to the grabber shows up as a diff in the `.md` files. `pages.tsv` lists each page's source and license. To record pages again, run `mac/Tests/TextGrabTests/Pages/record.sh [name ...]`. After a change to the grabber, `berang-grab --replay page.json.lzma` prints what it now reads from a saved page.
 
+### Website
+
+`site` is berang.monosodiums.com, a Cloudflare Worker. `site/public` is the page. `site/worker.js` serves it and sends what people write in Send feedback by email, through Email Routing, at most three messages a minute from one address. The page's audio and word timings come from `berang-say site site/text/<name>.txt <dir> kitten/eleanor`, which reads the text through Berang's own cleanup and voices. `site/tools/pitch.py <dir>` measures how much each voice's pitch and loudness change from sentence to sentence. Run `npx wrangler dev` in `site` to try it, and `npx wrangler deploy` to publish it.
+
 ## License
 
 The code is GPL-3.0. Model weights are not part of this repository, and each keeps its own license. Updates use [Sparkle](https://sparkle-project.org) (MIT).

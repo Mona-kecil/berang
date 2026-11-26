@@ -1,0 +1,10 @@
+{
+  "name": "berang-site",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "routes": [{ "pattern": "berang.monosodiums.com", "custom_domain": true }],
+  "assets": { "directory": "public", "binding": "ASSETS", "run_worker_first": ["/feedback"] },
+  "send_email": [{ "name": "EMAIL", "destination_address": "michael@monosodiums.com" }],
+  "ratelimits": [{ "name": "LIMIT", "namespace_id": "1001", "simple": { "limit": 3, "period": 60 } }],
+  "observability": { "enabled": true }
+}
