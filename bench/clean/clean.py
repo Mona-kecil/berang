@@ -99,6 +99,7 @@ ABBR = {"Mr.": "Mister", "Mrs.": "Missus", "Ms.": "Miz", "Prof.": "Professor", "
         "Oct.": "October", "Nov.": "November", "Dec.": "December"}
 TLD = r"(?:com|org|net|io|dev|ai|app|co|edu|gov|me|xyz|sh|so|gg)"
 NUM = r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?"
+UNIT_SYMBOLS = r"km/h|°[CF]|kHz|MHz|GHz|mph|lbs|ms|km|cm|mm|kg|mg|lb|GB|MB|KB|TB|Hz|m(?=\s+[a-z])"
 
 EMOJI_WORDS = {"❤": "love", "♥": "love", "👍": "thumbs up"}
 
@@ -211,7 +212,7 @@ RULES = [
     ("paragraph", r"\n[ \t]*\n\s*", lambda m, s: "\n\n"),
     ("newline", r"[ \t]*\n[ \t]*", lambda m, s: " "),
     ("currency", rf"(?P<sym>[$€£¥])\s?(?P<amt>{NUM})(?:\s?(?P<scale>[kKMBT]\b|thousand|million|billion|trillion))?", _currency),
-    ("month_day", r"\b(?P<mon>(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\.?|January|February|March|April|May|June|July|August|September|October|November|December)\s(?P<d>[12]?\d|3[01])(?!\d|[.,]\d|:)\b(?:,\s(?P<y>1[1-9]\d\d|20\d\d)\b)?",
+    ("month_day", rf"\b(?P<mon>(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\.?|January|February|March|April|May|June|July|August|September|October|November|December)\s(?P<d>[12]?\d|3[01])(?!\d|[.,]\d|:)\b(?:,\s(?P<y>1[1-9]\d\d|20\d\d)\b(?![-%:]|\.\d|\s?(?:{UNIT_SYMBOLS})(?![\w/])))?",
      # The year goes with the date, so the comma between them is never a place to split the sentence.
      lambda m, s: f"{_month(m.group('mon'))} {ordinal_words(int(m.group('d')))}"
      + (f", {year_words(int(m.group('y')))}" if m.group('y') else "")),
@@ -220,7 +221,7 @@ RULES = [
     ("percent", rf"(?P<approx>~)?(?P<n>{NUM})\s?%", _percent),
     ("dims", r"\b(\d+)\s?[x×]\s?(\d+)\b", lambda m, s: f"{int_words(int(m.group(1)))} by {int_words(int(m.group(2)))}"),
     ("times", r"\b(\d+(?:\.\d+)?)x\b", lambda m, s: f"{num_words(m.group(1))} times"),
-    ("unit", rf"(?P<n>{NUM})\s?(?P<u>km/h|°[CF]|kHz|MHz|GHz|mph|lbs|ms|km|cm|mm|kg|mg|lb|GB|MB|KB|TB|Hz|m(?=\s+[a-z]))(?![\w/])", _unit),
+    ("unit", rf"(?P<n>{NUM})\s?(?P<u>{UNIT_SYMBOLS})(?![\w/])", _unit),
     ("ordinal", r"\b(\d+)(?:st|nd|rd|th)\b", lambda m, s: ordinal_words(int(m.group(1)))),
     ("version", r"\b(?P<v>[vV])?(?P<n>\d+\.\d+\.\d+(?:\.\d+)*)\b",
      lambda m, s: ("version " if m.group("v") else "") + " point ".join(num_words(p) for p in m.group("n").split("."))),
