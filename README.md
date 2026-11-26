@@ -18,9 +18,10 @@ Prefer not to use Terminal? Download `Berang.zip` from the [latest release](http
 
 When Berang first opens, its window walks you through what it needs:
 
-1. **Let me read other apps**: Accessibility, so Berang can read the text in other apps. Click Allow, then turn Berang on in System Settings.
+1. **Let me read other apps**: Accessibility, so Berang can read the text in other apps. Click Allow. Berang opens System Settings and floats a small guide beside it: switch Berang on. If Berang isn't in the list, drag the guide's icon into it. When it's on, Berang comes back to the front.
 2. **Pick my voice.** Hear each one, then download its engine once: Kitten (82 MB, 10 voices), Phonon (137 MB, 38 voices), or Pocket (240 MB, 8 voices). Setup starts on Eleanor, a Kitten voice.
-3. **Read screen areas**: Screen Recording, if you want to read parts of the screen. This is optional.
+
+Berang asks for Screen Recording the first time you read a screen area or an app that draws its own text, with the same guide. After you switch it on, choose Quit & Reopen when macOS offers it.
 
 Then press ⌥⎋ (Option-Escape) on any page.
 
@@ -73,7 +74,7 @@ Each update must be signed with Berang's update key and its certificate, or Bera
 - **Images** open in Preview, by recognizing their text.
 - **VS Code and Cursor**, from the cursor. Turn on screen reader mode first with ⇧⌥F1.
 - **Google Docs**, the whole document. Turn on screen reader support and braille support first, under Tools > Accessibility.
-- **Apps that draw their own text**, such as web readers that show pages as images. Berang recognizes the text on screen. This needs Screen Recording access, as does ⌥⇧⎋.
+- **Apps that draw their own text**, such as web readers that show pages as images. Berang recognizes the text on screen. This needs Screen Recording access, as does ⌥⇧⎋. Berang asks the first time you need it.
 
 In PDFs and Apple Books, Berang highlights the paragraph rather than the word. VS Code, Google Docs, and recognized text have no highlight.
 

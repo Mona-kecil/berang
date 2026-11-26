@@ -17,14 +17,6 @@ enum ScreenAreaError: Error, CustomStringConvertible {
     }
 }
 
-/// Asks for Screen Recording access the first time; macOS shows its prompt once.
-func checkScreenAccess() throws {
-    guard CGPreflightScreenCaptureAccess() else {
-        CGRequestScreenCaptureAccess()
-        throw ScreenAreaError.notAllowed
-    }
-}
-
 /// Nil when the user presses Escape, or when the pick is cancelled, which closes the crosshair.
 @MainActor func captureScreenArea() async throws -> URL? {
     let url = FileManager.default.temporaryDirectory.appending(path: "berang-area-\(UUID().uuidString).png")

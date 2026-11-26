@@ -32,6 +32,15 @@ final class BerangWindow: NSWindow {
         makeFirstResponder(nil)  // nothing looks chosen until you press Tab
     }
 
+    /// Brings the window forward after you switch Berang on in System Settings. macOS may not let an app activate
+    /// itself while another is in front, so Berang also asks to be opened, which it always honors.
+    func comeBack() {
+        show()
+        let open = NSWorkspace.OpenConfiguration()
+        open.activates = true
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: open)
+    }
+
     override func close() {
         model.shortcuts?.cancelRecording()
         super.close()
@@ -41,9 +50,6 @@ final class BerangWindow: NSWindow {
 @MainActor @Observable final class WindowModel {
     enum Page { case home, voices, settings }
     var page = Page.home
-    /// macOS shows each permission prompt once; kept on the window model so navigating pages doesn't reset it.
-    var askedTrust = false
-    var askedScreen = false
     /// Stays false while the user finishes first-time setup, so the checklist doesn't snap away mid-click.
     var setupDismissed = !BerangWindow.setupNeeded
     @ObservationIgnored weak var shortcuts: Shortcuts?
@@ -126,7 +132,6 @@ struct HomePage: View {
     let go: (WindowModel.Page) -> Void
 
     @State private var trusted = AXIsProcessTrusted()
-    @State private var screen = CGPreflightScreenCaptureAccess()
     @State private var voice = Engine.allCases.contains(where: \.isInstalled)
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -147,11 +152,14 @@ struct HomePage: View {
         .task {
             while !Task.isCancelled {
                 trusted = AXIsProcessTrusted()
-                screen = CGPreflightScreenCaptureAccess()
                 voice = Engine.allCases.contains(where: \.isInstalled)
                 if !trusted || !voice { model.setupDismissed = false }
                 try? await Task.sleep(for: .seconds(1))
             }
+        }
+        // So the row is already ticked when the guide brings Berang back.
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            trusted = AXIsProcessTrusted()
         }
     }
 
@@ -187,7 +195,7 @@ struct HomePage: View {
             .multilineTextAlignment(.center)
             VStack(spacing: 0) {
                 check("Let me read other apps", done: trusted) {
-                    Button("Allow", action: allowAccessibility).buttonStyle(ChunkyButtonStyle(compact: true))
+                    Button("Allow") { player.guide.show(.accessibility) }.buttonStyle(ChunkyButtonStyle(compact: true))
                 }
                 Divider().overlay(Otter.edge)
                 check("Pick my voice", done: voice) {
@@ -202,10 +210,6 @@ struct HomePage: View {
                     } else {
                         Button("Choose") { go(.voices) }.buttonStyle(SoftButtonStyle())
                     }
-                }
-                Divider().overlay(Otter.edge)
-                check("Read screen areas", note: "Optional", done: screen) {
-                    Button("Allow", action: allowScreenRecording).buttonStyle(SoftButtonStyle())
                 }
             }
             .card(padding: 12)
@@ -236,16 +240,13 @@ struct HomePage: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func check(_ title: String, note: String? = nil, done: Bool, @ViewBuilder action: () -> some View) -> some View {
+    private func check(_ title: String, done: Bool, @ViewBuilder action: () -> some View) -> some View {
         HStack(spacing: 10) {
             Image(systemName: done ? "checkmark.circle.fill" : "circle")
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(done ? Otter.teal : Otter.edge)
                 .accessibilityLabel(done ? "Done" : "To do")
-            VStack(alignment: .leading, spacing: 1) {
-                Text(title).font(Otter.font(13.5, .bold)).foregroundStyle(Otter.ink)
-                if let note { Text(note).font(Otter.font(11, .medium)).foregroundStyle(Otter.soft) }
-            }
+            Text(title).font(Otter.font(13.5, .bold)).foregroundStyle(Otter.ink)
             Spacer()
             if !done { action() }
         }
@@ -264,7 +265,6 @@ struct HomePage: View {
                 idleCenter
             }
             Spacer(minLength: 0)
-            if !screen { screenTip.padding(.bottom, 12) }
             voiceCard
         }
     }
@@ -378,42 +378,12 @@ struct HomePage: View {
         .accessibilityLabel("Voice: \(Engine.title(player.voice)). Change")
     }
 
-    private var screenTip: some View {
-        HStack(spacing: 8) {
-            Text("Reading part of the screen needs Screen Recording.").font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft)
-            Spacer()
-            Button("Allow", action: allowScreenRecording).buttonStyle(SoftButtonStyle())
-        }
-    }
-
     private func chooseFile() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.pdf, .epub, .image, .plainText]
         guard panel.runModal() == .OK, let url = panel.url else { return }
         player.stageFile(url)
     }
-
-    private func allowAccessibility() {
-        if model.askedTrust {
-            openPrivacy("Privacy_Accessibility")
-        } else {
-            model.askedTrust = true
-            trusted = AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
-        }
-    }
-
-    private func allowScreenRecording() {
-        if model.askedScreen {
-            openPrivacy("Privacy_ScreenCapture")
-        } else {
-            model.askedScreen = true
-            screen = CGRequestScreenCaptureAccess()
-        }
-    }
-}
-
-func openPrivacy(_ pane: String) {
-    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?\(pane)")!)
 }
 
 func megabytes(_ bytes: Int64) -> Int64 { bytes / 1_000_000 }

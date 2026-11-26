@@ -130,7 +130,11 @@ import UniformTypeIdentifiers
     /// takes focus, so this is the app the user is looking at, even after granting Accessibility access.
     @ObservationIgnored private var target = NSWorkspace.shared.frontmostApplication
 
-    init() {
+    /// Shown beside System Settings when a reading needs a permission that is off.
+    let guide: PermissionGuide
+
+    init(guide: PermissionGuide) {
+        self.guide = guide
         audio.rate = speed
         NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
@@ -345,15 +349,29 @@ import UniformTypeIdentifiers
         start(source)
     }
 
-    /// Shows the system's permission prompt the first time, before the voice download.
+    /// Shows the guide to a permission the request needs and lacks, before the voice download.
     private func allow(_ source: Source) throws {
         switch source {
         case .window:
-            guard AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
-            else { throw GrabError.notTrusted }
-        case .screenArea: try checkScreenAccess()
+            guard AXIsProcessTrusted() else {
+                guide.show(.accessibility)
+                throw GrabError.notTrusted
+            }
+        case .screenArea:
+            guard CGPreflightScreenCaptureAccess() else {
+                askForScreenRecording()
+                throw ScreenAreaError.notAllowed
+            }
         case .stagedFile, .text: break
         }
+    }
+
+    /// Opens the guide the first time a reading needs Screen Recording. Afterwards the player's message offers it, so
+    /// someone who said no isn't taken to System Settings at every press.
+    private func askForScreenRecording() {
+        guard !UserDefaults.standard.bool(forKey: "askedScreenRecording") else { return }
+        UserDefaults.standard.set(true, forKey: "askedScreenRecording")
+        guide.show(.screenRecording)
     }
 
     private func start(_ requested: Source) {
@@ -385,7 +403,7 @@ import UniformTypeIdentifiers
                     // An app that draws its own text, like a web reader drawing on a canvas, is read off the screen.
                     if page.blocks.isEmpty, let frame = page.viewportFrame {
                         guard CGPreflightScreenCaptureAccess() else {
-                            CGRequestScreenCaptureAccess()
+                            askForScreenRecording()
                             throw ScreenAreaError.drawnText(app: page.app)
                         }
                         state = .recognizing  // Model/Player.tla, ShowRecognizing
