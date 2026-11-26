@@ -242,7 +242,7 @@ It reads other apps' text, so the app that runs it, such as your terminal, needs
 
 ### Website
 
-`site` is berang.monosodiums.com, a Cloudflare Worker. `site/public` is the page. `site/worker.js` serves it and sends what people write in Send feedback by email, through Email Routing, at most three messages a minute from one address. The page's audio and word timings come from `berang-say site site/text/<name>.txt <dir> kitten/eleanor`, which reads the text through Berang's own cleanup and voices. `site/tools/pitch.py <dir>` measures how much each voice's pitch and loudness change from sentence to sentence. Run `npx wrangler dev` in `site` to try it, and `npx wrangler deploy` to publish it.
+`site` is berang.monosodiums.com, served by Cloudflare from `site/public`. The page's audio and word timings come from `berang-say site site/text/<name>.txt <dir> kitten/eleanor`, which reads the text through Berang's own cleanup and voices. `site/tools/pitch.py <dir>` measures how much each voice's pitch and loudness change from sentence to sentence. Run `npx wrangler dev` in `site` to try it, and `npx wrangler deploy` to publish it.
 
 ## License
 
