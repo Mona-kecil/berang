@@ -63,6 +63,10 @@ enum Engine: String, CaseIterable, Sendable {
         Bundle.main.resourceURL?.appending(path: "Previews/\(rawValue)/\(voice).m4a")
     }
 
+    /// The engine to read with when none was chosen: one already on this Mac, or else Kitten, whose voices keep
+    /// one tone from sentence to sentence where Phonon's drift.
+    static var first: Engine { allCases.first(where: \.isInstalled) ?? .kitten }
+
     /// The voice to read with when none was chosen.
     var defaultVoice: String {
         switch self {

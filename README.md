@@ -19,7 +19,7 @@ Prefer not to use Terminal? Download `Berang.zip` from the [latest release](http
 When Berang first opens, its window walks you through what it needs:
 
 1. **Let me read other apps**: Accessibility, so Berang can read the text in other apps. Click Allow, then turn Berang on in System Settings.
-2. **Pick my voice.** Hear each one, then download its engine once: Phonon (137 MB, 38 voices), Kitten (82 MB, 10 voices), or Pocket (240 MB, 8 voices).
+2. **Pick my voice.** Hear each one, then download its engine once: Kitten (82 MB, 10 voices), Phonon (137 MB, 38 voices), or Pocket (240 MB, 8 voices). Setup starts on Eleanor, a Kitten voice.
 3. **Read screen areas**: Screen Recording, if you want to read parts of the screen. This is optional.
 
 Then press ⌥⎋ (Option-Escape) on any page.
