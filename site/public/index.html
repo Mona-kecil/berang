@@ -55,7 +55,6 @@
   .steps { display: inline-grid; gap: 6px; padding: 0; list-style: none; text-align: left; counter-reset: step; color: var(--ink); }
   .steps li { counter-increment: step; display: flex; align-items: center; gap: 8px; }
   .steps li::before { content: counter(step); flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 12px; display: grid; place-items: center; }
-  .steps + p { margin-top: 10px; }
   .steps kbd { font: inherit; font-weight: 800; padding: 1px 6px; border-radius: 6px; background: var(--card); box-shadow: inset 0 -2px 0 var(--edge), 0 0 0 1px var(--edge); }
 
   .stage { position: relative; margin: 96px auto 0; max-width: 860px; }
@@ -205,7 +204,7 @@ const $ = id => document.getElementById(id);
 const STEPS = ["Press <kbd>⌘ Space</kbd>, type Terminal, press Return.", "Press <kbd>⌘ V</kbd> to paste.", "Press Return."];
 // macOS blocks an app downloaded in a browser the first time, so say how to open it once the zip is downloading.
 const ZIPPED = "This otter only has pebbles, not $99/year for Apple, so macOS will stop it once. Unzip, move Berang to Applications, and open it. Go to System Settings › Privacy & Security, scroll down, and click “Open Anyway”. Built by GitHub from the public code.";
-const steps = list => `<ol class="steps">${list.map(t => `<li><span>${t}</span></li>`).join("")}</ol><p>No password needed. Berang installs and opens by itself.</p>`;
+const steps = list => `<ol class="steps">${list.map(t => `<li><span>${t}</span></li>`).join("")}</ol>`;
 document.querySelector("[data-download]").href = "https://github.com/Mona-kecil/berang/releases/latest/download/Berang.zip";
 document.querySelector("[data-download]").addEventListener("click", () => $("get-note").textContent = ZIPPED);
 $("copy").onclick = async () => {
