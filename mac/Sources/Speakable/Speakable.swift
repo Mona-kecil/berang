@@ -205,8 +205,9 @@ private let rules: [Rule] = [
         }
         return out
     },
-    Rule("month_day", #"\b(?<mon>(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\.?|January|February|March|April|May|June|July|August|September|October|November|December)\s(?<d>[12]?\d|3[01])(?!\d|[.,]\d|:)\b"#) {
-        "\(month($0.group("mon")!)) \(ordinalWords(int($0.group("d")!)))"
+    Rule("month_day", #"\b(?<mon>(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\.?|January|February|March|April|May|June|July|August|September|October|November|December)\s(?<d>[12]?\d|3[01])(?!\d|[.,]\d|:)\b(?:,\s(?<y>1[1-9]\d\d|20\d\d)\b)?"#) {
+        // The year goes with the date, so the comma between them is never a place to split the sentence.
+        "\(month($0.group("mon")!)) \(ordinalWords(int($0.group("d")!)))" + ($0.group("y").map { ", \(yearWords(int($0)))" } ?? "")
     },
     Rule("iso_date", #"\b(\d{4})-(\d{2})-(\d{2})\b"#) { m in
         let y = int(m.group(1)), mo = int(m.group(2)), d = int(m.group(3))

@@ -211,8 +211,10 @@ RULES = [
     ("paragraph", r"\n[ \t]*\n\s*", lambda m, s: "\n\n"),
     ("newline", r"[ \t]*\n[ \t]*", lambda m, s: " "),
     ("currency", rf"(?P<sym>[$€£¥])\s?(?P<amt>{NUM})(?:\s?(?P<scale>[kKMBT]\b|thousand|million|billion|trillion))?", _currency),
-    ("month_day", r"\b(?P<mon>(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\.?|January|February|March|April|May|June|July|August|September|October|November|December)\s(?P<d>[12]?\d|3[01])(?!\d|[.,]\d|:)\b",
-     lambda m, s: f"{_month(m.group('mon'))} {ordinal_words(int(m.group('d')))}"),
+    ("month_day", r"\b(?P<mon>(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\.?|January|February|March|April|May|June|July|August|September|October|November|December)\s(?P<d>[12]?\d|3[01])(?!\d|[.,]\d|:)\b(?:,\s(?P<y>1[1-9]\d\d|20\d\d)\b)?",
+     # The year goes with the date, so the comma between them is never a place to split the sentence.
+     lambda m, s: f"{_month(m.group('mon'))} {ordinal_words(int(m.group('d')))}"
+     + (f", {year_words(int(m.group('y')))}" if m.group('y') else "")),
     ("iso_date", r"\b(\d{4})-(\d{2})-(\d{2})\b", _iso_date),
     ("time", r"\b(?P<h>[01]?\d|2[0-3]):(?P<m>[0-5]\d)(?:\s?(?P<ap>[AaPp]\.?[Mm]\.?))?(?![\w:])", _time),
     ("percent", rf"(?P<approx>~)?(?P<n>{NUM})\s?%", _percent),
