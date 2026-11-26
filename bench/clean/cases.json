@@ -135,6 +135,34 @@
   {
    "in": "Fixes #1902.",
    "out": "Fixes number nineteen oh two."
+  },
+  {
+   "in": "On Nov. 22, 2026.5 kg arrived.",
+   "out": "On November twenty-second, two thousand twenty-six point five kilograms arrived."
+  },
+  {
+   "in": "On May 1, 1500 kg of steel arrived.",
+   "out": "On May first, one thousand five hundred kilograms of steel arrived."
+  },
+  {
+   "in": "On May 1, 2000% growth was reported.",
+   "out": "On May first, two thousand percent growth was reported."
+  },
+  {
+   "in": "Between Jan 5, 2026-01-02 and later.",
+   "out": "Between January fifth, January second, twenty twenty-six and later."
+  },
+  {
+   "in": "On May 1, 2026.1.0 was released.",
+   "out": "On May first, two thousand twenty-six point one point zero was released."
+  },
+  {
+   "in": "Value on Jan 5, 1999.5 was high.",
+   "out": "Value on January fifth, one thousand nine hundred ninety-nine point five was high."
+  },
+  {
+   "in": "It ended on May 1, 2026.",
+   "out": "It ended on May first, twenty twenty-six."
   }
  ],
  "chunks": [

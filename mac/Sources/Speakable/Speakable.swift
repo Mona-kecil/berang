@@ -125,6 +125,7 @@ private let abbreviations = [
 private let emojiWords = ["❤": "love", "♥": "love", "👍": "thumbs up"]
 private let tld = "(?:com|org|net|io|dev|ai|app|co|edu|gov|me|xyz|sh|so|gg)"
 private let num = #"\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?"#
+private let unitSymbols = #"km/h|°[CF]|kHz|MHz|GHz|mph|lbs|ms|km|cm|mm|kg|mg|lb|GB|MB|KB|TB|Hz|m(?=\s+[a-z])"#
 
 /// One rule's match: the rule matched alone, so its named groups resolve.
 private struct Match {
@@ -205,7 +206,7 @@ private let rules: [Rule] = [
         }
         return out
     },
-    Rule("month_day", #"\b(?<mon>(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\.?|January|February|March|April|May|June|July|August|September|October|November|December)\s(?<d>[12]?\d|3[01])(?!\d|[.,]\d|:)\b(?:,\s(?<y>1[1-9]\d\d|20\d\d)\b)?"#) {
+    Rule("month_day", #"\b(?<mon>(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept?|Oct|Nov|Dec)\.?|January|February|March|April|May|June|July|August|September|October|November|December)\s(?<d>[12]?\d|3[01])(?!\d|[.,]\d|:)\b(?:,\s(?<y>1[1-9]\d\d|20\d\d)\b(?![-%:]|\.\d|\s?(?:"# + unitSymbols + #")(?![\w/])))?"#) {
         // The year goes with the date, so the comma between them is never a place to split the sentence.
         "\(month($0.group("mon")!)) \(ordinalWords(int($0.group("d")!)))" + ($0.group("y").map { ", \(yearWords(int($0)))" } ?? "")
     },
@@ -228,7 +229,7 @@ private let rules: [Rule] = [
     Rule("percent", #"(?<approx>~)?(?<n>"# + num + #")\s?%"#) { ($0.group("approx") == nil ? "" : "about ") + numWords($0.group("n")!) + " percent" },
     Rule("dims", #"\b(\d+)\s?[x×]\s?(\d+)\b"#) { "\(intWords(int($0.group(1)))) by \(intWords(int($0.group(2))))" },
     Rule("times", #"\b(\d+(?:\.\d+)?)x\b"#) { "\(numWords($0.group(1))) times" },
-    Rule("unit", #"(?<n>"# + num + #")\s?(?<u>km/h|°[CF]|kHz|MHz|GHz|mph|lbs|ms|km|cm|mm|kg|mg|lb|GB|MB|KB|TB|Hz|m(?=\s+[a-z]))(?![\w/])"#) { m in
+    Rule("unit", #"(?<n>"# + num + #")\s?(?<u>"# + unitSymbols + #")(?![\w/])"#) { m in
         let (one, many) = units[m.group("u")!]!
         let n = m.group("n")!
         return "\(numWords(n)) \(n == "1" ? one : many)"
