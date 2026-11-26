@@ -165,14 +165,15 @@ With `SaveOnAnyMove = TRUE`, Berang saves every move of the player, and TLC find
 
 ### Permission model
 
-`mac/Model/Permission.tla` models the guide that floats beside System Settings while you switch on Accessibility or Screen Recording: you click Allow, open and close System Settings, switch the permission on and off, and close the guide, while Berang checks once a second. TLC checks that:
+`mac/Model/Permission.tla` models the guide that floats beside System Settings while you switch on Accessibility or Screen Recording: you click Allow, open and close System Settings, switch the permission on and off, and close the guide, while Berang checks once a second and looks for Settings' window many times a second. TLC checks that:
 
 - after a check that finds Accessibility on, no guide asks for it;
 - Berang comes to the front only after a grant you started from Berang, and at most once per grant;
 - never more than one guide shows;
-- a guide closes when System Settings has been gone for a moment, but waits longer while Settings is still opening.
+- a guide closes when System Settings has been gone for a moment, but waits longer until it has found Settings' window, and asking again while Settings is open finds it at once;
+- a failure shown for lacking Accessibility clears when the check finds it on.
 
-With `CloseOnGrant = FALSE`, the guide stays after the check sees access on, and TLC finds it still showing. With `FrontOnlyIfAsked = FALSE`, TLC finds Berang coming to the front for a switch you turned on yourself. With `ReplaceOldGuide = FALSE`, TLC finds two guides at once. With `WaitForLaunch = FALSE`, TLC finds the guide closing while Settings still opens. With `CloseWhenSettingsGone = FALSE`, TLC finds the guide staying after you close Settings. Update it with any change to `PermissionGuide.swift`.
+With `CloseOnGrant = FALSE`, the guide stays after the check sees access on, and TLC finds it still showing. With `FrontOnlyIfAsked = FALSE`, TLC finds Berang coming to the front for a switch you turned on yourself. With `ReplaceOldGuide = FALSE`, TLC finds two guides at once. With `WaitForLaunch = FALSE`, TLC finds the guide closing while Settings still opens. With `CloseWhenSettingsGone = FALSE`, TLC finds the guide staying after you close Settings. With `ObserveOnShow = FALSE`, TLC finds a guide shown while Settings is open that has not found its window. With `ClearOnGrant = FALSE`, TLC finds the player's failure outliving the check that found access on. Update it with any change to `PermissionGuide.swift`.
 
 ### Brand
 
