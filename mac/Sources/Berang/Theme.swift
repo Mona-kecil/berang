@@ -140,13 +140,22 @@ extension View {
         return background {
             ZStack {
                 shape.fill(.black)
-                    .shadow(color: Otter.shadow, radius: 6, y: 3)
+                    .floatingShadow()
                     // Only the shadow outside the shape shows: under the glass it would cloud it.
                     .mask { outside(shape) }
                 Glass(radii: radii)
             }
         }
         .overlay { shape.strokeBorder(Otter.hair, lineWidth: 0.5) }
+    }
+
+    /// The shadow of everything that floats above other windows.
+    func floatingShadow() -> some View { shadow(color: Otter.shadow, radius: 6, y: 3) }
+
+    /// A card that floats over other apps, with the shadow of the floating player.
+    func floatingCard(padding: CGFloat = 12) -> some View {
+        card(padding: padding)
+            .background { RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Otter.card).floatingShadow() }
     }
 
     func floating(_ radius: CGFloat) -> some View {

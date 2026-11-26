@@ -28,6 +28,9 @@ app.delegate = opener
 let updater = Updater()
 let window = BerangWindow(player: player, shortcuts: shortcuts, updater: updater)
 if BerangWindow.setupNeeded { window.show() } else if shortcuts.needsAttention { window.show(.settings) }
-guide.granted = { window.comeBack() }
+guide.granted = {
+    player.accessibilityGranted()
+    window.comeBack()
+}
 let menuBar = MenuBar(player: player, shortcuts: shortcuts, updater: updater, window: window)
 app.run()

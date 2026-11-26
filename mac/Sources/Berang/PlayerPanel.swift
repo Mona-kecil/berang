@@ -253,10 +253,10 @@ struct PlayerView: View {
         .onChange(of: player.state == .idle) { _, idle in if idle { showsSpeed = false } }
         .onChange(of: dock.dragging) { _, dragging in if dragging { showsSpeed = false } }
         .task(id: player.state) {
-            guard case .failed(let message) = player.state,
-                  message == ScreenAreaError.noText.description else { return }
+            guard case .failed(let failure) = player.state,
+                  failure.message == ScreenAreaError.noText.description else { return }
             try? await Task.sleep(for: .seconds(4))
-            if !Task.isCancelled, case .failed(let current) = player.state, current == message {
+            if !Task.isCancelled, case .failed(let current) = player.state, current == failure {
                 player.stop()
             }
         }
@@ -306,7 +306,7 @@ struct PlayerView: View {
     }
 
     @ViewBuilder private var cards: some View {
-        let failure: String? = if case .failed(let message) = player.state { message } else { nil }
+        let failure: Player.Failure? = if case .failed(let failure) = player.state { failure } else { nil }
         let fileContext: Player.ReadingInfo? = if dock.open, reading, let info = player.reading, info.isFile { info } else { nil }
         let recognizing = player.state == .recognizing
         if showsSpeed || fileContext != nil || recognizing || player.resumedAt != nil || failure != nil || tips.showing != nil {
@@ -397,10 +397,10 @@ struct PlayerView: View {
         }
     }
 
-    @ViewBuilder private func failure(_ message: String) -> some View {
+    @ViewBuilder private func failure(_ failure: Player.Failure) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 6) {
-                Text(message).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.ink)
+                Text(failure.message).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.ink)
                     .frame(width: 192, alignment: .leading).fixedSize(horizontal: false, vertical: true)
                 Button(action: player.stop) {
                     Image(systemName: "xmark").font(.system(size: 8.5, weight: .heavy)).foregroundStyle(Otter.soft)
@@ -409,16 +409,9 @@ struct PlayerView: View {
                 .buttonStyle(PlainButtonStyle(radius: 6))
                 .accessibilityLabel("Dismiss")
             }
-            if message == GrabError.notTrusted.description {
-                Button("Open Accessibility Settings") {
-                    player.guide.show(.accessibility)
-                }
-                .buttonStyle(SoftButtonStyle())
-            } else if message.hasSuffix(ScreenAreaError.turnOn) {
-                Button("Open Screen Recording Settings") {
-                    player.guide.show(.screenRecording)
-                }
-                .buttonStyle(SoftButtonStyle())
+            if let permission = failure.permission {
+                Button("Open \(permission.name) Settings") { player.openSettings(for: permission) }
+                    .buttonStyle(SoftButtonStyle())
             }
         }
     }
