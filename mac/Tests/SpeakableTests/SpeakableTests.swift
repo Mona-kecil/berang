@@ -68,7 +68,7 @@ private func splits(_ c: Cases.Split) {
     let src = "In 1969, Apollo 11 landed. It was July 20, 1969."
     let got = prepare(src).map { c in c.words.map { (src as NSString).substring(with: NSRange($0)) } }
     // "In nineteen sixty-nine, Apollo eleven landed." and "It was July twentieth, nineteen sixty-nine."
-    #expect(got == [["In", "1969", "1969,", "Apollo", "11", "landed."], ["It", "was", "July 20", "July 20,", "1969", "1969."]])
+    #expect(got == [["In", "1969", "1969,", "Apollo", "11", "landed."], ["It", "was", "July 20, 1969", "July 20, 1969", "July 20, 1969", "July 20, 1969."]])
 }
 
 @Test(arguments: Cases.all.text.map(\.in) + Cases.all.chunks.map(\.in))

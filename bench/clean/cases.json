@@ -189,6 +189,13 @@
     "“Yes.”",
     "He left."
    ]
+  },
+  {
+   "in": "We shipped it on Nov. 22, 2026, and the whole team celebrated with a long dinner downtown.",
+   "out": [
+    "We shipped it on November twenty-second, twenty twenty-six,",
+    "and the whole team celebrated with a long dinner downtown."
+   ]
   }
  ],
  "spans": {
