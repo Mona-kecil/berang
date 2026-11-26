@@ -1,0 +1,1 @@
+Berang reads aloud the page in front of you. Select a sentence, press Option Escape, and it reads from there. The voice runs on your Mac, so nothing you read ever leaves it.
