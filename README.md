@@ -162,6 +162,17 @@ With `Remember = FALSE`, Berang forgets the selection it moved to, and TLC finds
 
 With `SaveOnAnyMove = TRUE`, Berang saves every move of the player, and TLC finds your spot replaced by where macOS put the player when you unplugged a display.
 
+### Permission model
+
+`mac/Model/Permission.tla` models the guide that floats beside System Settings while you switch on Accessibility or Screen Recording: you click Allow, open and close System Settings, switch the permission on and off, and close the guide, while Berang checks once a second. TLC checks that:
+
+- after a check that finds Accessibility on, no guide asks for it;
+- Berang comes to the front only after a grant you started from Berang, and at most once per grant;
+- never more than one guide shows;
+- a guide closes when System Settings has been gone for a moment, but waits longer while Settings is still opening.
+
+With `CloseOnGrant = FALSE`, the guide stays after the check sees access on, and TLC finds it still showing. With `FrontOnlyIfAsked = FALSE`, TLC finds Berang coming to the front for a switch you turned on yourself. With `ReplaceOldGuide = FALSE`, TLC finds two guides at once. With `WaitForLaunch = FALSE`, TLC finds the guide closing while Settings still opens. With `CloseWhenSettingsGone = FALSE`, TLC finds the guide staying after you close Settings. Update it with any change to `PermissionGuide.swift`.
+
 ### Brand
 
 `mac/App/Brand` holds the app icon, the menu bar icon, and the otter's poses. The otter was drawn with an image model, gpt-image-2.6-sunburst, from a written brief: a flat otter in deep teal, otter brown, cream, and one orange, with its natural face. The app icon is that artwork shaped into the macOS icon outline. The menu bar icon is a single-colour drawing traced into a PDF with potrace.
