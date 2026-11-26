@@ -44,8 +44,19 @@
   .hero { text-align: center; padding: 40px 0 0; }
   h1 { font-size: clamp(44px, 8vw, 84px); line-height: .98; font-weight: 900; letter-spacing: -.025em; }
   h1 span { color: var(--teal); }
-  .hero-cta { margin-top: 36px; }
-  .hero .note { margin: 14px auto 0; max-width: 44ch; font-size: 14px; font-weight: 700; color: var(--soft); }
+  .cmd { margin: 36px auto 0; display: flex; align-items: center; gap: 6px; max-width: 560px; background: var(--ink); color: #fff; border-radius: 16px;
+    padding: 8px 8px 8px 20px; box-shadow: 0 4px 0 #0A2726; text-align: left; }
+  .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; font: 600 15px/1.4 ui-monospace, "SF Mono", Menlo, monospace; padding: 8px 0; scrollbar-width: none; }
+  .cmd code::-webkit-scrollbar { display: none; }
+  .cmd code::selection { background: rgba(255,255,255,.3); }
+  .cmd button { flex: none; min-width: 88px; background: var(--orange); color: #fff; font-weight: 800; font-size: 15px; padding: 10px 16px; border-radius: 11px; box-shadow: 0 3px 0 var(--orange-edge); }
+  .hero .note { margin: 14px auto 0; max-width: 46ch; font-size: 14px; font-weight: 700; color: var(--soft); }
+  .hero .note a { color: var(--teal); font-weight: 800; }
+  .steps { display: inline-grid; gap: 6px; padding: 0; list-style: none; text-align: left; counter-reset: step; color: var(--ink); }
+  .steps li { counter-increment: step; display: flex; align-items: center; gap: 8px; }
+  .steps li::before { content: counter(step); flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 12px; display: grid; place-items: center; }
+  .steps + p { margin-top: 10px; }
+  .steps kbd { font: inherit; font-weight: 800; padding: 1px 6px; border-radius: 6px; background: var(--card); box-shadow: inset 0 -2px 0 var(--edge), 0 0 0 1px var(--edge); }
 
   .stage { position: relative; margin: 96px auto 0; max-width: 860px; }
   .stage .otter { position: absolute; z-index: 2; top: -77px; left: 16%; width: 150px; height: 80px; object-fit: cover; object-position: top; }
@@ -141,8 +152,9 @@
 
   <header class="hero">
     <h1>Your Mac,<br><span>reading to you.</span></h1>
-    <a class="btn hero-cta" data-download href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 20h14"/></svg>Download free</a>
-    <p class="note" id="get-note" role="status">For Macs with Apple silicon and macOS 15 or later.</p>
+    <div class="cmd"><code id="install">curl -fsSL berang.monosodiums.com/install | sh</code><button class="press" id="copy">Copy</button></div>
+    <div class="note" id="get-note" role="status">Copy and paste into Terminal to install Berang (Apple silicon, macOS 15 or later).</div>
+    <p class="note"><a data-download href="#">Or download the zip</a></p>
     <div class="stage">
       <img class="otter" src="assets/otter-peeking.png" alt="">
       <div class="window">
@@ -188,14 +200,25 @@
 
 <script src="assets/timing.js"></script>
 <script>
-document.querySelectorAll("[data-download]").forEach(a => {
-  a.href = "https://github.com/Mona-kecil/berang/releases/latest/download/Berang.zip";
-  // macOS blocks an app from outside the App Store the first time, so say how to open it once it's downloading.
-  a.addEventListener("click", () => $("get-note").textContent =
-    "Unzip it and move Berang to Applications. The first time you open it, macOS blocks it. Go to System Settings › Privacy & Security and click Open Anyway.");
-});
 
 const $ = id => document.getElementById(id);
+const STEPS = ["Press <kbd>⌘ Space</kbd>, type Terminal, press Return.", "Press <kbd>⌘ V</kbd> to paste.", "Press Return."];
+// macOS blocks an app downloaded in a browser the first time, so say how to open it once the zip is downloading.
+const ZIPPED = "This otter only has pebbles, not $99/year for Apple, so macOS will stop it once. Unzip, move Berang to Applications, and open it. Go to System Settings › Privacy & Security, scroll down, and click “Open Anyway”. Built by GitHub from the public code.";
+const steps = list => `<ol class="steps">${list.map(t => `<li><span>${t}</span></li>`).join("")}</ol><p>No password needed. Berang installs and opens by itself.</p>`;
+document.querySelector("[data-download]").href = "https://github.com/Mona-kecil/berang/releases/latest/download/Berang.zip";
+document.querySelector("[data-download]").addEventListener("click", () => $("get-note").textContent = ZIPPED);
+$("copy").onclick = async () => {
+  try {
+    await navigator.clipboard.writeText($("install").textContent);
+    $("copy").textContent = "Copied";
+    $("get-note").innerHTML = steps(STEPS);
+  } catch {
+    // Without clipboard access, select the command so ⌘ C copies it.
+    getSelection().selectAllChildren($("install"));
+    $("get-note").innerHTML = steps(["Press <kbd>⌘ C</kbd> to copy.", ...STEPS]);
+  }
+};
 const ICON = {
   play: '<svg class="play" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M3 1.6v10.8a.8.8 0 0 0 1.2.7l8.6-5.4a.8.8 0 0 0 0-1.4L4.2.9A.8.8 0 0 0 3 1.6z"/></svg>',
   pause: '<svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><rect x="2.5" y="1.5" width="3.2" height="11" rx=".8"/><rect x="8.3" y="1.5" width="3.2" height="11" rx=".8"/></svg>',
