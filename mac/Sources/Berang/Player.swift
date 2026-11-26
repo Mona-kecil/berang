@@ -10,9 +10,24 @@ import UniformTypeIdentifiers
 @MainActor @Observable final class Player {
     enum State: Equatable {
         case idle, downloading, loading, recognizing, playing, paused
-        case failed(String)
+        case failed(Failure)
 
         var isFailed: Bool { if case .failed = self { true } else { false } }
+    }
+
+    /// Why a request failed, and the permission it lacks when that is the reason.
+    struct Failure: Equatable {
+        let message: String
+        let permission: Permission?
+
+        init(_ error: Error) {
+            message = "\(error)"
+            permission = switch error {
+            case GrabError.notTrusted: .accessibility
+            case ScreenAreaError.notAllowed, ScreenAreaError.drawnText: .screenRecording
+            default: nil
+            }
+        }
     }
 
     /// A file opened or dropped onto Berang's window, ready to read once the user clicks Read
@@ -73,8 +88,8 @@ import UniformTypeIdentifiers
     private(set) var download: Double?
     private(set) var downloadError: DownloadFailure?
     /// The engine and voice reading, one of the engine's `voices`. Kept across launches.
-    private(set) var engine = Engine(rawValue: UserDefaults.standard.string(forKey: "engine") ?? "") ?? Engine.first
-    private(set) var voice = UserDefaults.standard.string(forKey: "voice") ?? Engine.first.defaultVoice
+    private(set) var engine: Engine
+    private(set) var voice: String
     /// The engine downloading, while `download` counts.
     private(set) var downloading: Engine?
     private(set) var previewing: PreviewVoice?
@@ -135,6 +150,9 @@ import UniformTypeIdentifiers
 
     init(guide: PermissionGuide) {
         self.guide = guide
+        let engine = Engine(rawValue: UserDefaults.standard.string(forKey: "engine") ?? "") ?? Engine.starting
+        self.engine = engine
+        voice = UserDefaults.standard.string(forKey: "voice") ?? engine.defaultVoice
         audio.rate = speed
         NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
@@ -202,6 +220,16 @@ import UniformTypeIdentifiers
         if state == .paused { audio.resume() }
         let g = generation
         task = Task { await read(g) }
+    }
+
+    /// Accessibility turned on, so a failure for lacking it no longer holds (Model/Permission.tla, ClearOnGrant).
+    func accessibilityGranted() {
+        if case .failed(let failure) = state, failure.permission == .accessibility { stop() }
+    }
+
+    /// The failure card's button. With Accessibility already on there is nothing to switch on, so the failure goes.
+    func openSettings(for permission: Permission) {
+        if permission == .accessibility, AXIsProcessTrusted() { accessibilityGranted() } else { guide.show(permission) }
     }
 
     func stop() {
@@ -465,7 +493,7 @@ import UniformTypeIdentifiers
                 guard g == generation, !(error is CancellationError) else { return }
                 pending = nil
                 isReadingVoicesText = false
-                state = .failed("\(error)")
+                state = .failed(Failure(error))
             }
         }
     }
@@ -506,7 +534,7 @@ import UniformTypeIdentifiers
                 let hadPending = pending != nil
                 pending = nil
                 if hadPending {
-                    state = .failed("\(error)")
+                    state = .failed(Failure(error))
                 } else {
                     downloadError = DownloadFailure(engine: engine, message: "\(error)")
                     state = .idle
@@ -569,7 +597,7 @@ import UniformTypeIdentifiers
             } catch {
                 guard g == generation, !(error is CancellationError) else { return }
                 pending = nil
-                state = .failed("\(error)")
+                state = .failed(Failure(error))
             }
         }
     }
@@ -643,7 +671,7 @@ import UniformTypeIdentifiers
             await audio.drain()
             try Task.checkCancellation()
         } catch {
-            if g == generation, !(error is CancellationError) { state = .failed("\(error)") }
+            if g == generation, !(error is CancellationError) { state = .failed(Failure(error)) }
             return
         }
         guard g == generation else { return }

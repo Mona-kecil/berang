@@ -223,8 +223,8 @@ struct HomePage: View {
             } else if let failure = player.downloadError, !voice {
                 Text(failure.message).font(Otter.font(12, .medium)).foregroundStyle(Otter.alert)
                     .multilineTextAlignment(.center)
-            } else if case .failed(let message) = player.state, !voice {
-                Text(message).font(Otter.font(12, .medium)).foregroundStyle(Otter.alert)
+            } else if case .failed(let failure) = player.state, !voice {
+                Text(failure.message).font(Otter.font(12, .medium)).foregroundStyle(Otter.alert)
                     .multilineTextAlignment(.center)
             }
             if readyToRead, !hasPendingFile {

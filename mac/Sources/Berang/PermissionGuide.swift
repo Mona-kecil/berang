@@ -5,8 +5,19 @@ import SwiftUI
 enum Permission {
     case accessibility, screenRecording
 
+    var name: String {
+        switch self {
+        case .accessibility: "Accessibility"
+        case .screenRecording: "Screen Recording"
+        }
+    }
+
     var pane: URL {
-        URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_\(self == .accessibility ? "Accessibility" : "ScreenCapture")")!
+        let name = switch self {
+        case .accessibility: "Accessibility"
+        case .screenRecording: "ScreenCapture"
+        }
+        return URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_\(name)")!
     }
 
     var line: String {
@@ -25,7 +36,9 @@ enum Permission {
 /// - Accessibility's guide closes once the once-a-second check finds access on, and Berang comes to the front then,
 ///   once. No other guide brings Berang forward, and neither does a switch you turned on with no guide up.
 /// - A new ask replaces the guide on screen, so there is never more than one.
-/// - A guide closes after System Settings has been gone for a moment, and waits longer while Settings is opening.
+/// - A guide closes after System Settings has been gone for a moment, and waits longer until it has found Settings'
+///   window, which asking again while Settings is open finds at once.
+/// - Accessibility turning on also clears the player's failure for lacking it.
 @MainActor final class PermissionGuide {
     /// Called when Accessibility turns on while its guide shows.
     var granted: () -> Void = {}
@@ -33,10 +46,10 @@ enum Permission {
     private var panel: GuidePanel?
     /// The guide fading out, which a new ask removes so two never show.
     private var leaving: GuidePanel?
+    private var dismissing: Task<Void, Never>?
     private var watching: Task<Void, Never>?
     private var lastSeen = ContinuousClock.now
     private var lastChecked = ContinuousClock.now
-    private var appeared = false
 
     private static let checkEvery = Duration.seconds(1)
     private static let grace = Duration.milliseconds(1500)
@@ -46,17 +59,19 @@ enum Permission {
     func show(_ permission: Permission) {
         if permission == .accessibility, AXIsProcessTrusted() { return }
         NSWorkspace.shared.open(permission.pane)
-        leaving?.orderOut(nil)
-        if panel?.permission != permission {
+        release()
+        let frame = Self.settingsFrame()
+        if let panel, panel.permission == permission {
+            panel.ask(frame)
+        } else {
             panel?.orderOut(nil)
             let next = GuidePanel(permission: permission) { [weak self] in self?.close() }
-            next.follow(Self.settingsFrame())
+            next.follow(frame)
             next.orderFrontRegardless()
             panel = next
         }
         lastSeen = .now
         lastChecked = .now
-        appeared = false
         watching?.cancel()
         watching = Task { [weak self] in
             while !Task.isCancelled {
@@ -69,10 +84,23 @@ enum Permission {
     func close() {
         watching?.cancel()
         watching = nil
-        leaving?.orderOut(nil)
+        release()
+        guard let panel else { return }
         leaving = panel
-        leaving?.dismiss()
-        panel = nil
+        self.panel = nil
+        panel.dismiss()
+        dismissing = Task { [weak self] in
+            try? await Task.sleep(for: GuidePanel.fadeTime)
+            if !Task.isCancelled { self?.release() }
+        }
+    }
+
+    /// Takes the fading guide off the screen at once and lets it go.
+    private func release() {
+        dismissing?.cancel()
+        dismissing = nil
+        leaving?.orderOut(nil)
+        leaving = nil
     }
 
     private func look() {
@@ -80,7 +108,6 @@ enum Permission {
         let now = ContinuousClock.now
         if let frame = Self.settingsFrame() {
             lastSeen = now
-            appeared = true
             panel.follow(frame)
         }
         if panel.permission == .accessibility, now - lastChecked >= Self.checkEvery {
@@ -91,7 +118,7 @@ enum Permission {
                 return
             }
         }
-        if now - lastSeen > (appeared ? Self.grace : Self.launchGrace) { close() }
+        if now - lastSeen > (panel.beside ? Self.grace : Self.launchGrace) { close() }
     }
 
     /// Where System Settings' window is, in screen coordinates, if one shows. The list of windows gives their
@@ -120,7 +147,14 @@ enum Permission {
 private final class GuidePanel: NSPanel {
     let permission: Permission
     private let model = GuideModel()
-    private var beside = false
+    /// Whether System Settings has been seen, so the guide sits beside it. Once set, it stays set.
+    private(set) var beside = false
+    /// Where the guide was last sent, so a repeated look at an unmoved window leaves a glide running.
+    private var target: NSRect?
+
+    /// How long the guide fades, and the time for it to finish.
+    private static let fade: TimeInterval = 0.12
+    static let fadeTime = Duration.seconds(fade + 0.02)
 
     /// The room around the card for its shadow, its gap to System Settings, and its drop below Settings' top edge.
     private static let margin: CGFloat = 12
@@ -175,7 +209,8 @@ private final class GuidePanel: NSPanel {
         model.anchor = anchor
         let glide = isVisible && !beside && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         beside = true
-        guard target != frame else { return }
+        guard target != self.target else { return }
+        self.target = target
         if glide {
             NSAnimationContext.runAnimationGroup { context in
                 context.duration = 0.25
@@ -187,12 +222,14 @@ private final class GuidePanel: NSPanel {
         }
     }
 
+    /// Asked again while this guide shows. System Settings that isn't there may be opening, which the guide waits
+    /// for as it does for a new one.
+    func ask(_ settings: NSRect?) {
+        if settings == nil { beside = false } else { follow(settings) }
+    }
+
     func dismiss() {
-        withAnimation(.easeOut(duration: 0.12)) { model.shown = false }
-        Task { [weak self] in
-            try? await Task.sleep(for: .milliseconds(140))
-            self?.orderOut(nil)
-        }
+        withAnimation(.easeOut(duration: Self.fade)) { model.shown = false }
     }
 
     private func overlap(_ a: NSRect, _ b: NSRect) -> CGFloat {
@@ -240,11 +277,7 @@ private struct GuideView: View {
                 .font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft)
         }
         .frame(width: 168)
-        .card(padding: 14)
-        .background {
-            RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Otter.card)
-                .shadow(color: Otter.shadow, radius: 6, y: 3)
-        }
+        .floatingCard(padding: 14)
         .padding(margin)
         .opacity(model.shown ? 1 : 0)
         .scaleEffect(model.shown || reduceMotion ? 1 : 0.96, anchor: model.anchor)
