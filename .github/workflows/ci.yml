@@ -54,7 +54,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - name: Check the player, update, shortcut, placement and jump models with TLC
+      - name: Check the player, update, shortcut, placement, jump and permission models with TLC
         working-directory: mac/Model
         run: |
           curl -fsSL -o tla2tools.jar https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar
@@ -64,3 +64,4 @@ jobs:
           java -cp tla2tools.jar tlc2.TLC -config Shortcuts.cfg -workers auto Shortcuts.tla
           java -cp tla2tools.jar tlc2.TLC -config Place.cfg -workers auto Place.tla
           java -cp tla2tools.jar tlc2.TLC -config Jump.cfg -workers auto Jump.tla
+          java -cp tla2tools.jar tlc2.TLC -config Permission.cfg -workers auto Permission.tla
