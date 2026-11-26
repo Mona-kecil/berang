@@ -13,7 +13,7 @@
   /* Tokens from mac/Sources/Berang/Theme.swift */
   :root {
     --mint: #DFF3EF; --card: #fff; --edge: #B7DCD6; --ink: #123B3A; --soft: #4D7C79; --teal: #0F7D7A;
-    --orange: #E0661F; --orange-edge: #A74B16; --alert: #B42318; --hair: rgba(18,59,58,.12); --shadow: rgba(18,59,58,.18);
+    --orange: #E0661F; --orange-edge: #A74B16; --hair: rgba(18,59,58,.12); --shadow: rgba(18,59,58,.18);
     --ease-out: cubic-bezier(.23, 1, .32, 1);
     --round: ui-rounded, Nunito, system-ui, sans-serif;
   }
@@ -39,13 +39,13 @@
   nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
   .logo { display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 22px; text-decoration: none; }
   .logo img { width: 38px; }
-  nav .get { font-weight: 800; text-decoration: none; color: var(--teal); padding: 8px 4px; }
 
   /* ---------- Hero ---------- */
   .hero { text-align: center; padding: 40px 0 0; }
   h1 { font-size: clamp(44px, 8vw, 84px); line-height: .98; font-weight: 900; letter-spacing: -.025em; }
   h1 span { color: var(--teal); }
   .hero-cta { margin-top: 36px; }
+  .hero .note { margin: 14px auto 0; max-width: 44ch; font-size: 14px; font-weight: 700; color: var(--soft); }
 
   .stage { position: relative; margin: 96px auto 0; max-width: 860px; }
   .stage .otter { position: absolute; z-index: 2; top: -77px; left: 16%; width: 150px; height: 80px; object-fit: cover; object-position: top; }
@@ -121,35 +121,7 @@
   .says::after { content: ""; position: absolute; left: var(--tail, 50%); bottom: -5px; width: 10px; height: 10px; background: var(--ink); transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
 
   /* ---------- Get it ---------- */
-  .get-it { padding: 140px 0 40px; display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: end; }
-  .get-it h2 kbd { display: inline-block; font: 800 .42em/1 var(--round); padding: .5em .65em; border-radius: .45em; vertical-align: .4em; background: var(--card);
-    box-shadow: inset 0 -3px 0 var(--edge), 0 0 0 1.5px var(--edge); letter-spacing: 0; }
-  .get-it .note { margin-top: 16px; font-size: 14px; color: var(--soft); font-weight: 700; max-width: 46ch; }
-  .get-it .cta { margin-top: 28px; }
-  .get-it img { width: 240px; }
-  footer { border-top: 2px solid var(--edge); margin-top: 40px; padding: 22px 0 48px; display: flex; gap: 22px; flex-wrap: wrap; font-size: 14px; color: var(--soft); font-weight: 700; }
-  footer button { font-weight: 700; text-decoration: underline; }
-
-  /* ---------- Feedback ---------- */
-  .feedback { border: 0; border-radius: 22px; padding: 24px; width: min(440px, calc(100vw - 32px)); margin: auto; background: var(--card); color: var(--ink);
-    box-shadow: 0 6px 0 var(--edge), 0 24px 60px var(--shadow); }
-  .feedback[open] { animation: pop 220ms var(--ease-out); }
-  .feedback::backdrop { background: rgba(18,59,58,.32); }
-  @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.97); } }
-  .feedback h3 { font-size: 22px; font-weight: 900; margin-bottom: 14px; }
-  .feedback textarea, .feedback input { display: block; width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--mint);
-    border: 2px solid transparent; border-radius: 12px; padding: 12px 14px; }
-  .feedback textarea { resize: vertical; min-height: 120px; }
-  .feedback input { margin-top: 10px; }
-  .feedback :is(textarea, input):focus { outline: none; border-color: var(--teal); }
-  .feedback ::placeholder { color: var(--soft); }
-  .feedback .trap { position: absolute; left: -9999px; width: 1px; height: 1px; }
-  .feedback .err { color: var(--alert); font-size: 14px; font-weight: 700; margin-top: 10px; }
-  .feedback .err:empty { display: none; }
-  .feedback .actions { display: flex; justify-content: flex-end; align-items: center; gap: 6px; margin-top: 16px; }
-  .feedback .quiet { font-weight: 800; color: var(--soft); padding: 11px 14px; border-radius: 12px; }
-  .feedback .btn { font-size: 16px; padding: 11px 22px; border-radius: 13px; }
-  .feedback .btn:disabled { opacity: .6; cursor: default; }
+  footer { border-top: 2px solid var(--edge); margin-top: 120px; padding: 22px 0 48px; display: flex; gap: 22px; flex-wrap: wrap; font-size: 14px; color: var(--soft); font-weight: 700; }
 
   @media (hover: none) { .player .more { grid-template-rows: 1fr; opacity: 1; } }
   @media (max-width: 720px) {
@@ -157,22 +129,20 @@
     .stage .otter { left: 8%; width: 120px; height: 64px; top: -62px; }
     .window .page { padding: 8px 22px 36px; }
     .sample { padding: 56px 22px 32px; }
-    .get-it { grid-template-columns: 1fr; } .get-it img { width: 160px; grid-row: 1; }
   }
   @media (prefers-reduced-motion: reduce) {
     .btn, .press, .card, .says, .pbar .more { transition-property: opacity !important; transform: none !important; }
-    .feedback[open] { animation-name: fade; }
-    @keyframes fade { from { opacity: 0; } }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <nav><a class="logo" href="#"><img src="assets/otter-peeking.png" alt="">Berang</a><a class="get" href="#get">Download</a></nav>
+  <nav><a class="logo" href="#"><img src="assets/otter-peeking.png" alt="">Berang</a></nav>
 
   <header class="hero">
     <h1>Your Mac,<br><span>reading to you.</span></h1>
     <a class="btn hero-cta" data-download href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 20h14"/></svg>Download free</a>
+    <p class="note" id="get-note" role="status">For Macs with Apple silicon and macOS 15 or later.</p>
     <div class="stage">
       <img class="otter" src="assets/otter-peeking.png" alt="">
       <div class="window">
@@ -188,32 +158,8 @@
     <div class="sample" id="sample"><p id="hard-text"></p><div class="says" id="says" aria-hidden="true"></div></div>
   </section>
 
-  <section class="get-it" id="get">
-    <div>
-      <h2>Press <kbd>⌥ option</kbd> <kbd>esc</kbd><br>on any page.</h2>
-      <a class="btn cta" data-download href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 20h14"/></svg>Download for Mac</a>
-      <p class="note">Free, for a Mac with Apple silicon and macOS 15 or later. The first time you open Berang, macOS blocks it. Go to System Settings › Privacy &amp; Security and click Open Anyway.</p>
-    </div>
-    <img src="assets/otter-floating.png" alt="">
-  </section>
-
-  <footer><span>Free and open source</span><a href="https://github.com/Mona-kecil/berang">Source code</a><button id="feedback-open" aria-haspopup="dialog">Send feedback</button></footer>
+  <footer><span>Free and open source</span><a href="https://github.com/Mona-kecil/berang">Source code</a><a href="mailto:michael@monosodiums.com?subject=Berang%20feedback">Send feedback</a></footer>
 </div>
-
-<dialog class="feedback" id="feedback" aria-labelledby="feedback-title">
-  <form id="feedback-form">
-    <h3 id="feedback-title">Send feedback</h3>
-    <textarea name="message" required maxlength="5000" aria-label="Your feedback" placeholder="What should Berang do better?"></textarea>
-    <input name="email" type="email" maxlength="254" autocomplete="email" aria-label="Your email" placeholder="Your email, if you'd like a reply">
-    <input class="trap" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <p class="err" id="feedback-error" role="alert"></p>
-    <div class="actions"><button type="button" class="quiet" data-close>Cancel</button><button class="btn" type="submit">Send</button></div>
-  </form>
-  <div id="feedback-sent" hidden>
-    <h3>Thanks! It's sent.</h3>
-    <div class="actions"><button type="button" class="btn" data-close>Done</button></div>
-  </div>
-</dialog>
 
 <div class="player" id="player" role="group" aria-label="Berang player" data-side="right">
   <div class="cards">
@@ -242,30 +188,14 @@
 
 <script src="assets/timing.js"></script>
 <script>
-document.querySelectorAll("[data-download]").forEach(a => a.href = "https://github.com/Mona-kecil/berang/releases/latest/download/Berang.zip");
+document.querySelectorAll("[data-download]").forEach(a => {
+  a.href = "https://github.com/Mona-kecil/berang/releases/latest/download/Berang.zip";
+  // macOS blocks an app from outside the App Store the first time, so say how to open it once it's downloading.
+  a.addEventListener("click", () => $("get-note").textContent =
+    "Unzip it and move Berang to Applications. The first time you open it, macOS blocks it. Go to System Settings › Privacy & Security and click Open Anyway.");
+});
 
 const $ = id => document.getElementById(id);
-
-const feedback = $("feedback"), feedbackForm = $("feedback-form"), feedbackError = $("feedback-error");
-$("feedback-open").onclick = () => {
-  feedbackForm.hidden = false; $("feedback-sent").hidden = true; feedbackError.textContent = "";
-  feedback.showModal();
-};
-feedback.querySelectorAll("[data-close]").forEach(b => b.onclick = () => feedback.close());
-feedbackForm.onsubmit = async e => {
-  e.preventDefault();
-  const send = feedbackForm.querySelector("[type=submit]");
-  send.disabled = true; feedbackError.textContent = "";
-  try {
-    const res = await fetch("/feedback", { method: "POST", body: new FormData(feedbackForm) });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error);
-    feedbackForm.reset(); feedbackForm.hidden = true; $("feedback-sent").hidden = false;
-    $("feedback-sent").querySelector("button").focus();
-  } catch (err) {
-    feedbackError.textContent = err.message || "It didn't send. Check your connection and try again.";
-  } finally { send.disabled = false; }
-};
 const ICON = {
   play: '<svg class="play" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M3 1.6v10.8a.8.8 0 0 0 1.2.7l8.6-5.4a.8.8 0 0 0 0-1.4L4.2.9A.8.8 0 0 0 3 1.6z"/></svg>',
   pause: '<svg viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><rect x="2.5" y="1.5" width="3.2" height="11" rx=".8"/><rect x="8.3" y="1.5" width="3.2" height="11" rx=".8"/></svg>',
