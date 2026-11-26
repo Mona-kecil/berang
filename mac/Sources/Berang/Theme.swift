@@ -90,6 +90,8 @@ extension EnvironmentValues {
 }
 
 extension View {
+    /// Sets the view on a solid edge `depth` points below it. It sinks only inside a button whose ButtonStyle sets
+    /// `.environment(\.keyPressed, configuration.isPressed)`, so every new ButtonStyle that uses `raised` must.
     func raised(_ radius: CGFloat, face: Color = Otter.card, edge: Color = Otter.edge, depth: CGFloat = 2,
                 stroke: Color? = nil, lineWidth: CGFloat = 0) -> some View {
         raised(in: RoundedRectangle(cornerRadius: radius, style: .continuous), face: face, edge: edge, depth: depth,

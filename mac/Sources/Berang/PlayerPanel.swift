@@ -236,6 +236,8 @@ struct PlayerView: View {
         HStack(alignment: .top, spacing: 8) {
             if dock.side == .right { cards; bar } else { bar; cards }
         }
+        // Start over, tips, the controls, and the drag's round corners come and go on their own. Changes that
+        // shortcuts make, such as the speed, stay instant.
         .animation(motion, value: player.resumedAt != nil)
         .animation(motion, value: tips.showing)
         .animation(motion, value: dock.open)
@@ -249,6 +251,7 @@ struct PlayerView: View {
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity,
                alignment: dock.side == .right ? .topTrailing : .topLeading)
         .fontDesign(.rounded)
+        // The panel never activates Berang, so the app being read keeps focus and the controls show no focus ring.
         .focusEffectDisabled()
         .onChange(of: player.state == .idle) { _, idle in if idle { showsSpeed = false } }
         .onChange(of: dock.dragging) { _, dragging in if dragging { showsSpeed = false } }
