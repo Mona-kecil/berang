@@ -30,12 +30,6 @@
   .press { transition: transform 140ms var(--ease-out); }
   .press:active { transform: scale(.96); }
 
-  .btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; font-size: 18px; color: #fff;
-    background: var(--orange); padding: 15px 26px; border-radius: 16px; box-shadow: 0 4px 0 var(--orange-edge);
-    transition: transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out); }
-  .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--orange-edge); }
-  .btn svg { width: 20px; height: 20px; }
-
   nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
   .logo { display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 22px; text-decoration: none; }
   .logo img { width: 38px; }
@@ -125,7 +119,7 @@
   .voice[aria-pressed="true"] .dot { background: var(--orange); color: #fff; }
   .sample { position: relative; background: var(--card); border-radius: 22px; box-shadow: 0 6px 0 var(--edge); padding: 64px 48px 48px; }
   .sample p { font-size: clamp(19px, 2.3vw, 25px); line-height: 1.85; font-weight: 700; }
-  .says { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; white-space: nowrap; background: var(--ink); color: #fff; font-size: 14px; font-weight: 800;
+  .says { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; width: max-content; max-width: calc(100% - 16px); background: var(--ink); color: #fff; font-size: 14px; font-weight: 800;
     padding: 6px 11px; border-radius: 10px; opacity: 0; transform: translateY(4px); transition: opacity 120ms var(--ease-out), transform 120ms var(--ease-out); }
   .says.on { opacity: 1; transform: translateY(0); }
   .says::after { content: ""; position: absolute; left: var(--tail, 50%); bottom: -5px; width: 10px; height: 10px; background: var(--ink); transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
@@ -141,7 +135,7 @@
     .sample { padding: 56px 22px 32px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .btn, .press, .card, .says, .pbar .more { transition-property: opacity !important; transform: none !important; }
+    .press, .card, .says, .pbar .more { transition-property: opacity !important; transform: none !important; }
   }
 </style>
 </head>
@@ -153,7 +147,7 @@
     <h1>Your Mac,<br><span>reading to you.</span></h1>
     <div class="cmd"><code id="install">curl -fsSL https://berang.monosodiums.com/install | sh</code><button class="press" id="copy">Copy</button></div>
     <div class="note" id="get-note" role="status">Copy and paste into Terminal to install Berang (Apple silicon, macOS 15 or later).</div>
-    <p class="note"><a data-download href="#">Or download the zip</a></p>
+    <p class="note"><a data-download href="https://github.com/Mona-kecil/berang/releases/latest/download/Berang.zip">Or download the zip</a></p>
     <div class="stage">
       <img class="otter" src="assets/otter-peeking.png" alt="">
       <div class="window">
@@ -205,7 +199,6 @@ const STEPS = ["Press <kbd>⌘ Space</kbd>, type Terminal, press Return.", "Pres
 // macOS blocks an app downloaded in a browser the first time, so say how to open it once the zip is downloading.
 const ZIPPED = "This otter only has pebbles, not $99/year for Apple, so macOS will stop it once. Unzip, move Berang to Applications, and open it. Go to System Settings › Privacy & Security, scroll down, and click “Open Anyway”. Built by GitHub from the public code.";
 const steps = list => `<ol class="steps">${list.map(t => `<li><span>${t}</span></li>`).join("")}</ol>`;
-document.querySelector("[data-download]").href = "https://github.com/Mona-kecil/berang/releases/latest/download/Berang.zip";
 document.querySelector("[data-download]").addEventListener("click", () => $("get-note").textContent = ZIPPED);
 $("copy").onclick = async () => {
   try {
@@ -268,19 +261,36 @@ let active = null, speed = 1;
 function reader({ el, timing, folder, voice }) {
   const { groups, ofWord } = render(el, timing);
   const audio = new Audio(); audio.preload = "auto";
-  let starts, current = -1, raf = 0;
+  // Each play, pause, stop, and voice switch takes a new number; a switch waiting on its file plays only if it still holds the latest.
+  let starts, current = -1, raf = 0, latest = 0;
   const r = {
-    el, groups, audio,
+    el, groups,
     get playing() { return !audio.paused; },
     get word() { return current; },
     get pace() { return timing.say.length / (starts.at(-1) + .6) * 60; },
     load(name) { voice = name; starts = timing.voices[name]; audio.src = `assets/${folder}/${encodeURIComponent(name)}.m4a`; },
+    rate(s) { audio.playbackRate = s; },
     play() {
-      readers.forEach(o => { if (o !== r && o.playing) o.pause(); });
-      active = r; audio.playbackRate = speed; audio.play(); loop(); changed();
+      const mine = ++latest;
+      takeOver(); audio.playbackRate = speed;
+      // The browser can refuse to start, for instance outside a tap in Safari; then stay paused.
+      audio.play().catch(() => { if (mine === latest) { cancelAnimationFrame(raf); changed(); } });
+      startLoop(); changed();
     },
-    pause() { audio.pause(); cancelAnimationFrame(raf); changed(); },
+    pause() { latest++; audio.pause(); cancelAnimationFrame(raf); changed(); },
     stop() { r.pause(); audio.currentTime = 0; mark(-1); changed(); },
+    // Another voice picks up at the same word, once its file has loaded. Stop, pause, or another play cancels it.
+    switchVoice(name, word) {
+      r.pause(); takeOver();
+      const mine = ++latest;
+      r.load(name);
+      audio.addEventListener("loadedmetadata", () => {
+        if (mine !== latest) return;
+        if (word >= 0) r.seek(word);
+        r.play();
+      }, { once: true });
+      changed();
+    },
     seek(word) { audio.currentTime = Math.max(0, starts[word] - .05); mark(word); },
     wordAt(t) { let i = -1; for (let k = 0; k < starts.length && starts[k] <= t; k++) i = k; return i; },
     groupOf(word) { return word < 0 ? -1 : ofWord[word]; },
@@ -293,7 +303,10 @@ function reader({ el, timing, folder, voice }) {
     if (before?.sentence !== after?.sentence) { before?.sentence.classList.remove("on"); after?.sentence.classList.add("on"); }
     r.onWord?.(after);
   }
-  function loop() { mark(r.wordAt(audio.currentTime)); raf = requestAnimationFrame(loop); }
+  function takeOver() { readers.forEach(o => { if (o !== r) o.pause(); }); active = r; }
+  // One loop per reader, and none while the audio is paused.
+  function loop() { if (audio.paused) return; mark(r.wordAt(audio.currentTime)); raf = requestAnimationFrame(loop); }
+  function startLoop() { cancelAnimationFrame(raf); loop(); }
   audio.addEventListener("ended", () => { cancelAnimationFrame(raf); audio.currentTime = 0; mark(-1); changed(); });
   r.load(voice);
   readers.push(r);
@@ -330,7 +343,7 @@ function drawPlayer() {
 // One speed for every reading, remembered across visits, from 0.5× to 3× in steps of 0.1×.
 function setSpeed(s, learnt = true) {
   speed = Math.min(3, Math.max(.5, Math.round(s * 10) / 10));
-  readers.forEach(r => r.audio.playbackRate = speed);
+  readers.forEach(r => r.rate(speed));
   spd.textContent = label(speed); spd.setAttribute("aria-label", `Speed, ${label(speed)}`);
   $("speed-big").textContent = label(speed);
   $("slider").value = speed;
@@ -379,8 +392,9 @@ player.addEventListener("focusin", () => player.classList.add("open"));
 let drag = null;
 pbar.addEventListener("pointerdown", e => {
   if (e.button !== 0 || e.target.closest("button")) return;
-  const b = player.getBoundingClientRect();
-  drag = { dx: e.clientX - b.left, dy: e.clientY - b.top, x: e.clientX, y: e.clientY, path: [], moved: false };
+  const b = player.getBoundingClientRect(), bar = pbar.getBoundingClientRect();
+  drag = { dx: e.clientX - b.left, dy: e.clientY - b.top, x: e.clientX, y: e.clientY, path: [], moved: false,
+    start: { side: player.dataset.side, y: bar.top / innerHeight } };
   pbar.setPointerCapture(e.pointerId);
 });
 pbar.addEventListener("pointermove", e => {
@@ -391,13 +405,19 @@ pbar.addEventListener("pointermove", e => {
   player.style.left = e.clientX - drag.dx + "px"; player.style.right = "auto"; player.style.top = e.clientY - drag.dy + "px";
   drag.path = [...drag.path.filter(p => e.timeStamp - p.t < 100), { x: e.clientX, t: e.timeStamp }];
 });
+// An interrupted drag goes back to where it began.
+pbar.addEventListener("pointercancel", () => {
+  const d = drag; drag = null;
+  if (d?.moved) place(d.start, pbar.getBoundingClientRect());
+});
 pbar.addEventListener("pointerup", () => {
   const d = drag; drag = null;
   if (!d?.moved) return;
-  const b = player.getBoundingClientRect(), p = d.path;
+  // The bar decides the side; the cards beside it, hidden while dragging, still take room in the player.
+  const b = pbar.getBoundingClientRect(), p = d.path;
   const velocity = p.length > 1 ? (p.at(-1).x - p[0].x) / Math.max(p.at(-1).t - p[0].t, 1) * 1000 : 0;
   const side = b.left + b.width / 2 + velocity * .2 < innerWidth / 2 ? "left" : "right";
-  place({ side, y: b.top / innerHeight }, b);
+  saved.set("spot", place({ side, y: b.top / innerHeight }, b));
   learn("move");
 });
 function place(spot, from) {
@@ -405,15 +425,16 @@ function place(spot, from) {
   player.classList.remove("dragging");
   player.dataset.side = spot.side;
   player.style.left = player.style.right = ""; player.style.top = y + "px";
-  saved.set("spot", { side: spot.side, y: y / innerHeight });
-  if (!from || reduceMotion.matches) return;
+  const placed = { side: spot.side, y: y / innerHeight };
+  if (!from || reduceMotion.matches) return placed;
   // Slides from where you let go to the edge: drawn at the drop point, then eased to rest.
-  const to = player.getBoundingClientRect();
+  const to = pbar.getBoundingClientRect();
   player.style.transition = "none";
   player.style.transform = `translate(${from.left - to.left}px, ${from.top - to.top}px)`;
   player.getBoundingClientRect();
   player.style.transition = "transform 300ms cubic-bezier(.23, 1, .32, 1)";
   player.style.transform = "";
+  return placed;
 }
 addEventListener("resize", () => place(saved.get("spot") ?? { side: player.dataset.side, y: .4 }));
 
@@ -461,7 +482,7 @@ function learn(k) {
 $("tip-x").onclick = () => learn(tipShown);
 
 /* ---------- The hard parts ---------- */
-const VOICES = ["eleanor", "grace", "danny", "Maeve", "Edwin", "Old Mortlake"];
+const VOICES = Object.keys(TIMING.hard.voices);
 const sample = $("sample"), says = $("says");
 hard.onWord = g => {
   if (!g || !g.rewritten) return says.classList.remove("on");
@@ -470,7 +491,7 @@ hard.onWord = g => {
   const width = says.offsetWidth, mid = w.left + w.width / 2 - box.left;
   const left = Math.min(Math.max(8, mid - width / 2), box.width - width - 8);
   says.style.left = left + "px"; says.style.top = (w.top - box.top - says.offsetHeight - 10) + "px";
-  says.style.setProperty("--tail", (mid - left) + "px");
+  says.style.setProperty("--tail", Math.min(Math.max(12, mid - left), width - 12) + "px");
   says.classList.add("on");
 };
 let chosen = "eleanor";
@@ -480,11 +501,8 @@ const voiceButtons = VOICES.map(id => {
   b.innerHTML = `<span class="dot"></span>${name}`;
   b.onclick = () => {
     if (id === chosen) return hard.playing ? hard.pause() : hard.play();
-    // Another voice picks up at the same word, so you hear the same phrase in both.
     const word = hard.playing ? hard.word : -1;
-    hard.pause(); chosen = id; hard.load(id);
-    hard.audio.addEventListener("loadedmetadata", () => { if (word >= 0) hard.seek(word); hard.play(); }, { once: true });
-    drawVoices();
+    chosen = id; hard.switchVoice(id, word);
   };
   $("voices").append(b); return [id, name, b];
 });
