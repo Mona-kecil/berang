@@ -18,6 +18,7 @@ let package = Package(
         .target(name: "Kitten", dependencies: [
             .product(name: "MLX", package: "mlx-swift"), .product(name: "MLXNN", package: "mlx-swift"),
             .product(name: "MLXFast", package: "mlx-swift"), .product(name: "MLXAudioCore", package: "mlx-audio-swift"),
+            .product(name: "MLXAudioTTS", package: "mlx-audio-swift"), .product(name: "HuggingFace", package: "swift-huggingface"),
         ]),
         .executableTarget(name: "berang-grab", dependencies: ["TextGrab"]),
         .executableTarget(name: "page-viewer"),

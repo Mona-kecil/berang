@@ -13,10 +13,9 @@ enum KittenVoice {
         ("config.json", 21_108), ("vocab.json", 1_313),
         ("kitten_tts_2_nano_en.safetensors", 67_859_256), ("voices_en.npz", 5_224_846),
     ]
-    static let folder = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        .appending(path: "Berang/Kitten")
+    static let folder = Kitten2.defaultFolder
     /// Misaki's lexicons and BART, about 9 MB, from beshkenadze/kitten-tts-g2p (MIT).
-    private static let lexicons = HubCache(cacheDirectory: folder.appending(path: "G2P"))
+    private static let lexicons = Kitten2.lexicons(in: folder)
 
     /// Each model file is moved in once it has fully arrived. The lexicons' download writes its listing of their
     /// files last, so lexicons cut short don't count (Model/Update.tla).
@@ -81,8 +80,6 @@ final class KittenSpeech: Speech, @unchecked Sendable {
     private let lock = NSLock()
     private var voice = "eleanor"
     private var last: Task<Void, Never>?
-    /// Kitten's training text was cut at 350 phonemes.
-    private static let longest = 350
 
     init(_ kitten: Kitten2, misaki: MisakiTextProcessor) {
         self.kitten = kitten
@@ -103,12 +100,7 @@ final class KittenSpeech: Speech, @unchecked Sendable {
                 let task = Task {
                     await previous?.value
                     do {
-                        let phonemes = try misaki.process(text: Self.unhyphenated(text), language: "en-us")
-                        for (i, piece) in Self.pieces(phonemes).enumerated() {
-                            try Task.checkCancellation()
-                            continuation.yield(kitten.speak(piece, voice: voice, keepStart: i == 0))
-                        }
-                        continuation.yield([Float](repeating: 0, count: Int(0.15 * Engine.sampleRate)))
+                        try kitten.say(text, voice: voice, misaki: misaki) { continuation.yield($0) }
                         continuation.finish()
                     } catch {
                         continuation.finish(throwing: error)
@@ -119,23 +111,5 @@ final class KittenSpeech: Speech, @unchecked Sendable {
             }
             continuation.onTermination = { _ in task.cancel() }
         }
-    }
-
-    /// Misaki writes the hyphen in "per-project" or "twenty-one" as a dash, which Kitten pauses at, so a joined
-    /// word is said as two words in a row instead.
-    private static func unhyphenated(_ text: String) -> String {
-        text.replacing(/(\w)-(?=\w)/) { "\($0.1) " }
-    }
-
-    /// Phonemes cut at spaces into pieces Kitten was trained on.
-    private static func pieces(_ phonemes: String) -> [String] {
-        var pieces: [String] = [], rest = Substring(phonemes)
-        while rest.count > longest {
-            let cut = rest.prefix(longest).lastIndex(of: " ") ?? rest.index(rest.startIndex, offsetBy: longest)
-            pieces.append(String(rest[..<cut]))
-            rest = rest[cut...].drop { $0 == " " }
-        }
-        if !rest.isEmpty { pieces.append(String(rest)) }
-        return pieces
     }
 }
