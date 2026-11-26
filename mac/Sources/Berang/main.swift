@@ -1,6 +1,7 @@
 import AppKit
 
 let app = NSApplication.shared
+AppMenu.install()
 let guide = PermissionGuide()
 let player = Player(guide: guide)
 let tips = Tips()
