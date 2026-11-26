@@ -62,8 +62,9 @@ where they differ.
 ## Testing the app on the owner's Mac
 
 - A test build (`mac/build-app.sh`) shares the installed Berang's settings, because the bundle ID is the same. Before
-  testing, note the settings you will change (`speed`, `playerSpot`, `tips.learned`, `tips.shown`, and the
-  `positions` entries for your test files). Restore them afterwards. Quit the test build when you finish.
+  testing, note the settings you will change (`speed`, `playerSpot`, `tips.learned`, `tips.shown`,
+  `askedScreenRecording`, and the `positions` entries for your test files). Restore them afterwards. Quit the test build
+  when you finish.
 - Send key presses only while a window you own is in front, and check that right before each key. Use a throwaway
   TextEdit document or a small test app. An app launched from the shell in the background can't bring itself to the
   front, so wrap the test app as a `.app` and start it with `open`.

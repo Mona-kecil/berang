@@ -411,12 +411,12 @@ struct PlayerView: View {
             }
             if message == GrabError.notTrusted.description {
                 Button("Open Accessibility Settings") {
-                    openPrivacy("Privacy_Accessibility")
+                    player.guide.show(.accessibility)
                 }
                 .buttonStyle(SoftButtonStyle())
             } else if message.hasSuffix(ScreenAreaError.turnOn) {
                 Button("Open Screen Recording Settings") {
-                    openPrivacy("Privacy_ScreenCapture")
+                    player.guide.show(.screenRecording)
                 }
                 .buttonStyle(SoftButtonStyle())
             }

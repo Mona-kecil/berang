@@ -1,7 +1,8 @@
 import AppKit
 
 let app = NSApplication.shared
-let player = Player()
+let guide = PermissionGuide()
+let player = Player(guide: guide)
 let tips = Tips()
 let shortcuts = Shortcuts(actions: [
     .page: { if player.readOrPause() { tips.learn(.jump) } },
@@ -27,5 +28,6 @@ app.delegate = opener
 let updater = Updater()
 let window = BerangWindow(player: player, shortcuts: shortcuts, updater: updater)
 if BerangWindow.setupNeeded { window.show() } else if shortcuts.needsAttention { window.show(.settings) }
+guide.granted = { window.comeBack() }
 let menuBar = MenuBar(player: player, shortcuts: shortcuts, updater: updater, window: window)
 app.run()
