@@ -7,7 +7,7 @@ let player = Player(guide: guide)
 let tips = Tips()
 let shortcuts = Shortcuts(actions: [
     .page: { if player.readOrPause() { tips.learn(.jump) } },
-    .area: { player.readScreenArea() },
+    .area: { player.readScreenArea(); tips.learn(.area) },
     .faster: { player.nudge(0.1); tips.learn(.speed) },
     .slower: { player.nudge(-0.1); tips.learn(.speed) },
 ])
