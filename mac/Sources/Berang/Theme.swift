@@ -106,6 +106,9 @@ extension View {
     func dimmedWhenDisabled() -> some View { modifier(DimmedWhenDisabled()) }
 
     func card(padding: CGFloat = 12) -> some View { self.padding(padding).raised(16, depth: 3) }
+
+    /// The one white card of a window page, on its deep ledge.
+    func pageCard(padding: CGFloat = 20) -> some View { self.padding(padding).raised(22, depth: 6) }
 }
 
 private struct Raised<S: InsettableShape>: ViewModifier {
@@ -198,14 +201,23 @@ private struct Glass: NSViewRepresentable {
     }
 }
 
-/// A small uppercase heading over a group of cards.
+/// A heading over a group of rows.
 struct SectionLabel: View {
     let text: String
     init(_ text: String) { self.text = text }
     var body: some View {
-        Text(text.uppercased()).font(Otter.font(10.5, .heavy)).tracking(0.7).foregroundStyle(Otter.soft)
-            .accessibilityAddTraits(.isHeader)
+        Text(text).font(Otter.font(15, .heavy)).foregroundStyle(Otter.ink).accessibilityAddTraits(.isHeader)
     }
+}
+
+extension Otter {
+    /// A row's label in a window page.
+    static let rowFont = font(15, .heavy)
+}
+
+extension Text {
+    /// The big heavy title of a window page.
+    func pageTitle() -> some View { font(Otter.font(34, .heavy)).tracking(-0.85).foregroundStyle(Otter.ink) }
 }
 
 /// The chunky orange button for the one main action on a screen. It sinks onto its edge when pressed.
@@ -213,15 +225,24 @@ struct ChunkyButtonStyle: ButtonStyle {
     var compact = false
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(Otter.font(compact ? 12 : 13.5, .heavy))
+            .font(Otter.font(compact ? 13 : 15, .heavy))
             .foregroundStyle(.white)
-            .padding(.horizontal, compact ? 11 : 16)
-            .padding(.vertical, compact ? 5 : 9)
-            .raised(compact ? 10 : 14, face: Otter.orange, edge: Otter.orangeEdge, depth: 3)
+            .padding(.horizontal, compact ? 13 : 18)
+            .padding(.vertical, compact ? 6 : 10)
+            .raised(compact ? 9 : 11, face: Otter.orange, edge: Otter.orangeEdge, depth: 3)
             .environment(\.keyPressed, configuration.isPressed)
             .contentShape(Rectangle())
-            .focusRing(compact ? 10 : 14)
+            .focusRing(compact ? 9 : 11)
             .dimmedWhenDisabled()
+    }
+}
+
+/// Plain teal text for a quiet action.
+struct LinkButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        PlainButtonBody(configuration: configuration, radius: 6)
+            .font(Otter.font(14, .heavy))
+            .foregroundStyle(Otter.teal)
     }
 }
 
@@ -245,14 +266,46 @@ struct SoftButtonStyle: ButtonStyle {
 struct KeyCap: View {
     let text: String
     var tint: Color? = nil
+    /// Sits in a line of text instead of standing alone.
+    var inline = false
     var body: some View {
         Text(text)
-            .font(Otter.font(13, .heavy))
+            .font(Otter.font(inline ? 12.5 : 13, .heavy))
             .foregroundStyle(tint ?? Otter.ink)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .frame(minWidth: 64)
-            .raised(10, stroke: tint ?? Otter.edge, lineWidth: tint == nil ? 1.5 : 2.5)
+            .padding(.horizontal, inline ? 7 : 10)
+            .padding(.vertical, inline ? 2 : 4)
+            .frame(minWidth: inline ? 0 : 64)
+            .raised(inline ? 7 : 10, stroke: tint ?? Otter.edge, lineWidth: tint == nil ? 1.5 : 2.5)
+    }
+}
+
+/// The otter's head and paws over the top edge of a card.
+struct PeekingOtter: View {
+    var body: some View {
+        OtterImage(pose: .peeking, size: 120).frame(height: 66, alignment: .top).clipped().allowsHitTesting(false)
+    }
+}
+
+/// A page's title, with a link back to Berang above it on pages below Home.
+struct PageHeader: View {
+    let title: String
+    var back: (() -> Void)? = nil
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            if let back {
+                Button(action: back) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left").font(.system(size: 11, weight: .heavy))
+                        Text("Berang").font(Otter.font(14, .heavy))
+                    }
+                    .foregroundStyle(Otter.soft)
+                    .padding(.vertical, 4).padding(.trailing, 8)
+                }
+                .buttonStyle(PlainButtonStyle(radius: 6)).accessibilityLabel("Back")
+                .keyboardShortcut("[", modifiers: .command)
+            }
+            Text(title).pageTitle().accessibilityAddTraits(.isHeader)
+        }
     }
 }
 
