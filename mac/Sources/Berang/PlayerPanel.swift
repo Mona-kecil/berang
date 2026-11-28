@@ -316,7 +316,8 @@ struct PlayerView: View {
         let file: Player.ReadingInfo? = if dock.open, reading, let info = player.reading, info.isFile { info } else { nil }
         let recognizing = player.state == .recognizing
         let startOver = file == nil && player.resumedAt != nil
-        if showsSpeed || file != nil || recognizing || startOver || failure != nil || tips.showing != nil {
+        let wide = showsSpeed || file != nil || failure != nil || tips.showing != nil
+        if wide || recognizing || startOver {
             VStack(alignment: .leading, spacing: 12) {
                 if recognizing {
                     Text("Reading screen…").font(Otter.font(12, .semibold)).foregroundStyle(Otter.ink).section(reduceMotion)
@@ -333,7 +334,7 @@ struct PlayerView: View {
                 if showsSpeed { SpeedControls(player: player, shortcuts: shortcuts).section(reduceMotion) }
                 if let tip = tips.showing { tipRow(tip).section(reduceMotion) }
             }
-            .frame(width: Self.panelWidth, alignment: .leading)
+            .frame(width: wide ? Self.panelWidth : nil, alignment: .leading)
             .padding(12)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .floating(14)
