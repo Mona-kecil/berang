@@ -226,15 +226,16 @@ struct PlayerView: View {
 
     /// Room around the player for its shadow. On the screen's edge, it hangs off the screen.
     static let margin: CGFloat = 14
+    static let panelWidth: CGFloat = 208
     static let springDuration: TimeInterval = 0.2
     /// The spring, and time for it to settle.
     static let motionTime = Duration.seconds(springDuration + 0.05)
-    private var motion: Animation? { reduceMotion ? nil : .snappy(duration: Self.springDuration) }
+    private var motion: Animation { reduceMotion ? .easeOut(duration: 0.15) : .snappy(duration: Self.springDuration) }
     private var expanded: Bool { dock.open || showsSpeed }
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
-            if dock.side == .right { cards; bar } else { bar; cards }
+            if dock.side == .right { panel; bar } else { bar; panel }
         }
         // Start over, tips, the controls, and the drag's round corners come and go on their own. Changes that
         // shortcuts make, such as the speed, stay instant.
@@ -308,61 +309,53 @@ struct PlayerView: View {
             : RectangleCornerRadii(topLeading: 0, bottomLeading: 0, bottomTrailing: r, topTrailing: r)
     }
 
-    @ViewBuilder private var cards: some View {
+    /// One surface beside the bar. What the reading needs shows as sections inside it, so the surface resizes and
+    /// casts one shadow however many sections there are.
+    @ViewBuilder private var panel: some View {
         let failure: Player.Failure? = if case .failed(let failure) = player.state { failure } else { nil }
-        let fileContext: Player.ReadingInfo? = if dock.open, reading, let info = player.reading, info.isFile { info } else { nil }
+        let file: Player.ReadingInfo? = if dock.open, reading, let info = player.reading, info.isFile { info } else { nil }
         let recognizing = player.state == .recognizing
-        if showsSpeed || fileContext != nil || recognizing || player.resumedAt != nil || failure != nil || tips.showing != nil {
-            VStack(alignment: dock.side == .right ? .trailing : .leading, spacing: 8) {
-                if showsSpeed {
-                    SpeedControls(player: player, shortcuts: shortcuts).padding(12).floating(14).transition(.opacity)
-                }
-                if let fileContext {
-                    contextCard(fileContext).padding(.horizontal, 12).padding(.vertical, 9).floating(14).transition(.opacity)
-                }
+        let startOver = file == nil && player.resumedAt != nil
+        if showsSpeed || file != nil || recognizing || startOver || failure != nil || tips.showing != nil {
+            VStack(alignment: .leading, spacing: 12) {
                 if recognizing {
-                    Text("Reading screen…")
-                        .font(Otter.font(12, .semibold)).foregroundStyle(Otter.ink)
-                        .padding(.horizontal, 12).padding(.vertical, 8)
-                        .floating(14)
+                    Text("Reading screen…").font(Otter.font(12, .semibold)).foregroundStyle(Otter.ink).section(reduceMotion)
                 }
-                if player.resumedAt != nil {
+                if let failure { self.failure(failure).section(reduceMotion) }
+                if let file { fileHeader(file).section(reduceMotion) }
+                if startOver {
                     Button("Start over", systemImage: "arrow.counterclockwise", action: player.startOver)
                         .buttonStyle(PlainButtonStyle(radius: 6))
                         .font(Otter.font(12, .semibold))
                         .foregroundStyle(Otter.teal)
-                        .padding(.horizontal, 12).padding(.vertical, 8)
-                        .floating(14)
-                        .transition(.opacity)
+                        .section(reduceMotion)
                 }
-                if let failure { self.failure(failure).padding(12).floating(14) }
-                if let tip = tips.showing { tipRow(tip).padding(.leading, 12).padding(.vertical, 6).floating(14).transition(.opacity) }
+                if showsSpeed { SpeedControls(player: player, shortcuts: shortcuts).section(reduceMotion) }
+                if let tip = tips.showing { tipRow(tip).section(reduceMotion) }
             }
+            .frame(width: Self.panelWidth, alignment: .leading)
+            .padding(12)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .floating(14)
+            .transition(.opacity)
         }
     }
 
-    /// Quiet wayfinding card on hover for files (where no document is open on screen).
-    private func contextCard(_ info: Player.ReadingInfo) -> some View {
+    private func fileHeader(_ info: Player.ReadingInfo) -> some View {
         HStack(alignment: .center, spacing: 8) {
             VStack(alignment: .leading, spacing: 1) {
-                Text(info.title)
-                    .font(Otter.font(12, .bold)).foregroundStyle(Otter.ink)
-                    .lineLimit(1)
-                Text("\(info.percent)%")
-                    .font(Otter.font(10.5, .semibold)).monospacedDigit().foregroundStyle(Otter.teal)
-                    .lineLimit(1)
+                Text(info.title).font(Otter.font(12.5, .bold)).foregroundStyle(Otter.ink).lineLimit(1)
+                Text("\(info.percent)%").font(Otter.font(11, .semibold)).monospacedDigit().foregroundStyle(Otter.teal)
             }
-            .frame(maxWidth: 158, alignment: .leading)
-            if player.resumedAt == nil {
-                Button(action: player.startOver) {
-                    Image(systemName: "arrow.counterclockwise")
-                        .font(.system(size: 11, weight: .bold)).foregroundStyle(Otter.teal)
-                        .frame(width: 26, height: 26)
-                }
-                .buttonStyle(PlainButtonStyle(radius: 7))
-                .help("Start over")
-                .accessibilityLabel("Start over")
+            .frame(maxWidth: .infinity, alignment: .leading)
+            Button(action: player.startOver) {
+                Image(systemName: "arrow.counterclockwise")
+                    .font(.system(size: 11, weight: .bold)).foregroundStyle(Otter.teal)
+                    .frame(width: 26, height: 26)
             }
+            .buttonStyle(PlainButtonStyle(radius: 7))
+            .help("Start over")
+            .accessibilityLabel("Start over")
         }
     }
 
@@ -375,13 +368,13 @@ struct PlayerView: View {
     }
 
     private func tipRow(_ tip: Tip) -> some View {
-        HStack(alignment: .center, spacing: 2) {
+        HStack(alignment: .top, spacing: 4) {
             Text(tip.text(shortcuts)).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.soft)
-                .frame(width: 184, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
             Button { tips.learn(tip) } label: {
                 Image(systemName: "xmark").font(.system(size: 8, weight: .heavy)).foregroundStyle(Otter.soft)
-                    .frame(width: 28, height: 28)
+                    .frame(width: 24, height: 24)
             }
             .buttonStyle(PlainButtonStyle(radius: 6))
             .accessibilityLabel("Dismiss tip")
@@ -404,7 +397,7 @@ struct PlayerView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 6) {
                 Text(failure.message).font(Otter.font(11.5, .medium)).foregroundStyle(Otter.ink)
-                    .frame(width: 192, alignment: .leading).fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading).fixedSize(horizontal: false, vertical: true)
                 Button(action: player.stop) {
                     Image(systemName: "xmark").font(.system(size: 8.5, weight: .heavy)).foregroundStyle(Otter.soft)
                         .frame(width: 22, height: 22)
@@ -417,6 +410,13 @@ struct PlayerView: View {
                     .buttonStyle(SoftButtonStyle())
             }
         }
+    }
+}
+
+private extension View {
+    /// A section of the panel: it fades in from a little above, and with Reduce Motion only fades.
+    func section(_ reduceMotion: Bool) -> some View {
+        transition(reduceMotion ? .opacity : .opacity.combined(with: .offset(y: -6)))
     }
 }
 
@@ -465,7 +465,6 @@ struct SpeedControls: View {
             }
         }
         .buttonStyle(PlainButtonStyle(radius: 8))
-        .frame(width: 214)
     }
 
     private func step(_ symbol: String, by delta: Float, name: String, _ action: ShortcutAction) -> some View {
